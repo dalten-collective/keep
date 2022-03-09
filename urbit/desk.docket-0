@@ -1,0 +1,9 @@
+:~  title+'Keep'
+    info+'Back up your Urbit.'
+    color+0x81.88c9
+    site+/apps/keep
+    base+'keep'
+    version+[0 0 1]
+    website+'https://dalten.org/'
+    license+'AGPL'
+==
