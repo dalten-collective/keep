@@ -1,48 +1,90 @@
-::  keep: agent wrapper for generic backup tools
+::  keep: agent wrapper for backups
 ::
 ::  usage: %-(agent:keep your-agent)
 ::
+/-  *keep
+/+  default-agent
+::
 |%
++$  versioned-state
+  $%  state-0
+  ==
+::
++$  state-0
+  $:  %0
+      keepers=(map ship term)
+  ==
+::
 ++  agent
   |=  =agent:gall
+  ::
+  =|  state-0
+  =*  state  -
+  ::
   ^-  agent:gall
   |_  =bowl:gall
   +*  this  .
       ag    ~(. agent bowl)
+      def   ~(. (default-agent this %|) bowl)
+      backup
+        |=  to=ship
+        ^-  (list card:agent:gall)
+        =/  secret  (~(got by keepers) to)
+        ~[[%give %fact ~[/keep/[secret]] noun+on-save:ag]] :: probably change to vase+!>(on-save:ag)
   ::
   ++  on-poke
     |=  [=mark =vase]
     ^-  (quip card:agent:gall agent:gall)
-    ?.  ?=(%keep mark)
+    ?.  ?=(%keep-wrapper mark)
       =^  cards  agent  (on-poke:ag mark vase)
       [cards this]
-    `this
+    ::
+    =+  !<(keep=poke vase)
+    ?+  -.keep  (on-poke:def mark vase)
+    ::
+        %init
+      =/  new-seed=@uv  (jam seed.keep (sham eny.bowl))
+      =.  keepers.state  (~(put by keepers) src.bowl (scot %ux new-seed))
+      :_  this
+      :~  :*
+        %pass   /response/(scot %p src.bowl)
+        %agent  [src.bowl %keep]
+        %poke   keep-agent+!>((poke %init new-seed))
+      ==  ==
+    ::
+        %save
+      [(backup to.keep) this]
+    ==
   ::
   ++  on-peek
     |=  =path
     ^-  (unit (unit cage))
-    ?.  ?=([@ %dbug *] path)
-      (on-peek:ag path)
-    `~
+    ?:  ?=([%keep *] path)  `~
+    (on-peek:ag path)
   ::
   ++  on-init
     ^-  (quip card:agent:gall agent:gall)
     =^  cards  agent  on-init:ag
     [cards this]
   ::
-  ++  on-save   on-save:ag
+  ++  on-save  on-save:ag
   ::
   ++  on-load
-    |=  old-state=vase
+    |=  =vase
     ^-  (quip card:agent:gall agent:gall)
-    =^  cards  agent  (on-load:ag old-state)
+    =^  cards  agent  (on-load:ag vase)
     [cards this]
   ::
   ++  on-watch
     |=  =path
     ^-  (quip card:agent:gall agent:gall)
-    =^  cards  agent  (on-watch:ag path)
-    [cards this]
+    ?.  ?=(%keep -.path)
+      =^  cards  agent  (on-watch:ag path)
+      [cards this]
+    ?>  (team:title [our src]:bowl) :: Only backup to moons for now.
+    ?>  ?=([term ~] +.path)
+    ?>  =(&2.path (~(got by keepers) src.bowl))
+    [(backup src.bowl) this]
   ::
   ++  on-leave
     |=  =path
