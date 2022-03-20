@@ -44,10 +44,9 @@
   ::
       %keep
     =/  seed  (sham eny.bowl)
-    =.  pending  (~(put by pending) seed source)
-    :_  this
+    :_  this(pending (~(put by pending) seed source))
     :~  :*
-      %pass   /keep/init/(scot %p ship.source)/[app.source]
+      %pass   /init/(scot %p ship.source)/[app.source]
       %agent  source
       %poke   keep-wrapper+!>((poke %init seed))
     ==  ==
@@ -56,9 +55,9 @@
     =+  ;;([my-seed=@uv *] (cue seed))
     =/  source  (~(got by pending) my-seed)
     ?>  =(ship.source src.bowl)
-    :_  this(pending.state (~(del by pending) my-seed))
+    :_  this(pending (~(del by pending) my-seed))
     :~  :*
-      %pass   /backups/[app.source]
+      %pass   /backups/(scot %p ship.source)/[app.source]
       %agent  source
       %watch  /keep/(scot %ux seed)
     ==  ==
@@ -67,15 +66,15 @@
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
-  ?.  ?=([%backups term ~] wire)  (on-agent:def wire sign)
+  ?.  ?=([%backups term term ~] wire)  (on-agent:def wire sign)
   ?+  -.sign  `this
   ::
       %fact
     ?.  ?=(%noun p.cage.sign)  `this
-    `this(kept.state (~(put by kept) [src.bowl &2.wire] q.cage.sign))
+    `this(kept (~(put by kept) [src.bowl &2.wire] q.cage.sign))
   ==
 ::
-++  on-init  on-init:def
+++  on-init   on-init:def
 ++  on-watch  on-watch:def
 ++  on-arvo   on-arvo:def
 ++  on-peek   on-peek:def

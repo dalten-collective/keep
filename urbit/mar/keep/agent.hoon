@@ -10,6 +10,6 @@
   --
 ++  grab
   |%
-  ++  noun  ^poke
+  ++  noun  ^poke :: TODO restrict this with $<
   --
 --

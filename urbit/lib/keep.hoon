@@ -44,10 +44,9 @@
     ::
         %init
       =/  new-seed=@uv  (jam seed.keep (sham eny.bowl))
-      =.  keepers.state  (~(put by keepers) src.bowl (scot %ux new-seed))
-      :_  this
+      :_  this(keepers (~(put by keepers) src.bowl (scot %ux new-seed)))
       :~  :*
-        %pass   /response/(scot %p src.bowl)
+        %pass   /keep/init/(scot %p src.bowl)
         %agent  [src.bowl %keep]
         %poke   keep-agent+!>((poke %init new-seed))
       ==  ==
