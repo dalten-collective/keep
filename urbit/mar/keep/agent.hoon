@@ -2,14 +2,14 @@
 ::  keep-wrapper
 ::
 /-  *keep
-|_  =poke
+|_  =agent:poke
 ++  grad  %noun
 ++  grow
   |%
-  ++  noun  poke
+  ++  noun  agent
   --
 ++  grab
   |%
-  ++  noun  ^poke :: TODO restrict this with $<
+  ++  noun  agent:poke
   --
 --

@@ -12,8 +12,10 @@
 ::
 +$  state-0
   $:  %0
-      keepers=(map ship term)
+      pending=(map ship [term ?(%init %grab)])
   ==
+::
++$  card  card:agent:gall
 ::
 ++  agent
   |=  =agent:gall
@@ -27,32 +29,58 @@
       ag    ~(. agent bowl)
       def   ~(. (default-agent this %|) bowl)
       backup
-        |=  to=ship
-        ^-  (list card:agent:gall)
-        =/  secret  (~(got by keepers) to)
-        ~[[%give %fact ~[/keep/[secret]] noun+on-save:ag]] :: probably change to vase+!>(on-save:ag)
+        |=  paths=(list path)
+        ^-  (list card)
+        ~&  [%backup paths=paths]
+        ~[[%give %fact paths noun+!>(+:on-save:ag)]]
   ::
   ++  on-poke
     |=  [=mark =vase]
-    ^-  (quip card:agent:gall agent:gall)
-    ?.  ?=(%keep-wrapper mark)
+    ^-  (quip card agent:gall)
+    ?.  ?=(%keep mark)
       =^  cards  agent  (on-poke:ag mark vase)
       [cards this]
     ::
-    =+  !<(keep=poke vase)
-    ?+  -.keep  (on-poke:def mark vase)
-    ::
-        %init
-      =/  new-seed=@uv  (jam seed.keep (sham eny.bowl))
-      :_  this(keepers (~(put by keepers) src.bowl (scot %ux new-seed)))
-      :~  :*
-        %pass   /keep/init/(scot %p src.bowl)
-        %agent  [src.bowl %keep]
-        %poke   keep-agent+!>((poke %init new-seed))
-      ==  ==
+    =/  cmd  !<(wrapper:poke vase)
+    ?-  -.cmd
     ::
         %save
-      [(backup to.keep) this]
+      ?>  =(src.bowl our.bowl)
+      =/  paths
+        ::  Already backing up to there?
+        %+  murn  ~(val by sup.bowl)
+        |=  [=ship =path]
+        ?.  =(ship to.cmd)   ~
+        `path
+      ?^  paths
+        ::  Yes. Just give the fact.
+        [(backup paths) this]
+      ::  No. Initiate new connection.
+      =/  key  (scot %uv (sham eny.bowl))
+      :_  this(pending (~(put by pending) to.cmd key %init))
+      :~  :*
+        %pass   /keep/init/(scot %p to.cmd)
+        %agent  [to.cmd %keep]
+        %poke   keep-agent+!>([%init dap.bowl key])
+      ==  ==
+    ::
+        %mend
+      ?>  =(src.bowl our.bowl)
+      =/  key  (scot %uv (sham eny.bowl))
+      ~&  cmd
+      :_  this(pending (~(put by pending) from.cmd key %grab))
+      :~  :*
+        %pass   /keep/mend/(scot %p from.cmd)
+        %agent  [from.cmd %keep]
+        %poke   keep-agent+!>([%grab dap.bowl key])
+      ==  ==
+    ::
+        %data
+      ~&  %receiving-backup
+      ~|  %did-not-request-this-backup
+      ?>  =([key.cmd %grab] (~(got by pending) src.bowl))
+      =.  pending  (~(del by pending) src.bowl)
+      %-  on-load  [-:on-save:ag data.cmd] :: yolo
     ==
   ::
   ++  on-peek
@@ -62,7 +90,7 @@
     (on-peek:ag path)
   ::
   ++  on-init
-    ^-  (quip card:agent:gall agent:gall)
+    ^-  (quip card agent:gall)
     =^  cards  agent  on-init:ag
     [cards this]
   ::
@@ -70,42 +98,43 @@
   ::
   ++  on-load
     |=  =vase
-    ^-  (quip card:agent:gall agent:gall)
+    ^-  (quip card agent:gall)
     =^  cards  agent  (on-load:ag vase)
     [cards this]
   ::
   ++  on-watch
     |=  =path
-    ^-  (quip card:agent:gall agent:gall)
+    ^-  (quip card agent:gall)
     ?.  ?=(%keep -.path)
       =^  cards  agent  (on-watch:ag path)
       [cards this]
     ?>  (team:title [our src]:bowl) :: Only backup to moons for now.
     ?>  ?=([term ~] +.path)
-    ?>  =(&2.path (~(got by keepers) src.bowl))
-    [(backup src.bowl) this]
+    ?>  =([&2.path %init] (~(got by pending) src.bowl))
+    :-  (backup ~[path])
+    this(pending (~(del by pending) src.bowl))
   ::
   ++  on-leave
     |=  =path
-    ^-  (quip card:agent:gall agent:gall)
+    ^-  (quip card agent:gall)
     =^  cards  agent  (on-leave:ag path)
     [cards this]
   ::
   ++  on-agent
     |=  [=wire =sign:agent:gall]
-    ^-  (quip card:agent:gall agent:gall)
+    ^-  (quip card agent:gall)
     =^  cards  agent  (on-agent:ag wire sign)
     [cards this]
   ::
   ++  on-arvo
     |=  [=wire =sign-arvo]
-    ^-  (quip card:agent:gall agent:gall)
+    ^-  (quip card agent:gall)
     =^  cards  agent  (on-arvo:ag wire sign-arvo)
     [cards this]
   ::
   ++  on-fail
     |=  [=term =tang]
-    ^-  (quip card:agent:gall agent:gall)
+    ^-  (quip card agent:gall)
     =^  cards  agent  (on-fail:ag term tang)
     [cards this]
   --

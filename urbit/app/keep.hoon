@@ -10,8 +10,7 @@
 ::
 +$  state-0
   $:  %0
-      kept=(map source vase)
-      pending=(map @uv source)
+      kept=(map [ship dude] noun)
   ==
 ::
 +$  card  card:agent:gall
@@ -38,28 +37,26 @@
   ^-  (quip card _this)
   ?>  (team:title [src our]:bowl) :: Only backup to moons for now.
   ?>  ?=(%keep-agent mark)
-  =+  !<(keep=poke vase)
-  =,  keep
-  ?+  -.keep  (on-poke:def mark vase)
-  ::
-      %keep
-    =/  seed  (sham eny.bowl)
-    :_  this(pending (~(put by pending) seed source))
-    :~  :*
-      %pass   /init/(scot %p ship.source)/[app.source]
-      %agent  source
-      %poke   keep-wrapper+!>((poke %init seed))
-    ==  ==
+  =/  cmd  !<(agent:poke vase)
+  ?-  -.cmd
   ::
       %init
-    =+  ;;([my-seed=@uv *] (cue seed))
-    =/  source  (~(got by pending) my-seed)
-    ?>  =(ship.source src.bowl)
-    :_  this(pending (~(del by pending) my-seed))
+    :_  this
     :~  :*
-      %pass   /backups/(scot %p ship.source)/[app.source]
-      %agent  source
-      %watch  /keep/(scot %ux seed)
+      %pass   /backups/(scot %p src.bowl)/[dap.cmd]
+      %agent  [src.bowl dap.cmd]
+      %watch  /keep/[key.cmd]
+    ==  ==
+  ::
+      %grab
+    :_  this
+    ~&  [ship=src.bowl %grabs app=dap.cmd]
+    =/  data=noun
+      ~|([%has-no dap.cmd src.bowl] (~(got by kept) [src.bowl dap.cmd]))
+    :~  :*
+      %pass   =-  ~&  -  -  /recoveries/(scot %p src.bowl)/[dap.cmd]
+      %agent  =-  ~&  -  -  [src.bowl dap.cmd]
+      %poke   keep+!>([%data data key.cmd])
     ==  ==
   ==
 ::
@@ -67,11 +64,12 @@
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
   ?.  ?=([%backups term term ~] wire)  (on-agent:def wire sign)
-  ?+  -.sign  `this
+  ?+  -.sign  (on-agent:def wire sign)
   ::
       %fact
+    ~&  %store-vase
     ?.  ?=(%noun p.cage.sign)  `this
-    `this(kept (~(put by kept) [src.bowl &2.wire] q.cage.sign))
+    `this(kept (~(put by kept) [src.bowl &3.wire] !<(noun q.cage.sign)))
   ==
 ::
 ++  on-init   on-init:def

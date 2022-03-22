@@ -1,10 +1,17 @@
 |%
++$  dude  dude:gall
 ::
-+$  source  [=ship app=term]
-::
-+$  poke
-  $%  [%init seed=@uvH]
-      [%save to=ship]
-      [%keep =source]
-  ==
+++  poke
+  |%
+  +$  agent
+    $%  [%init dap=dude key=term]
+        [%grab dap=dude key=term]
+    ==
+  ::
+  +$  wrapper
+    $%  [%save to=ship]
+        [%mend from=ship]
+        [%data data=noun key=term]
+    ==
+  --
 --
