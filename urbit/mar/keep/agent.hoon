@@ -1,5 +1,5 @@
 ::
-::  keep-wrapper
+::  keep agent pokes
 ::
 /-  *keep
 |_  =agent:poke

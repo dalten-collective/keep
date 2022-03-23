@@ -12,8 +12,6 @@
   $:  %0
       kept=(map [ship dude] noun)
   ==
-::
-+$  card  card:agent:gall
 --
 ::
 %-  agent:dbug
@@ -39,7 +37,7 @@
   ?>  ?=(%keep-agent mark)
   =/  cmd  !<(agent:poke vase)
   ?-  -.cmd
-  ::
+  ::  "Save my stuff"
       %init
     :_  this
     :~  :*
@@ -47,15 +45,15 @@
       %agent  [src.bowl dap.cmd]
       %watch  /keep/[key.cmd]
     ==  ==
-  ::
+  ::  "Give me my stuff"
       %grab
     :_  this
-    ~&  [ship=src.bowl %grabs app=dap.cmd]
+    ~|  [%has-no dap.cmd from=src.bowl]
     =/  data=noun
-      ~|([%has-no dap.cmd src.bowl] (~(got by kept) [src.bowl dap.cmd]))
+      (~(got by kept) [src.bowl dap.cmd])
     :~  :*
-      %pass   =-  ~&  -  -  /recoveries/(scot %p src.bowl)/[dap.cmd]
-      %agent  =-  ~&  -  -  [src.bowl dap.cmd]
+      %pass   /recoveries/(scot %p src.bowl)/[dap.cmd]
+      %agent  [src.bowl dap.cmd]
       %poke   keep+!>([%data data key.cmd])
     ==  ==
   ==
@@ -67,15 +65,15 @@
   ?+  -.sign  (on-agent:def wire sign)
   ::
       %fact
-    ~&  %store-vase
+    ~&  %store-backup
     ?.  ?=(%noun p.cage.sign)  `this
     `this(kept (~(put by kept) [src.bowl &3.wire] !<(noun q.cage.sign)))
   ==
 ::
+++  on-peek   on-peek:def
 ++  on-init   on-init:def
 ++  on-watch  on-watch:def
 ++  on-arvo   on-arvo:def
-++  on-peek   on-peek:def
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def
 --

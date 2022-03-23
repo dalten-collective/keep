@@ -12,10 +12,8 @@
 ::
 +$  state-0
   $:  %0
-      pending=(map ship [term ?(%init %grab)])
+      pending=(map ship [term ?(%invite %restore)])
   ==
-::
-+$  card  card:agent:gall
 ::
 ++  agent
   |=  =agent:gall
@@ -29,9 +27,9 @@
       ag    ~(. agent bowl)
       def   ~(. (default-agent this %|) bowl)
       backup
-        |=  paths=(list path)
+        |=  paths=(lest path)
         ^-  (list card)
-        ~&  [%backup paths=paths]
+        ~&  [%backup to=paths]
         ~[[%give %fact paths noun+!>(+:on-save:ag)]]
   ::
   ++  on-poke
@@ -43,7 +41,7 @@
     ::
     =/  cmd  !<(wrapper:poke vase)
     ?-  -.cmd
-    ::
+    ::  Save your state
         %save
       ?>  =(src.bowl our.bowl)
       =/  paths
@@ -57,37 +55,33 @@
         [(backup paths) this]
       ::  No. Initiate new connection.
       =/  key  (scot %uv (sham eny.bowl))
-      :_  this(pending (~(put by pending) to.cmd key %init))
+      :_  this(pending (~(put by pending) to.cmd key %invite))
       :~  :*
         %pass   /keep/init/(scot %p to.cmd)
         %agent  [to.cmd %keep]
         %poke   keep-agent+!>([%init dap.bowl key])
       ==  ==
-    ::
+    ::  Repair your state
         %mend
       ?>  =(src.bowl our.bowl)
       =/  key  (scot %uv (sham eny.bowl))
       ~&  cmd
-      :_  this(pending (~(put by pending) from.cmd key %grab))
+      :_  this(pending (~(put by pending) from.cmd key %restore))
       :~  :*
         %pass   /keep/mend/(scot %p from.cmd)
         %agent  [from.cmd %keep]
         %poke   keep-agent+!>([%grab dap.bowl key])
       ==  ==
-    ::
+    ::  Load this back
         %data
       ~&  %receiving-backup
-      ~|  %did-not-request-this-backup
-      ?>  =([key.cmd %grab] (~(got by pending) src.bowl))
+      ~|  %do-not-want
+      ?>  =([key.cmd %restore] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
-      %-  on-load  [-:on-save:ag data.cmd] :: yolo
+      (on-load [-:on-save:ag data.cmd]) :: yolo
     ==
   ::
-  ++  on-peek
-    |=  =path
-    ^-  (unit (unit cage))
-    ?:  ?=([%keep *] path)  `~
-    (on-peek:ag path)
+  ++  on-peek  on-peek:ag
   ::
   ++  on-init
     ^-  (quip card agent:gall)
@@ -108,9 +102,12 @@
     ?.  ?=(%keep -.path)
       =^  cards  agent  (on-watch:ag path)
       [cards this]
+    ~|  %dont-care
     ?>  (team:title [our src]:bowl) :: Only backup to moons for now.
     ?>  ?=([term ~] +.path)
-    ?>  =([&2.path %init] (~(got by pending) src.bowl))
+    ::  Requested?
+    ~|  %didnt-ask
+    ?>  =([&2.path %invite] (~(got by pending) src.bowl))
     :-  (backup ~[path])
     this(pending (~(del by pending) src.bowl))
   ::

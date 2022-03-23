@@ -1,5 +1,5 @@
 ::
-::  mark for commands to the keep wrapper
+::  keep wrapper pokes
 ::
 /-  *keep
 |_  =wrapper:poke
