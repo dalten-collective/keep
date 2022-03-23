@@ -28,7 +28,7 @@
       def   ~(. (default-agent this %|) bowl)
       backup
         |=  paths=(lest path)
-        ^-  (list card)
+        ^-  (lest card)
         ~&  [%backup to=paths]
         ~[[%give %fact paths noun+!>(+:on-save:ag)]]
   ::
