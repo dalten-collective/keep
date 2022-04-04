@@ -3,7 +3,7 @@
 ::  usage: %-(agent:keep your-agent)
 ::
 /-  *keep
-/+  default-agent, *sane
+/+  default-agent
 ::
 |%
 +$  versioned-state
@@ -12,7 +12,7 @@
 ::
 +$  state-0
   $:  %0
-      last=(map ship [path @da])
+      last=(map ship @da)
       auto=(map ship @dr)
       pending=(map ship [?(%invite %restore) term])
   ==
@@ -29,34 +29,6 @@
       ag    ~(. agent bowl)
       def   ~(. (default-agent this %|) bowl)
   ::
-      backup-to
-        |=  to=ship
-        ^-  (quip card agent:gall)
-        =/  paths
-          ::  Already backing up to there?
-          %+  murn  ~(val by sup.bowl)
-          |=  [=ship =path]
-          ?.  =(ship to)   ~
-          `path
-        ?~  paths
-          ::  No. Initiate new connection.
-          =/  key  (scot %uv (sham eny.bowl))
-          :_  this(pending (~(put by pending) to %invite key))
-          :~  :*
-            %pass   /keep/init/(scot %p to)
-            %agent  [to %keep]
-            %poke   keep+!>([%init dap.bowl key])
-          ==  ==
-        ::  Yes. Just give the fact.
-        :_  this(last (~(put by last) ship now.bowl))
-        =/  freq  (~(get by auto) ship)
-        =/  prev  (~(get by last) ship)
-        %-  catunits
-        :~  `[%give %fact paths noun+!>(+:on-save:ag)]
-            (clef prev freq (cork add (rest to)))
-            (clef `now.bowl freq (cork add (wait to)))
-        ==
-  ::
   ++  on-poke
     |=  [=mark =vase]
     ^-  (quip card agent:gall)
@@ -69,17 +41,42 @@
     ::  Backup your state once
         %once
       ?>  =(src.bowl our.bowl)
-      (backup-to:hc paths)
+      =/  paths
+        ::  Already backing up to there?
+        %+  murn  ~(val by sup.bowl)
+        |=  [=ship =path]
+        ?.  =(ship to.cmd)   ~
+        `path
+      ?~  paths
+        ::  No. Initiate new connection.
+        =/  key  (scot %uv (sham eny.bowl))
+        :_  this(pending (~(put by pending) to.cmd %invite key))
+        :~  :*
+          %pass   /keep/init/(scot %p to.cmd)
+          %agent  [to.cmd %keep]
+          %poke   keep+!>([%init dap.bowl key])
+        ==  ==
+      ::  Yes. Just give the fact.
+      :_  this(last (~(put by last) to.cmd now.bowl))
+      =/  freq  (~(get by auto) to.cmd)
+      =/  prev  (~(get by last) to.cmd)
+      %-  catunits
+      :~  (some [%give %fact paths noun+!>(+:on-save:ag)])
+          (bind (both prev freq) (cork add (rest to.cmd)))
+          (bind (both `now.bowl freq) (cork add (wait to.cmd)))
+          :: (clef prev freq |=(* `((rest to.cmd)))) :: (cork add (rest to.cmd)))
+      ::    `(unit card)`~ ::(clef `now.bowl freq |=(* ((wait to.cmd)))) :: )
+      ==
     ::  Set/unset repeating backups
         %many
       ?>  =(src.bowl our.bowl)
       :_  this(auto (putunit auto to.cmd freq.cmd))
-      =/  freq  (~(get by auto) ship)
-      =/  prev  (~(get by last) ship)
+      =/  freq  (~(get by auto) to.cmd)
+      =/  prev  (~(get by last) to.cmd)
       %-  catunits
-      :~  (clef prev freq (cork add rest))
-          %+  first
-            (clef prev freq.cmd (cork add (wait to.cmd)))
+      :~  (bind (both prev freq) (cork add (rest to.cmd)))
+          ?^  new=(bind (both prev freq.cmd) (cork add (wait to.cmd)))
+            new
           (bind freq.cmd |=(* ((wait to.cmd) now.bowl)))
       ==
     ::  Start repairing your state
@@ -105,17 +102,23 @@
   ++  on-peek  on-peek:ag
   ::
   ++  on-init
-   ^-  (quip card agent:gall)
-   =^  cards  agent  on-init:ag
-   [cards this]
+    ^-  (quip card agent:gall)
+    =^  cards  agent  on-init:ag
+    [cards this]
   ::
   ++  on-save  on-save:ag
   ::
   ++  on-load
-    |=  =vase
-    ^-  (quip card agent:gall)
-    =^  cards  agent  (on-load:ag vase)
-    [cards this]
+   |=  =vase
+   ^-  (quip card agent:gall)
+   =^  cards  agent  (on-load:ag vase)
+   [cards this]
+  ::
+  ++  on-leave
+   |=  =path
+   ^-  (quip card agent:gall)
+   =^  cards  agent  (on-leave:ag path)
+   [cards this]
   ::
   ++  on-watch
     |=  =path
@@ -130,18 +133,12 @@
     ~|  %didnt-ask
     ?>  =([%invite &2.path] (~(got by pending) src.bowl))
     =.  pending  (~(del by pending) src.bowl)
-    (backup-to:hc ~[path])
+    (on-poke %keep !>([%once src.bowl]))
   ::
   ++  on-agent
    |=  [=wire =sign:agent:gall]
    ^-  (quip card agent:gall)
    =^  cards  agent  (on-agent:ag wire sign)
-   [cards this]
-  ::
-  ++  on-leave
-   |=  =path
-   ^-  (quip card agent:gall)
-   =^  cards  agent  (on-leave:ag path)
    [cards this]
   ::
   ++  on-arvo
@@ -150,10 +147,10 @@
    ?.  ?=(%keep -.wire)
      =^  cards  agent  (on-arvo:ag wire sign-arvo)
      [cards this]
-   ?.  ?=([%timer @] +.wire)          (on-arvo:def wire sign-arvo)
+   ?.  ?=([%timer @ *] +.wire)          (on-arvo:def wire sign-arvo)
    ?.  ?=([%behn %wake *] sign-arvo)  (on-arvo:def wire sign-arvo)
    ?^  error.sign-arvo                (on-arvo:def wire sign-arvo)
-   (backup-to:hc ~[(slav %p &3.wire)])
+   (on-poke %keep !>([%once (slav %p &3.wire)]))
   ::
   ++  on-fail
    |=  [=term =tang]
@@ -165,12 +162,24 @@
 ++  rest
   |=  =ship
   |=  =@da
-  ^-  card
+::  ^-  $<(%slip card)
   [%pass /keep/cancel/(scot %p ship) %arvo %b %rest da]
 ::
 ++  wait
   |=  =ship
   |=  =@da
-  ^-  card
+::  ^-  $<(%slip card)
   [%pass /keep/cancel/(scot %p ship) %arvo %b %wait da]
+::
+++  catunits
+  |=  xs=(list (unit card))
+  ^-  (list card)
+  (murn xs same)
+::
+++  putunit
+  |*  [=(map) key=* =(unit)]
+  ^+  map
+  ?~  unit
+    (~(del by map) key)
+  (~(put by map) key +.unit)
 --
