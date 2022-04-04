@@ -51,6 +51,7 @@
         ::  No. Initiate new connection.
         =/  key  (scot %uv (sham eny.bowl))
         :_  this(pending (~(put by pending) to.cmd %invite key))
+        :-  (try-invite:json to.cmd)
         :~  :*
           %pass   /keep/init/(scot %p to.cmd)
           %agent  [to.cmd %keep]
@@ -61,12 +62,11 @@
       =/  freq  (~(get by auto) to.cmd)
       =/  prev  (~(get by last) to.cmd)
       %-  catunits
-      :~  (some [%give %fact paths noun+!>(+:on-save:ag)])
+      :~  `(saved:json to.cmd now.bowl)
+          `[%give %fact paths noun+!>(+:on-save:ag)]
           (bind (both prev freq) (cork add (rest to.cmd)))
           (bind (both `now.bowl freq) (cork add (wait to.cmd)))
-          :: (clef prev freq |=(* `((rest to.cmd)))) :: (cork add (rest to.cmd)))
-      ::    `(unit card)`~ ::(clef `now.bowl freq |=(* ((wait to.cmd)))) :: )
-      ==
+                ==
     ::  Set/unset repeating backups
         %many
       ?>  =(src.bowl our.bowl)
@@ -74,7 +74,8 @@
       =/  freq  (~(get by auto) to.cmd)
       =/  prev  (~(get by last) to.cmd)
       %-  catunits
-      :~  (bind (both prev freq) (cork add (rest to.cmd)))
+      :~  `(fall (bind freq.cmd (cury auto:json to.cmd)) (noauto:json to.cmd))
+          (bind (both prev freq) (cork add (rest to.cmd)))
           ?^  new=(bind (both prev freq.cmd) (cork add (wait to.cmd)))
             new
           (bind freq.cmd |=(* ((wait to.cmd) now.bowl)))
@@ -85,6 +86,7 @@
       =/  key  (scot %uv (sham eny.bowl))
       ~&  cmd
       :_  this(pending (~(put by pending) from.cmd %restore key))
+      :-  (try-restore:json from.cmd)
       :~  :*
         %pass   /keep/mend/(scot %p from.cmd)
         %agent  [from.cmd %keep]
@@ -96,7 +98,10 @@
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
-      (on-load [-:on-save:ag data.cmd]) :: yolo
+      =^  cards  agent  (on-load:ag [-:on-save:ag data.cmd]) :: yolo
+      :_  this
+      :_  cards
+      (restored:json src.bowl now.bowl)
     ==
   ::
   ++  on-peek  on-peek:ag
@@ -126,14 +131,21 @@
     ?.  ?=(%keep -.path)
       =^  cards  agent  (on-watch:ag path)
       [cards this]
-    ~|  %dont-care
-    ?>  (team:title [our src]:bowl) :: Only backup to moons for now.
-    ?>  ?=([term ~] +.path)
-    ::  Requested?
-    ~|  %didnt-ask
-    ?>  =([%invite &2.path] (~(got by pending) src.bowl))
-    =.  pending  (~(del by pending) src.bowl)
-    (on-poke %keep !>([%once src.bowl]))
+    ::
+    ?+  +.path  (on-watch:def path)
+    ::
+        [%website ~]
+      [~[(state:json state)] this]
+    ::
+        [%data term ~]
+      ~|  %dont-care
+      ?>  (team:title [our src]:bowl) :: Only backup to moons for now.
+      ::  Requested?
+      ~|  %didnt-ask
+      ?>  =([%invite &3.path] (~(got by pending) src.bowl))
+      =.  pending  (~(del by pending) src.bowl)
+      (on-poke %keep !>([%once src.bowl]))
+    ==
   ::
   ++  on-agent
    |=  [=wire =sign:agent:gall]
@@ -182,4 +194,58 @@
   ?~  unit
     (~(del by map) key)
   (~(put by map) key +.unit)
+::
+++  json
+  =,  enjs:format
+  =<
+  |%
+  ++  saved
+    |=  new=[@p @da]  (in-card (frond 'saved' (json-da new)))
+  ::
+  ++  auto
+    |=  new=[@p @dr]  ^-  card  (in-card (frond 'set-auto' (json-dr new)))
+  ::
+  ++  try-invite
+    |=  =@p  (in-card (frond 'pending' (json-pending [p %invite ~])))
+  ::
+  ++  try-restore
+    |=  =@p  (in-card (frond 'pending' (json-pending [p %restore ~])))
+  ::
+  ++  restored
+    |=  new=[@p @da]  (in-card (frond 'restored' (json-da new)))
+  ::
+  ++  noauto
+    |=  =@p  ^-  card  (in-card (frond 'unset-auto' (ship p)))
+  ::
+  ++  state
+    |=  state=state-0
+    %-  in-card
+    %-  pairs
+    :~  [%backed-up a+(turn ~(tap by last.state) json-da)]
+        [%auto a+(turn ~(tap by auto.state) json-dr)]
+        [%pending a+(turn ~(tap by pending.state) json-pending)]
+    ==
+  --
+  ::
+  |%
+  ++  json-da
+    |=  [=@p prev=@da]
+    ^-  ^json
+    (pairs ~[['ship' (ship p)] ['time' (sect prev)]])
+  ::
+  ++  json-dr
+    |=  [=@p freq=@dr]
+    ^-  ^json
+    (pairs ~[['ship' (ship p)] ['freq' (numb (div freq ~s1))]])
+  ::
+  ++  json-pending
+    |=  [=@p status=?(%invite %restore) *]
+    ^-  ^json
+    (pairs ~[['ship' (ship p)] ['status' s+status]])
+  ::
+  ++  in-card
+    |=  =^json
+    ^-  card
+    [%give %fact ~[/keep/website] json+!>(json)]
+  --
 --

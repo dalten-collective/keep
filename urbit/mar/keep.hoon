@@ -12,17 +12,14 @@
 ++  grab
   |%
   ++  noun  ?(agent wrapper)
-::  ++  json
-::    %+  corl  ?(agent wrapper)
-::    =,  dejs:format
-::    %-  of
-::    :~  [%recover (ot ~['agent' so] ['ship' (se %p)])]
-::        :-  %config
-::        %-  ot
-::        :~  ['freq' (cu (lift (cury mul ~s1)) (mu ni))]
-::            ['agent' so]
-::            ['ship' (se %p)]
-::        ==
-::    ==
-::  --
+  ++  json
+    %+  corl  wrapper  ::  agent:poke is only used internally.
+    =,  dejs:format
+    %-  of
+    :~
+      [%once (ot ~[['to' (se %p)]])]
+      [%many (ot ~[['to' (se %p)] ['freq' (cu (lift (cury mul ~s1)) (mu ni))]])]
+      [%mend (ot ~[['from' (se %p)]])]
+    ==
+  --
 --

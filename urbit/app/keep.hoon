@@ -43,7 +43,7 @@
     :~  :*
       %pass   /backups/(scot %p src.bowl)/[dap.cmd]
       %agent  [src.bowl dap.cmd]
-      %watch  /keep/[key.cmd]
+      %watch  /keep/data/[key.cmd]
     ==  ==
   ::  "Give me my stuff," said the wrapper.
       %grab
