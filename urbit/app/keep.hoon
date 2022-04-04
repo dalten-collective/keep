@@ -10,7 +10,7 @@
 ::
 +$  state-0
   $:  %0
-      kept=(map [ship dude] noun)
+      kept=(map [dude ship] noun)
   ==
 --
 ::
@@ -34,10 +34,10 @@
   |=  [=mark =vase]
   ^-  (quip card _this)
   ?>  (team:title [src our]:bowl) :: Only backup to moons for now.
-  ?>  ?=(%keep-agent mark)
+  ?>  ?=(%keep mark)
   =/  cmd  !<(agent:poke vase)
   ?-  -.cmd
-  ::  "Save my stuff"
+  ::  "Save my stuff," said the wrapper.
       %init
     :_  this
     :~  :*
@@ -45,12 +45,12 @@
       %agent  [src.bowl dap.cmd]
       %watch  /keep/[key.cmd]
     ==  ==
-  ::  "Give me my stuff"
+  ::  "Give me my stuff," said the wrapper.
       %grab
     :_  this
     ~|  [%has-no dap.cmd from=src.bowl]
     =/  data=noun
-      (~(got by kept) [src.bowl dap.cmd])
+      (~(got by kept) [dap.cmd src.bowl])
     :~  :*
       %pass   /recoveries/(scot %p src.bowl)/[dap.cmd]
       %agent  [src.bowl dap.cmd]
@@ -67,7 +67,7 @@
       %fact
     ~&  %store-backup
     ?.  ?=(%noun p.cage.sign)  `this
-    `this(kept (~(put by kept) [src.bowl &3.wire] !<(noun q.cage.sign)))
+    `this(kept (~(put by kept) [&3.wire src.bowl] !<(noun q.cage.sign)))
   ==
 ::
 ++  on-peek   on-peek:def

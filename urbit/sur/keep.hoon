@@ -3,16 +3,17 @@
 +$  card  card:agent:gall
 ::
 ++  poke
-  |%
-  +$  agent
-    $%  [%init dap=dude key=term]   :: Initiate new keeper
-        [%grab dap=dude key=term]   :: Request old backup
+  |%                                    :: To the agent.
+  +$  agent                             ::
+    $%  [%init dap=dude key=term]       :: Initiate agent as keeper
+        [%grab dap=dude key=term]       :: Request old backup
     ==
-  ::
-  +$  wrapper
-    $%  [%save to=ship]             :: Make backup
-        [%mend from=ship]           :: Initiate recovery
-        [%data data=noun key=term]  :: Recovered state
+  ::                                    :: To the wrapper.
+  +$  wrapper                           ::
+    $%  [%once to=ship]                 :: Backup
+        [%many to=ship freq=(unit @dr)] :: Repeat backup
+        [%mend from=ship]               :: Initiate recovery
+        [%data data=noun key=term]      :: Recovered state and secret
     ==
   --
 --

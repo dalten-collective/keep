@@ -1,15 +1,28 @@
 ::
-::  keep wrapper pokes
+::  keep pokes
 ::
 /-  *keep
-|_  =wrapper:poke
+=,  poke
+|_  poke=?(agent wrapper)
 ++  grad  %noun
 ++  grow
   |%
-  ++  noun  wrapper
+  ++  noun  poke
   --
 ++  grab
   |%
-  ++  noun  wrapper:poke
-  --
+  ++  noun  ?(agent wrapper)
+::  ++  json
+::    %+  corl  ?(agent wrapper)
+::    =,  dejs:format
+::    %-  of
+::    :~  [%recover (ot ~['agent' so] ['ship' (se %p)])]
+::        :-  %config
+::        %-  ot
+::        :~  ['freq' (cu (lift (cury mul ~s1)) (mu ni))]
+::            ['agent' so]
+::            ['ship' (se %p)]
+::        ==
+::    ==
+::  --
 --
