@@ -66,7 +66,7 @@
           `[%give %fact paths noun+!>(+:on-save:ag)]
           (bind (both prev freq) (cork add (rest to.cmd)))
           (bind (both `now.bowl freq) (cork add (wait to.cmd)))
-                ==
+      ==
     ::  Set/unset repeating backups
         %many
       ?>  =(src.bowl our.bowl)
@@ -138,8 +138,6 @@
       [~[(state:json state)] this]
     ::
         [%data term ~]
-      ~|  %dont-care
-      ?>  (team:title [our src]:bowl) :: Only backup to moons for now.
       ::  Requested?
       ~|  %didnt-ask
       ?>  =([%invite &3.path] (~(got by pending) src.bowl))
