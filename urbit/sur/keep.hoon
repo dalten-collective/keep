@@ -1,3 +1,4 @@
+^?
 |%
 +$  dude  dude:gall
 +$  card  card:agent:gall

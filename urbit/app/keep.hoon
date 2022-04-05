@@ -14,6 +14,7 @@
   ==
 --
 ::
+=<
 %-  agent:dbug
 =|  state-0
 =*  state  -
@@ -37,7 +38,7 @@
   ?>  ?=(%keep mark)
   =/  cmd  !<(agent:poke vase)
   ?-  -.cmd
-  ::  "Save my stuff," said the wrapper.
+  ::  "Subscribe to my stuff," said the wrapper.
       %init
     :_  this
     :~  :*
@@ -76,4 +77,11 @@
 ++  on-arvo   on-arvo:def
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def
+--
+::
+|%
+++  json
+  |%
+  ++  hmm  ~
+  --
 --

@@ -1,9 +1,12 @@
 ::  Missing utilities to keep me from screaming into the void too often.
 ::
+^?
 |%
 ++  catunits
-  |*  =(list (unit))
-  (murn list same)
+  |*  xs=(list (unit))
+  =>  .(xs (homo xs))
+  ^-  (list _?>(?=(^ xs) (need i.xs)))
+  (murn xs same)
 ::
 ++  putunit
   |*  [=(map) key=* =(unit)]
@@ -11,6 +14,8 @@
   ?~  unit
     (~(del by map) key)
   (~(put by map) key +.unit)
+::
+++  isnull  |=  *  ^-  ?  =(~ +<)
 ::
 ++  update
   |*  [=(map) key=* f=$-((unit) (unit))]

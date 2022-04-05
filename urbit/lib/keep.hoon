@@ -3,7 +3,7 @@
 ::  usage: %-(agent:keep your-agent)
 ::
 /-  *keep
-/+  default-agent
+/+  default-agent, *sane
 ::
 |%
 +$  versioned-state
@@ -38,7 +38,7 @@
     ::
     =/  cmd  !<(wrapper:poke vase)
     ?-  -.cmd
-    ::  Backup your state once
+    ::  Back up your state once
         %once
       ?>  =(src.bowl our.bowl)
       =/  paths
@@ -62,10 +62,10 @@
       =/  freq  (~(get by auto) to.cmd)
       =/  prev  (~(get by last) to.cmd)
       %-  catunits
-      :~  `(saved:json to.cmd now.bowl)
-          `[%give %fact paths noun+!>(+:on-save:ag)]
+      :~  (bind (both `now.bowl freq) (cork add (wait to.cmd)))
           (bind (both prev freq) (cork add (rest to.cmd)))
-          (bind (both `now.bowl freq) (cork add (wait to.cmd)))
+          `[%give %fact paths noun+!>(+:on-save:ag)]
+          `(saved:json to.cmd now.bowl)
       ==
     ::  Set/unset repeating backups
         %many
@@ -74,8 +74,8 @@
       =/  freq  (~(get by auto) to.cmd)
       =/  prev  (~(get by last) to.cmd)
       %-  catunits
-      :~  `(fall (bind freq.cmd (cury auto:json to.cmd)) (noauto:json to.cmd))
-          (bind (both prev freq) (cork add (rest to.cmd)))
+      :~  (bind (both prev freq) (cork add (rest to.cmd)))
+          `(fall (bind freq.cmd (cury auto:json to.cmd)) (noauto:json to.cmd))
           ?^  new=(bind (both prev freq.cmd) (cork add (wait to.cmd)))
             new
           (bind freq.cmd |=(* ((wait to.cmd) now.bowl)))
@@ -114,16 +114,16 @@
   ++  on-save  on-save:ag
   ::
   ++  on-load
-   |=  =vase
-   ^-  (quip card agent:gall)
-   =^  cards  agent  (on-load:ag vase)
-   [cards this]
+    |=  =vase
+    ^-  (quip card agent:gall)
+    =^  cards  agent  (on-load:ag vase)
+    [cards this]
   ::
   ++  on-leave
-   |=  =path
-   ^-  (quip card agent:gall)
-   =^  cards  agent  (on-leave:ag path)
-   [cards this]
+    |=  =path
+    ^-  (quip card agent:gall)
+    =^  cards  agent  (on-leave:ag path)
+    [cards this]
   ::
   ++  on-watch
     |=  =path
@@ -131,14 +131,12 @@
     ?.  ?=(%keep -.path)
       =^  cards  agent  (on-watch:ag path)
       [cards this]
-    ::
     ?+  +.path  (on-watch:def path)
     ::
         [%website ~]
       [~[(state:json state)] this]
     ::
         [%data term ~]
-      ::  Requested?
       ~|  %didnt-ask
       ?>  =([%invite &3.path] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
@@ -146,78 +144,66 @@
     ==
   ::
   ++  on-agent
-   |=  [=wire =sign:agent:gall]
-   ^-  (quip card agent:gall)
-   =^  cards  agent  (on-agent:ag wire sign)
-   [cards this]
+    |=  [=wire =sign:agent:gall]
+    ^-  (quip card agent:gall)
+    =^  cards  agent  (on-agent:ag wire sign)
+    [cards this]
   ::
   ++  on-arvo
-   |=  [=wire =sign-arvo]
-   ^-  (quip card agent:gall)
-   ?.  ?=(%keep -.wire)
-     =^  cards  agent  (on-arvo:ag wire sign-arvo)
-     [cards this]
-   ?.  ?=([%timer @ *] +.wire)          (on-arvo:def wire sign-arvo)
-   ?.  ?=([%behn %wake *] sign-arvo)  (on-arvo:def wire sign-arvo)
-   ?^  error.sign-arvo                (on-arvo:def wire sign-arvo)
-   (on-poke %keep !>([%once (slav %p &3.wire)]))
+    |=  [=wire =sign-arvo]
+    ^-  (quip card agent:gall)
+    ?.  ?=(%keep -.wire)
+      =^  cards  agent  (on-arvo:ag wire sign-arvo)
+      [cards this]
+    ?.  ?=([%timer @ *] +.wire)          (on-arvo:def wire sign-arvo)
+    ?.  ?=([%behn %wake *] sign-arvo)  (on-arvo:def wire sign-arvo)
+    ?^  error.sign-arvo                (on-arvo:def wire sign-arvo)
+    (on-poke %keep !>([%once (slav %p &3.wire)]))
   ::
   ++  on-fail
-   |=  [=term =tang]
-   ^-  (quip card agent:gall)
-   =^  cards  agent  (on-fail:ag term tang)
-   [cards this]
+    |=  [=term =tang]
+    ^-  (quip card agent:gall)
+    =^  cards  agent  (on-fail:ag term tang)
+    [cards this]
   --
 ::
 ++  rest
   |=  =ship
   |=  =@da
-::  ^-  $<(%slip card)
+  ^-  card
   [%pass /keep/cancel/(scot %p ship) %arvo %b %rest da]
 ::
 ++  wait
   |=  =ship
   |=  =@da
-::  ^-  $<(%slip card)
+  ^-  card
   [%pass /keep/cancel/(scot %p ship) %arvo %b %wait da]
-::
-++  catunits
-  |=  xs=(list (unit card))
-  ^-  (list card)
-  (murn xs same)
-::
-++  putunit
-  |*  [=(map) key=* =(unit)]
-  ^+  map
-  ?~  unit
-    (~(del by map) key)
-  (~(put by map) key +.unit)
 ::
 ++  json
   =,  enjs:format
-  =<
+  |^
   |%
   ++  saved
-    |=  new=[@p @da]  (in-card (frond 'saved' (json-da new)))
+    |=  new=[@p @da]  (website-card (frond 'saved' (json-da new)))
   ::
   ++  auto
-    |=  new=[@p @dr]  ^-  card  (in-card (frond 'set-auto' (json-dr new)))
+    |=  new=[@p @dr]  (website-card (frond 'set-auto' (json-dr new)))
   ::
   ++  try-invite
-    |=  =@p  (in-card (frond 'pending' (json-pending [p %invite ~])))
+    |=  =@p  (website-card (frond 'pending' (json-pending [p %invite ~])))
   ::
   ++  try-restore
-    |=  =@p  (in-card (frond 'pending' (json-pending [p %restore ~])))
+    |=  =@p  (website-card (frond 'pending' (json-pending [p %restore ~])))
   ::
   ++  restored
-    |=  new=[@p @da]  (in-card (frond 'restored' (json-da new)))
+    |=  new=[@p @da]  (website-card (frond 'restored' (json-da new)))
   ::
   ++  noauto
-    |=  =@p  ^-  card  (in-card (frond 'unset-auto' (ship p)))
+    |=  =@p  (website-card (frond 'unset-auto' (ship p)))
   ::
   ++  state
     |=  state=state-0
-    %-  in-card
+    %-  website-card
     %-  pairs
     :~  [%backed-up a+(turn ~(tap by last.state) json-da)]
         [%auto a+(turn ~(tap by auto.state) json-dr)]
@@ -225,7 +211,6 @@
     ==
   --
   ::
-  |%
   ++  json-da
     |=  [=@p prev=@da]
     ^-  ^json
@@ -241,7 +226,7 @@
     ^-  ^json
     (pairs ~[['ship' (ship p)] ['status' s+status]])
   ::
-  ++  in-card
+  ++  website-card
     |=  =^json
     ^-  card
     [%give %fact ~[/keep/website] json+!>(json)]

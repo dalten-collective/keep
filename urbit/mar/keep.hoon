@@ -13,7 +13,7 @@
   |%
   ++  noun  ?(agent wrapper)
   ++  json
-    %+  corl  wrapper  ::  agent:poke is only used internally.
+    %+  corl  $<(%data wrapper)
     =,  dejs:format
     %-  of
     :~
