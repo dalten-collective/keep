@@ -164,6 +164,8 @@ Once the agent is installed, proceed to setting up the interface (below).
 
 - Vue 3
 - Typescript
+- Vite (for proxying to the urbit web interface)
+- NPM (for package management, handled by `bin` scripts)
 
 ## Setup
 
@@ -171,7 +173,11 @@ npm-wrapping scripts are provided in the `bin/` directory. Follow the steps belo
 
 - `bin/install-js-dependencies.sh`
 - Have your fakeship from above running. Note the web interface port (ie. `dojo> http: web interface live on http://localhost:8080`)
+- Get your login code from the fakeship (`dojo> +code`)
+- Copy `interface/.env.example` to `interface/.env` (not checked into git) and edit the port there to reflect the web interface on your fakeship.
 - `bin/serve-interface.sh`
 
-The Vue interface should now be accessible at the port noted above.
+The fakeship web interface should now be accessible at `http://localhost:3000` (provided by Vite). When you first visit the URL you should be prompted for your `+code` from above.
+
+The Vue interface for this application will be served from `http://localhost:3000/apps/keep/` (**note the trailing slash!**)
 
