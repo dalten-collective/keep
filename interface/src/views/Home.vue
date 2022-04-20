@@ -21,7 +21,7 @@ export default defineComponent({
   },
   methods: {
     testPoke() {
-      this.$store.dispatch("keep/testPoke")
+      this.$store.dispatch("keep/testPoke");
     },
   },
 });

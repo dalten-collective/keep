@@ -1,4 +1,4 @@
-import keepApi from "../api/keep"
+import keepApi from "../api/keep";
 
 export default {
   namespaced: true,
@@ -10,7 +10,7 @@ export default {
 
   getters: {
     agents(state) {
-      return state.agents
+      return state.agents;
     },
   },
 
@@ -26,8 +26,7 @@ export default {
     },
 
     testPoke() {
-      keepApi.test()
+      keepApi.test();
     },
   },
-
 };

@@ -12,9 +12,9 @@ module.exports = {
   ],
   plugins: ["@typescript-eslint", "prettier"],
   rules: {
-    "prettier/prettier": "error",
+    "prettier/prettier": "warn",
     // not needed for vue 3
     "vue/no-multiple-template-root": "off",
-    "indent": ["errorr", 2],
+    indent: ["error", 2],
   },
 };

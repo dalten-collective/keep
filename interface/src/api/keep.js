@@ -1,4 +1,4 @@
-import urbitAPI from "./urbitAPI"
+import urbitAPI from "./urbitAPI";
 
 export default {
   test() {
@@ -6,10 +6,10 @@ export default {
       app: "keep",
       mark: "keep",
       json: {
-        "once": {
-          "to": "~sum"
-        }
-      }
+        once: {
+          to: "~sum",
+        },
+      },
     });
-  }
-}
+  },
+};

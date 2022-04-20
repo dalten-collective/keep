@@ -22,8 +22,8 @@ export default {
       airlock.openAirlock(
         (data) => {
           console.log("data ", data);
-          const agents = data.agents
-          dispatch("keep/setAgents", agents, { root: true })
+          const agents = data.agents;
+          dispatch("keep/setAgents", agents, { root: true });
         },
         (sub) => {
           dispatch("setSubscription", sub);
@@ -36,10 +36,7 @@ export default {
     },
 
     closeAirlock({ commit, state }) {
-      airlock.closeAirlock(
-        state.subscription,
-        commit("unsetSubscription")
-      );
+      airlock.closeAirlock(state.subscription, commit("unsetSubscription"));
     },
   },
 };

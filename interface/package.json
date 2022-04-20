@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vite --host",
     "build": "vite build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "lint-fix": "vue-cli-service lint --fix"
   },
   "dependencies": {
     "@urbit/api": "^2.1.0",
