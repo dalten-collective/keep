@@ -12,7 +12,7 @@
   |%
   ++  noun  wrapper:poke
   ++  json
-    %+  corl  $<(%data wrapper)
+    %+  corl  $<(%data wrapper:poke)
     =,  dejs:format
     %-  of
     :~

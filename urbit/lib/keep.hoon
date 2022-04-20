@@ -75,7 +75,7 @@
       =/  prev  (~(get by last) to.cmd)
       %-  catunits
       :~  (bind (both prev freq) (cork add (rest to.cmd)))
-          `(fall (bind freq.cmd (cury auto:json to.cmd)) (noauto:json to.cmd))
+          `(auto:json to.cmd freq.cmd)
           ?^  new=(bind (both prev freq.cmd) (cork add (wait to.cmd)))
             new
           (bind freq.cmd |=(* ((wait to.cmd) now.bowl)))
@@ -199,7 +199,7 @@
     |=  new=[@p @da]  (website-card (frond 'saved' (json-da new)))
   ::
   ++  auto
-    |=  new=[@p @dr]  (website-card (frond 'set-auto' (json-dr new)))
+    |=  new=[@p (unit @dr)]  (website-card (frond 'auto' (json-dr new)))
   ::
   ++  try-invite
     |=  =@p  (website-card (frond 'pending' (json-pending [p %invite ~])))
@@ -210,15 +210,12 @@
   ++  restored
     |=  new=[@p @da]  (website-card (frond 'restored' (json-da new)))
   ::
-  ++  noauto
-    |=  =@p  (website-card (frond 'unset-auto' (ship p)))
-  ::
   ++  state
     |=  state=state-0
     %-  website-card
     %-  pairs
-    :~  [%backed-up a+(turn ~(tap by last.state) json-da)]
-        [%auto a+(turn ~(tap by auto.state) json-dr)]
+    :~  [%saved a+(turn ~(tap by last.state) json-da)]
+        [%auto a+(turn ~(tap by auto.state) |=([@ @] (json-dr +<- `+<+)))]
         [%pending a+(turn ~(tap by pending.state) json-pending)]
     ==
   --
@@ -229,9 +226,12 @@
     (pairs ~[['ship' (ship p)] ['time' (sect prev)]])
   ::
   ++  json-dr
-    |=  [=@p freq=@dr]
+    |=  [=@p freq=(unit @dr)]
     ^-  ^json
-    (pairs ~[['ship' (ship p)] ['freq' (numb (div freq ~s1))]])
+    %-  pairs
+    :~  ['ship' (ship p)]
+        ['freq' (bindcast freq (corl numb (curr div ~s1)))]
+    ==
   ::
   ++  json-pending
     |=  [=@p status=?(%invite %restore) *]
