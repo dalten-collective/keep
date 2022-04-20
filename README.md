@@ -20,6 +20,15 @@ All keep-enriched agents can be poked with the mark `%keep` and support the foll
 [%mend from=ship]               :: Initiate recovery
 ```
 
+These can also come in the form of JSON:
+
+```json
+{"once": {"to": "~sampel-palnet"}}
+{"many": {"to": "~sampel", "freq": 500}}
+{"many": {"to": "~palnet", "freq": null}}
+{"mend": {"from": "~sampel-palnet"}}
+```
+
 - `%once`
   Trigger a single backup to the specified ship.
   If repeating backups are set for this ship, this resets the timer.
