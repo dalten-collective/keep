@@ -1,9 +1,13 @@
-import { createStore } from "vuex";
+import { createStore as createVuexStore } from "vuex";
 
-export default createStore({
-  state: {},
-  getters: {},
-  mutations: {},
-  actions: {},
-  modules: {},
-});
+import ship from "./ship";
+import keep from "./keep";
+
+export const createStore = () => {
+  return createVuexStore({
+    modules: {
+      ship,
+      keep,
+    },
+  });
+};

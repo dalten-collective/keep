@@ -1,10 +1,28 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
   <router-view />
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  mounted() {
+    this.startAirlock();
+  },
+  unmounted() {
+    this.closeAirlock();
+  },
+  methods: {
+    startAirlock() {
+      this.$store.dispatch("ship/startAirlock");
+    },
+
+    closeAirlock() {
+      this.$store.dispatch("ship/closeAirlock");
+    },
+  },
+});
+</script>
 
 <style>
 #app {

@@ -15,5 +15,6 @@ module.exports = {
     "prettier/prettier": "error",
     // not needed for vue 3
     "vue/no-multiple-template-root": "off",
+    "indent": ["errorr", 2],
   },
 };
