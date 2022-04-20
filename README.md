@@ -10,9 +10,9 @@ Keep consists of two parts:
 
 ## Pokes
 
-All actions are initiated by poking keep-enriched agents (i.e. **not** `%keep`), using one of the pokes that the wrapper supplies. (To find out which agents that are keep-enriched, see the *Subscriptions* section below.)
+All actions are initiated by poking keep-enriched agents (i.e. **not** `%keep`), using one of the pokes that the wrapper supplies. (To find out which agents that are keep-enriched, see the *Subscriptions* and *Scries* sections below.)
 
-A keep-enriched agent is poked with the mark `%keep` and supports the following pokes:
+All keep-enriched agent can be poked with the mark `%keep` and then support the following pokes:
 
 ```hoon
 [%once to=ship]                 :: Backup
@@ -32,7 +32,7 @@ A keep-enriched agent is poked with the mark `%keep` and supports the following 
 
 ## Subscriptions
 
-### `%keep`
+### The `%keep` agent
 
 Subscribe to `/website` to get JSON objects specifying which keep-enriched agents that exist.
 
