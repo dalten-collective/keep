@@ -10,9 +10,9 @@ Keep consists of two parts:
 
 ## Pokes
 
-All actions are initiated by poking keep-enriched agents (i.e. **not** `%keep`), using one of the pokes that the wrapper supplies. (To find out which agents that are keep-enriched, see the *Subscriptions* and *Scries* sections below.)
+All actions are initiated by poking keep-enriched agents (i.e. **not** the `%keep` agent). To find out which agents that are keep-enriched, see the *Subscriptions* and *Scries* sections further down.
 
-All keep-enriched agent can be poked with the mark `%keep` and then support the following pokes:
+All keep-enriched agents can be poked with the mark `%keep` and support the following pokes:
 
 ```hoon
 [%once to=ship]                 :: Backup
@@ -25,8 +25,12 @@ All keep-enriched agent can be poked with the mark `%keep` and then support the 
   If repeating backups are set for this ship, this resets the timer.
 - `%many`
   Set or unset repeating backups to the specified ship.
+
   The frequency is either null for unsetting, or the desired frequency for setting.
-  If setting repeating backups and this agent **hasn't** been backed up to the specified ship before, this will trigger an immediate backup. If setting repeating backups at frequency `f` and this agent **has** been backed up to the specified ship at time `t`, this will trigger a backup at time `t+freq` or `now`, whichever comes last.
+
+  If setting repeating backups and this agent **hasn't** been backed up to the specified ship before, this will trigger an immediate backup.
+
+  If setting repeating backups at frequency `freq` and this agent **has** been backed up to the specified ship at time `t`, this will trigger a backup at time `t+freq` or `now`, whichever comes last.
 - `%mend`
   Load a backup from the specified ship.
 
