@@ -6,7 +6,7 @@ Back up your Urbit
 Keep consists of two parts:
 
 - a wrapper, which is a function from an `agent:gall` to an `agent:gall`. It turns a regular agent into a keep-enriched agent, specifically it adds a few additional pokes, one subscription path and one scry.
-- an agent `%keep`, which stores backups passed to it from wrappers on other ships, as well as keeps track of which agents on the same ship that are enriched by the wrapper.
+- an agent `%keep`, which stores backups passed to it from keep-enriched agents on other ships, as well as keeps track of which agents on the same ship that are keep-enriched.
 
 ## Pokes
 
