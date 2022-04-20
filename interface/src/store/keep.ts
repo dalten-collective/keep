@@ -25,8 +25,11 @@ export default {
       commit("setAgents", agents);
     },
 
-    testPoke() {
-      keepApi.test();
+    testBackup() {
+      keepApi.testBackup();
+    },
+    testRestore() {
+      keepApi.testRestore();
     },
   },
 };

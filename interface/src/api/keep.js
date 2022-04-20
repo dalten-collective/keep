@@ -1,13 +1,24 @@
 import urbitAPI from "./urbitAPI";
 
 export default {
-  test() {
+  testBackup() {
     urbitAPI.poke({
-      app: "keep",
+      app: "gora",
       mark: "keep",
       json: {
         once: {
           to: "~sum",
+        },
+      },
+    });
+  },
+  testRestore() {
+    urbitAPI.poke({
+      app: "gora",
+      mark: "keep",
+      json: {
+        mend: {
+          from: "~sum",
         },
       },
     });

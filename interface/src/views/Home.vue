@@ -4,7 +4,8 @@
     <pre>
       agents: {{ agents }}
     </pre>
-    <button @click="testPoke">Test Poke</button>
+    <button @click="testBackup">Test Backup</button>
+    <button @click="testRestore">Test Restore</button>
   </div>
 </template>
 
@@ -20,8 +21,13 @@ export default defineComponent({
     ...mapGetters("keep", ["agents"]),
   },
   methods: {
-    testPoke() {
-      this.$store.dispatch("keep/testPoke");
+    testBackup() {
+      console.log('backing up')
+      this.$store.dispatch("keep/testBackup");
+    },
+    testRestore() {
+      console.log('restoring')
+      this.$store.dispatch("keep/testRestore");
     },
   },
 });
