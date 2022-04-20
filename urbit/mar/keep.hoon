@@ -1,17 +1,16 @@
 ::
-::  keep pokes
+::  keep wrapper pokes
 ::
 /-  *keep
-=,  poke
-|_  poke=?(agent wrapper)
+|_  =wrapper:poke
 ++  grad  %noun
 ++  grow
   |%
-  ++  noun  poke
+  ++  noun  wrapper
   --
 ++  grab
   |%
-  ++  noun  ?(agent wrapper)
+  ++  noun  wrapper:poke
   ++  json
     %+  corl  $<(%data wrapper)
     =,  dejs:format

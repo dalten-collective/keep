@@ -11,10 +11,10 @@
 +$  state-0
   $:  %0
       kept=(map [dude ship] noun)
+      enabled=(list dude)
   ==
 --
 ::
-=<
 %-  agent:dbug
 =|  state-0
 =*  state  -
@@ -35,10 +35,10 @@
   |=  [=mark =vase]
   ^-  (quip card _this)
   ?>  (team:title [src our]:bowl) :: Only backup to moons for now.
-  ?>  ?=(%keep mark)
+  ?>  ?=(%keep-agent mark)
   =/  cmd  !<(agent:poke vase)
   ?-  -.cmd
-  ::  "Subscribe to my stuff," said the wrapper.
+  ::  "Subscribe to my stuff," said someone else's wrapper.
       %init
     :_  this
     :~  :*
@@ -46,7 +46,7 @@
       %agent  [src.bowl dap.cmd]
       %watch  /keep/data/[key.cmd]
     ==  ==
-  ::  "Give me my stuff," said the wrapper.
+  ::  "Give me my stuff," said someone else's wrapper.
       %grab
     :_  this
     ~|  [%has-no dap.cmd from=src.bowl]
@@ -57,6 +57,10 @@
       %agent  [src.bowl dap.cmd]
       %poke   keep+!>([%data data key.cmd])
     ==  ==
+  ::  "I exist," said a wrapper on our own ship.
+      %hiya
+    :_  this(enabled [dap.cmd enabled])
+    ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'agent' s+dap.cmd))]]
   ==
 ::
 ++  on-agent
@@ -71,17 +75,19 @@
     `this(kept (~(put by kept) [&3.wire src.bowl] !<(noun q.cage.sign)))
   ==
 ::
-++  on-peek   on-peek:def
+++  on-watch
+  |=  =path
+  ^-  (quip card _this)
+  ?.  ?=([%website ~] path)  (on-watch:def path)
+  :_  this
+  :~  :*
+    %give  %fact  ~[/website]  %json
+    !>((frond:enjs:format 'agents' a+(turn enabled (lead %s))))
+  ==  ==
+::
 ++  on-init   on-init:def
-++  on-watch  on-watch:def
+++  on-peek   on-peek:def
 ++  on-arvo   on-arvo:def
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def
---
-::
-|%
-++  json
-  |%
-  ++  hmm  ~
-  --
 --

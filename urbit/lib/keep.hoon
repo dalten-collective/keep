@@ -55,7 +55,7 @@
         :~  :*
           %pass   /keep/init/(scot %p to.cmd)
           %agent  [to.cmd %keep]
-          %poke   keep+!>([%init dap.bowl key])
+          %poke   keep-agent+!>((agent:poke %init dap.bowl key))
         ==  ==
       ::  Yes. Just give the fact.
       :_  this(last (~(put by last) to.cmd now.bowl))
@@ -90,11 +90,10 @@
       :~  :*
         %pass   /keep/mend/(scot %p from.cmd)
         %agent  [from.cmd %keep]
-        %poke   keep+!>([%grab dap.bowl key])
+        %poke   keep-agent+!>([%grab dap.bowl key])
       ==  ==
     ::  Load this back
         %data
-      ~&  %receiving-backup
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
@@ -104,19 +103,32 @@
       (restored:json src.bowl now.bowl)
     ==
   ::
-  ++  on-peek  on-peek:ag
+  ++  on-peek
+    |=  =path
+    ^-  (unit (unit cage))
+    ~&  [%keep peek=path]
+    ?.  ?=([%x %keep ~] path)  (on-peek:ag path)
+    ``loob+!>(&)
   ::
   ++  on-init
     ^-  (quip card agent:gall)
     =^  cards  agent  on-init:ag
-    [cards this]
+    :_  this
+    :_  cards
+    :*
+      %pass   /keep/hiya
+      %agent  [our.bowl %keep]
+      %poke   keep-agent+!>([%hiya dap.bowl])
+    ==
   ::
-  ++  on-save  on-save:ag
+  ++  on-save
+    !>([on-save:ag state])
   ::
   ++  on-load
-    |=  =vase
+    |=  old=vase
     ^-  (quip card agent:gall)
-    =^  cards  agent  (on-load:ag vase)
+    =^  their  state  !<([vase state-0] old)
+    =^  cards  agent  (on-load:ag their)
     [cards this]
   ::
   ++  on-leave
@@ -140,7 +152,7 @@
       ~|  %didnt-ask
       ?>  =([%invite &3.path] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
-      (on-poke %keep !>([%once src.bowl]))
+      (on-poke(src.bowl our.bowl) %keep !>([%once src.bowl]))
     ==
   ::
   ++  on-agent
@@ -155,7 +167,7 @@
     ?.  ?=(%keep -.wire)
       =^  cards  agent  (on-arvo:ag wire sign-arvo)
       [cards this]
-    ?.  ?=([%timer @ *] +.wire)          (on-arvo:def wire sign-arvo)
+    ?.  ?=([%timer @ *] +.wire)        (on-arvo:def wire sign-arvo)
     ?.  ?=([%behn %wake *] sign-arvo)  (on-arvo:def wire sign-arvo)
     ?^  error.sign-arvo                (on-arvo:def wire sign-arvo)
     (on-poke %keep !>([%once (slav %p &3.wire)]))
@@ -177,7 +189,7 @@
   |=  =ship
   |=  =@da
   ^-  card
-  [%pass /keep/cancel/(scot %p ship) %arvo %b %wait da]
+  [%pass /keep/timer/(scot %p ship) %arvo %b %wait da]
 ::
 ++  json
   =,  enjs:format
