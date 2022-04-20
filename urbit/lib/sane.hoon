@@ -8,6 +8,12 @@
   ^-  (list _?>(?=(^ xs) (need i.xs)))
   (murn xs same)
 ::
+++  bindcast
+  |*  [a=(unit) b=gate]
+  ^+  (b)
+  ?~  a  ~
+  (b u.a)
+::
 ++  putunit
   |*  [=(map) key=* =(unit)]
   ^+  map
