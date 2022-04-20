@@ -35,7 +35,7 @@ These can also come in the form of JSON:
 - `%many`
   Set or unset repeating backups to the specified ship.
 
-  The frequency is either null for unsetting, or the desired frequency for setting.
+  The frequency is either null for unsetting, or the desired frequency in seconds for setting.
 
   If setting repeating backups and this agent **hasn't** been backed up to the specified ship before, this will trigger an immediate backup.
 
