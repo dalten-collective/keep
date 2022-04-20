@@ -152,3 +152,26 @@ You will receive the same two objects as when initially subscribing, with the ex
 ## Scries
 
 Keep-enriched agents can be scried at `/keep/live/loob`. It will return a boolean, signifying whether the wrapper is active or not.
+
+# Development Setup
+
+You will need to create a fakezod and install the agent.  
+Run `bin/setup.sh` in a separate process and follow the instructions there. No changes will be made on your behalf.
+
+Once the agent is installed, proceed to setting up the interface (below).
+
+# Interface
+
+- Vue 3
+- Typescript
+
+## Setup
+
+npm-wrapping scripts are provided in the `bin/` directory. Follow the steps below to set up your local development environment:
+
+- `bin/install-js-dependencies.sh`
+- Have your fakeship from above running. Note the web interface port (ie. `dojo> http: web interface live on http://localhost:8080`)
+- `bin/serve-interface.sh`
+
+The Vue interface should now be accessible at the port noted above.
+
