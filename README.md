@@ -39,7 +39,7 @@ These can also come in the form of JSON:
 
   If setting repeating backups and this agent **hasn't** been backed up to the specified ship before, this will trigger an immediate backup.
 
-  If setting repeating backups at frequency `freq` and this agent **has** been backed up to the specified ship at time `t`, this will trigger a backup at time `t+freq` or `now`, whichever comes last.
+  If setting repeating backups and this agent **has** been backed up to the specified ship at time `t`, this will trigger a backup immediately or at time `t+freq`, whichever comes last.
 - `%mend`
   Load a backup from the specified ship.
 
