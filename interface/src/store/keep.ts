@@ -1,3 +1,5 @@
+import keepApi from "../api/keep"
+
 export default {
   namespaced: true,
   state() {
@@ -21,6 +23,10 @@ export default {
   actions: {
     setAgents({ commit }, agents: Array<any>) {
       commit("setAgents", agents);
+    },
+
+    testPoke() {
+      keepApi.test()
     },
   },
 

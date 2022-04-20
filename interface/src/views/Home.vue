@@ -4,6 +4,7 @@
     <pre>
       agents: {{ agents }}
     </pre>
+    <button @click="testPoke">Test Poke</button>
   </div>
 </template>
 
@@ -17,6 +18,11 @@ export default defineComponent({
   components: {},
   computed: {
     ...mapGetters("keep", ["agents"]),
+  },
+  methods: {
+    testPoke() {
+      this.$store.dispatch("keep/testPoke")
+    },
   },
 });
 </script>
