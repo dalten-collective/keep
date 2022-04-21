@@ -111,14 +111,9 @@
       ?>  =(our.bowl src.bowl)
       ?:  =(live live.cmd)  `this
       :_  this(live live.cmd)
-      %-  (leadif live.cmd (state:json state))
-      :~  (live:json live.cmd)
-          =/  plan  ?:(live.cmd %join %quit)
-          :*  %pass   /keep/[plan]
-              %agent  [our.bowl %keep]
-              %poke   keep-agent+!>((agent:poke plan dap.bowl))
-          ==
-      ==
+      :-  (live:json live.cmd)
+      ?.  live.cmd  ~
+      ~[(state:json state)]
     ==
   ::
   ++  on-peek
@@ -131,7 +126,8 @@
   ++  on-init
     ^-  (quip card agent:gall)
     =^  cards  agent  on-init:ag
-    [cards this]
+    :_  this
+    [(tell our.bowl dap.bowl) cards]
   ::
   ++  on-save
     ?.  live  on-save:ag
@@ -140,12 +136,13 @@
   ++  on-load
     |=  old=vase
     ^-  (quip card agent:gall)
-    ?~  res=(mole |.(!<([vase state-0] old)))
-      =^  cards  agent  (on-load:ag old)
+    ?^  our=(mole |.(!<([vase state-0] old)))
+      =^  their  state  u.our
+      =^  cards  agent  (on-load:ag their)
       [cards this]
-    =^  their  state  u.res
-    =^  cards  agent  (on-load:ag their)
-    [cards this]
+    =^  cards  agent  (on-load:ag old)
+    :_  this
+    [(tell our.bowl dap.bowl) cards]
   ::
   ++  on-leave
     |=  =path
@@ -207,6 +204,11 @@
   |=  =@da
   ^-  card
   [%pass /keep/timer/(scot %p ship) %arvo %b %wait da]
+::
+++  tell
+  |=  [our=ship dap=dude]
+  ^-  card
+  [%pass /keep/tell %agent [our %keep] %poke keep-agent+!>([%tell dap])]
 ::
 ++  json
   =,  enjs:format

@@ -64,17 +64,13 @@ After initial subscription, you will receive:
 {"agents": ["agent0", "agent1", "agent2"]}
 ```
 
-Whenever a new keep-enriched agent is activated, you will receive:
+Whenever a new agent becomes keep-enriched, you will receive:
 
 ```json
-{"join": "agent3"}
+{"agent": "agent3"}
 ```
 
-Whenever a keep-enriched agent is deactivated, you will receive:
-
-```json
-{"quit": "agent1"}
-```
+**Note** that these agents are not guaranteed to stay keep-enriched. Because of the way Gall works, the agent `%keep` has no way of knowing when the wrapper is removed from an agent. You'll have to try subscribing/scrying and be prepared to handle failures.
 
 ### Keep-enriched agents
 

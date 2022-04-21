@@ -8,8 +8,7 @@
   +$  agent                             ::
     $%  [%init dap=dude key=term]       :: Initiate agent as keeper
         [%grab dap=dude key=term]       :: Request old backup
-        [%join dap=dude]                :: Register new wrapped agent
-        [%quit dap=dude]                :: Deregister wrapped agent
+        [%tell dap=dude]                :: Register wrapped agent
     ==
   ::                                    :: To the wrapper.
   +$  wrapper                           ::

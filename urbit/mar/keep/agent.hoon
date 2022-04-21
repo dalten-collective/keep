@@ -11,5 +11,9 @@
 ++  grab
   |%
   ++  noun  agent:poke
+  ++  json
+    %+  corl  $>(%tell agent:poke)
+    =,  dejs:format
+    (of ~[['tell' (ot ~[['dap' so] ['live' bo]])]])
   --
 --

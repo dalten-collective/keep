@@ -11,7 +11,7 @@
 +$  state-0
   $:  %0
       kept=(map [dude ship] noun)
-      enabled=(list dude)
+      live=(set dude)
   ==
 --
 ::
@@ -57,17 +57,12 @@
       %agent  [src.bowl dap.cmd]
       %poke   keep+!>([%data data key.cmd])
     ==  ==
-  ::  "I exist," said a wrapper on our own ship.
-      %join
+  ::  "De/register me," said a wrapper on our own ship.
+      %tell
     ?>  =(src.bowl our.bowl)
-    ?:  (contains enabled dap.cmd)  `this
-    :_  this(enabled [dap.cmd enabled])
-    ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'join' s+dap.cmd))]]
-  ::  "I quit," said a wrapper on our own ship.
-      %quit
-    ?>  =(src.bowl our.bowl)
-    :_  this(enabled (delete dap.cmd enabled))
-    ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'quit' s+dap.cmd))]]
+    :_  this(live (~(put in live) +.cmd))
+    ?:  (~(has in live) dap.cmd)  ~
+    ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'agent' s+dap.cmd))]]
   ==
 ::
 ++  on-agent
@@ -88,8 +83,8 @@
   ?.  ?=([%website ~] path)  (on-watch:def path)
   :_  this
   :~  :*
-    %give  %fact  ~[/website]  %json
-    !>((frond:enjs:format 'agents' a+(turn enabled (lead %s))))
+    %give  %fact  ~[/website]
+    json+!>((frond:enjs:format 'agents' a+(turn ~(tap in live) (lead %s))))
   ==  ==
 ::
 ++  on-init   on-init:def
