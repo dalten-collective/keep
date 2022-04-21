@@ -12,6 +12,7 @@
 ::
 +$  state-0
   $:  %0
+      live=_|
       last=(map ship @da)
       auto=(map ship @dr)
       pending=(map ship [?(%invite %restore) term])
@@ -40,12 +41,13 @@
     ?-  -.cmd
     ::  Back up your state once
         %once
+      ?>  live
       ?>  =(src.bowl our.bowl)
       =/  paths
         ::  Already backing up to there?
         %+  murn  ~(val by sup.bowl)
         |=  [=ship =path]
-        ?.  =(ship to.cmd)   ~
+        ?.  &(=(ship to.cmd) ?=([%keep %data @ ~] path))  ~
         `path
       ?~  paths
         ::  No. Initiate new connection.
@@ -55,7 +57,7 @@
         :~  :*
           %pass   /keep/init/(scot %p to.cmd)
           %agent  [to.cmd %keep]
-          %poke   keep-agent+!>((agent:poke %init dap.bowl key))
+          %poke   keep-agent+!>([%init dap.bowl key])
         ==  ==
       ::  Yes. Just give the fact.
       :_  this(last (~(put by last) to.cmd now.bowl))
@@ -69,6 +71,7 @@
       ==
     ::  Set/unset repeating backups
         %many
+      ?>  live
       ?>  =(src.bowl our.bowl)
       :_  this(auto (putunit auto to.cmd freq.cmd))
       =/  freq  (~(get by auto) to.cmd)
@@ -82,6 +85,7 @@
       ==
     ::  Start repairing your state
         %mend
+      ?>  live
       ?>  =(src.bowl our.bowl)
       =/  key  (scot %uv (sham eny.bowl))
       ~&  cmd
@@ -94,6 +98,7 @@
       ==  ==
     ::  Load this back
         %data
+      ?>  live
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
@@ -101,33 +106,44 @@
       :_  this
       :_  cards
       (restored:json src.bowl now.bowl)
+    ::  Turn wrapper on or off
+        %live
+      ?>  =(our.bowl src.bowl)
+      ?:  =(live live.cmd)  `this
+      :_  this(live live.cmd)
+      %-  (leadif live.cmd (state:json state))
+      :~  (live:json live.cmd)
+          =/  plan  ?:(live.cmd %join %quit)
+          :*  %pass   /keep/[plan]
+              %agent  [our.bowl %keep]
+              %poke   keep-agent+!>((agent:poke plan dap.bowl))
+          ==
+      ==
     ==
   ::
   ++  on-peek
     |=  =path
     ^-  (unit (unit cage))
     ~&  [%keep peek=path]
-    ?.  ?=([%x %keep ~] path)  (on-peek:ag path)
-    ``loob+!>(&)
+    ?.  ?=([%x %keep %live ~] path)  (on-peek:ag path)
+    ``loob+!>(live)
   ::
   ++  on-init
     ^-  (quip card agent:gall)
     =^  cards  agent  on-init:ag
-    :_  this
-    :_  cards
-    :*
-      %pass   /keep/hiya
-      %agent  [our.bowl %keep]
-      %poke   keep-agent+!>([%hiya dap.bowl])
-    ==
+    [cards this]
   ::
   ++  on-save
+    ?.  live  on-save:ag
     !>([on-save:ag state])
   ::
   ++  on-load
     |=  old=vase
     ^-  (quip card agent:gall)
-    =^  their  state  !<([vase state-0] old)
+    ?~  res=(mole |.(!<([vase state-0] old)))
+      =^  cards  agent  (on-load:ag old)
+      [cards this]
+    =^  their  state  u.res
     =^  cards  agent  (on-load:ag their)
     [cards this]
   ::
@@ -146,7 +162,8 @@
     ?+  +.path  (on-watch:def path)
     ::
         [%website ~]
-      [~[(state:json state)] this]
+      :_  this
+      ~[(live:json live) (state:json state)]
     ::
         [%data term ~]
       ~|  %didnt-ask
@@ -209,6 +226,9 @@
   ::
   ++  restored
     |=  new=[@p @da]  (website-card (frond 'restored' (json-da new)))
+  ::
+  ++  live
+    |=  live=?  (website-card (frond 'active' b+live))
   ::
   ++  state
     |=  state=state-0

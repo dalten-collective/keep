@@ -14,12 +14,32 @@
   ?~  a  ~
   (b u.a)
 ::
+++  bindfall
+  |*  [a=(unit) b=* f=gate]
+  ^+  (f)
+  (fall (bind a f) b)
+::
 ++  putunit
   |*  [=(map) key=* =(unit)]
   ^+  map
   ?~  unit
     (~(del by map) key)
   (~(put by map) key +.unit)
+::
+++  contains
+  |*  [=(list) a=*]
+  ^-  ?
+  !(isnull (find [a ~] list))
+::
+++  delete
+  |*  [a=* =(list)]
+  ^+  list
+  (skip list (cury test a))
+::
+++  leadif
+  |*  [cond=? a=*]
+  ?.  cond  same
+  (lead a)
 ::
 ++  isnull  |=  *  ^-  ?  =(~ +<)
 ::

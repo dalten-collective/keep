@@ -18,15 +18,18 @@ All keep-enriched agents can be poked with the mark `%keep` and support the foll
 [%once to=ship]                 :: Backup
 [%many to=ship freq=(unit @dr)] :: Repeat backup
 [%mend from=ship]               :: Initiate recovery
+[%live live=?]                  :: (De)activate. Deact before uninstall!
 ```
 
 These can also come in the form of JSON:
 
 ```json
-{"once": {"to": "~sampel-palnet"}}
+{"once": "~sampel-palnet"}
 {"many": {"to": "~sampel", "freq": 500}}
 {"many": {"to": "~palnet", "freq": null}}
-{"mend": {"from": "~sampel-palnet"}}
+{"mend": "~sampel-palnet"}
+{"live": true}
+{"live": false}
 ```
 
 - `%once`
@@ -42,6 +45,12 @@ These can also come in the form of JSON:
   If setting repeating backups and this agent **has** been backed up to the specified ship at time `t`, this will trigger a backup immediately or at time `t+freq`, whichever comes last.
 - `%mend`
   Load a backup from the specified ship.
+- `%live`
+  Activate/deactivate the keep wrapper. Always initialized to false/deactivated.
+
+  This *needs* to be set to false before the wrapper is removed from the source code of any keep-enriched agent. Otherwise the previously enriched agent will most likely crash, or worse exhibit unexpected behaviour, possibly corrupting its own state.
+
+  When the wrapper is deactivated, the only available poke is to activate it again. However, subscribers will not be kicked, and new subscriptions will still be accepted.
 
 ## Subscriptions
 
@@ -55,10 +64,16 @@ After initial subscription, you will receive:
 {"agents": ["agent0", "agent1", "agent2"]}
 ```
 
-Whenever a new keep-enriched agent is registered, you will receive:
+Whenever a new keep-enriched agent is activated, you will receive:
 
 ```json
-{"agent": "agent3"}
+{"join": "agent3"}
+```
+
+Whenever a keep-enriched agent is deactivated, you will receive:
+
+```json
+{"quit": "agent1"}
 ```
 
 ### Keep-enriched agents
@@ -66,6 +81,14 @@ Whenever a new keep-enriched agent is registered, you will receive:
 Subscribe to `/keep/website` to get JSON objects specifying new backups as well as the current settings. As a subscriber, you will receive:
 
 #### After initial subscription
+
+You will receive two objects. One tells you whether the wrapper is active or not:
+
+```json
+{"active": false}
+```
+
+The other contains the current state:
 
 ```json
 {
@@ -87,6 +110,8 @@ Subscribe to `/keep/website` to get JSON objects specifying new backups as well 
 - `saved` is an array of objects, each containing a ship and a unix timestamp, specifying when this agent was last backed up to each ship.
 - `auto` is an array of objects, each containing a ship and a frequency in seconds, specifying how often we automatically back up to each ship, if at all.
 - `pending` is an array of objects, each containing a ship and a status `"invite"` or `"restore"`. These are ships from which we currently await a response to a request to either keep our state or hand us an old state, respectively.
+
+Note that if the wrapper is deactivated, its state **may disappear without notice** and no automatic backups will be performed, so if the second object contains any information, treat it as a historical record rather than current fact. We still provide it, and frontends may choose to simply discard it, or display parts of it to the user. Obviously any entries in `saved` will still be correct.
 
 #### After a successful backup
 
@@ -118,8 +143,12 @@ This has the same format as the `"pending"` entry in the initial json object, ex
 {"restored": {"ship": "~sampel-palnet", "time": 600}}
 ```
 
-This means that the state was restored from the backup kept by `~sampel-palnet` at unix time `600`.
+This means that at unix time `600`, the state was restored using the backup kept by `~sampel-palnet`.
+
+#### After successful (de)activation
+
+You will receive the same two objects as when initially subscribing, with the exception that if the wrapper was deactivated, you will not receive the object containing the current state.
 
 ## Scries
 
-Keep-enriched agents can be scried at `/keep/loob`. It will always return `%.y`, signifying that the agent is, in fact, keep-enriched.
+Keep-enriched agents can be scried at `/keep/live/loob`. It will return a boolean, signifying whether the wrapper is active or not.

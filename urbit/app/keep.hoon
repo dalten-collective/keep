@@ -1,7 +1,7 @@
 ::  keep: backup manager
 ::
 /-  *keep
-/+  default-agent, dbug
+/+  default-agent, dbug, *sane
 ::
 |%
 +$  versioned-state
@@ -34,12 +34,12 @@
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
-  ?>  (team:title [src our]:bowl) :: Only backup to moons for now.
   ?>  ?=(%keep-agent mark)
   =/  cmd  !<(agent:poke vase)
   ?-  -.cmd
   ::  "Subscribe to my stuff," said someone else's wrapper.
       %init
+    ?>  (team:title [src our]:bowl) :: Only backup to moons for now.
     :_  this
     :~  :*
       %pass   /backups/(scot %p src.bowl)/[dap.cmd]
@@ -58,9 +58,16 @@
       %poke   keep+!>([%data data key.cmd])
     ==  ==
   ::  "I exist," said a wrapper on our own ship.
-      %hiya
+      %join
+    ?>  =(src.bowl our.bowl)
+    ?:  (contains enabled dap.cmd)  `this
     :_  this(enabled [dap.cmd enabled])
-    ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'agent' s+dap.cmd))]]
+    ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'join' s+dap.cmd))]]
+  ::  "I quit," said a wrapper on our own ship.
+      %quit
+    ?>  =(src.bowl our.bowl)
+    :_  this(enabled (delete dap.cmd enabled))
+    ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'quit' s+dap.cmd))]]
   ==
 ::
 ++  on-agent
@@ -70,7 +77,7 @@
   ?+  -.sign  (on-agent:def wire sign)
   ::
       %fact
-    ~&  %store-backup
+    ~&  >  [%store-backup of=,.&3.wire from=src.bowl]
     ?.  ?=(%noun p.cage.sign)  `this
     `this(kept (~(put by kept) [&3.wire src.bowl] !<(noun q.cage.sign)))
   ==
