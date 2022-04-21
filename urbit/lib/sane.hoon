@@ -27,7 +27,7 @@
   (~(put by map) key +.unit)
 ::
 ++  contains
-  |*  [=(list) a=*]
+  |*  [a=* =(list)]
   ^-  ?
   !(isnull (find [a ~] list))
 ::

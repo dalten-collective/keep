@@ -113,12 +113,10 @@
       :_  this(live live.cmd)
       %-  (leadif live.cmd (state:json state))
       :~  (live:json live.cmd)
-          =/  plan  ?:(live.cmd %join %quit)
-          :*  %pass   /keep/[plan]
+          :*  %pass   /keep/tell
               %agent  [our.bowl %keep]
-              %poke   keep-agent+!>((agent:poke plan dap.bowl))
-          ==
-      ==
+              %poke   keep-agent+!>([%tell dap.bowl live.cmd])
+      ==  ==
     ==
   ::
   ++  on-peek

@@ -57,17 +57,15 @@
       %agent  [src.bowl dap.cmd]
       %poke   keep+!>([%data data key.cmd])
     ==  ==
-  ::  "I exist," said a wrapper on our own ship.
-      %join
+  ::  "De/register me," said a wrapper on our own ship.
+      %tell
     ?>  =(src.bowl our.bowl)
-    ?:  (contains enabled dap.cmd)  `this
+    ?.  live.cmd
+      :_  this(enabled (delete dap.cmd enabled))
+      ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'quit' s+dap.cmd))]]
+    ?:  (contains dap.cmd enabled)  `this
     :_  this(enabled [dap.cmd enabled])
     ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'join' s+dap.cmd))]]
-  ::  "I quit," said a wrapper on our own ship.
-      %quit
-    ?>  =(src.bowl our.bowl)
-    :_  this(enabled (delete dap.cmd enabled))
-    ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'quit' s+dap.cmd))]]
   ==
 ::
 ++  on-agent
