@@ -64,17 +64,13 @@ After initial subscription, you will receive:
 {"agents": ["agent0", "agent1", "agent2"]}
 ```
 
-Whenever a new keep-enriched agent is activated, you will receive:
+Whenever a new agent becomes keep-enriched, you will receive:
 
 ```json
-{"join": "agent3"}
+{"agent": "agent3"}
 ```
 
-Whenever a keep-enriched agent is deactivated, you will receive:
-
-```json
-{"quit": "agent1"}
-```
+**Note** that these agents are not guaranteed to stay keep-enriched. Because of the way Gall works, the agent `%keep` has no way of knowing when the wrapper is removed from an agent. You'll have to try subscribing/scrying and be prepared to handle failures.
 
 ### Keep-enriched agents
 
@@ -148,10 +144,6 @@ This means that at unix time `600`, the state was restored using the backup kept
 #### After successful (de)activation
 
 You will receive the same two objects as when initially subscribing, with the exception that if the wrapper was deactivated, you will not receive the object containing the current state.
-
-**IMPORTANT:** Broadcasting this information may seem redundant, since the `%keep` agent already broadcasts updates on agent (de)activation. However, due to the way Gall currently works, we can't *guarantee* that those are always correct. The user or a malicious app on the same ship can trick the `%keep` agent to believe that a wrapper has been de/activated when it hasn't. If there are any inconsistencies, treat the data from the wrapper as authorative. If possible, please also set the correct value by poking the `%keep` agent with `[%tell dap=dude live=?]` (or `{"tell": {"dap": "{<agent-name>}", "live": true/false}}`).
-
-(We *could* fix this, but 1) it doesn't seem like an important problem, 2) it would be unpleasantly bloated and 3) there have already been discussions on how Gall could be changed to solve this.)
 
 ## Scries
 
