@@ -1,9 +1,9 @@
 import urbitAPI from "./urbitAPI";
 
 export default {
-  testBackup() {
+  testBackup(agentName: string) {
     urbitAPI.poke({
-      app: "gora",
+      app: agentName,
       mark: "keep",
       json: {
         once: {
@@ -12,9 +12,9 @@ export default {
       },
     });
   },
-  testRestore() {
+  testRestore(agentName: string) {
     urbitAPI.poke({
-      app: "gora",
+      app: agentName,
       mark: "keep",
       json: {
         mend: {

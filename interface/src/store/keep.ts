@@ -25,11 +25,11 @@ export default {
       commit("setAgents", agents);
     },
 
-    testBackup() {
-      keepApi.testBackup();
+    testBackup(payload: { agentName: string} ) {
+      keepApi.testBackup(payload.agentName);
     },
-    testRestore() {
-      keepApi.testRestore();
+    testRestore(payload: { agentName: string }) {
+      keepApi.testRestore(payload.agentName);
     },
   },
 };

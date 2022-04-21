@@ -1,11 +1,12 @@
 <template>
   <div>
     Keep
-    <pre>
-      agents: {{ agents }}
-    </pre>
-    <button @click="testBackup">Test Backup</button>
-    <button @click="testRestore">Test Restore</button>
+    <div v-for="agent in agents">
+      <h3>{{ agent }}</h3>
+      <button @click="testBackup(agent)">Test Backup</button>
+      <button @click="testRestore(agent)">Test Restore</button>
+    </div>
+
   </div>
 </template>
 
@@ -21,13 +22,13 @@ export default defineComponent({
     ...mapGetters("keep", ["agents"]),
   },
   methods: {
-    testBackup() {
+    testBackup(agent) {
       console.log('backing up')
-      this.$store.dispatch("keep/testBackup");
+      this.$store.dispatch("keep/testBackup", { agentName: agent });
     },
-    testRestore() {
+    testRestore(agent) {
       console.log('restoring')
-      this.$store.dispatch("keep/testRestore");
+      this.$store.dispatch("keep/testRestore", { agentName: agent });
     },
   },
 });
