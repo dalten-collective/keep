@@ -4,7 +4,7 @@ export default {
   namespaced: true,
   state() {
     return {
-      agents: [],
+      agents: [] as Array<string>,
     };
   },
 
@@ -15,24 +15,34 @@ export default {
   },
 
   mutations: {
-    setAgents(state, agents: Array<any>) {
+    setAgents(state, agents: Array<string>) {
       state.agents = agents;
+    },
+    removeAgent(state, agentName: string) {
+      state.agents = state.agents.filter((a: string) => a != agentName);
     },
   },
 
   actions: {
-    setAgents({ commit }, agents: Array<any>) {
+    setAgents({ commit, dispatch }, agents: Array<string>) {
       commit("setAgents", agents);
+      agents.forEach((agentName: string) => {
+        dispatch("ship/openAirlockToAgent", agentName, { root: true });
+      });
     },
 
-    testBackup({}, payload: { agentName: string} ) {
+    removeAgent({ commit }, agentName: string) {
+      commit("removeAgent", agentName);
+    },
+
+    testBackup(payload: { agentName: string }) {
       keepApi.testBackup(payload.agentName);
     },
-    testRestore({}, payload: { agentName: string }) {
+    testRestore(payload: { agentName: string }) {
       keepApi.testRestore(payload.agentName);
     },
-    activate({}, payload: { agentName: string }) {
-      console.log(payload)
+    activate(payload: { agentName: string }) {
+      console.log(payload);
       keepApi.activate(payload.agentName);
     },
   },

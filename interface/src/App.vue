@@ -1,5 +1,8 @@
 <template>
   <router-view />
+  <button @click="startMainAirlock">Start Main airlock(s)</button>
+  <button @click="closeMainAirlock">Close keep airlock</button>
+  <button @click="closeAgentAirlocks">Close all agent airlocks</button>
 </template>
 
 <script lang="ts">
@@ -7,18 +10,23 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   mounted() {
-    this.startAirlock();
+    this.startMainAirlock();
   },
   unmounted() {
-    this.closeAirlock();
+    this.closeMainAirlock();
+    this.closeAgentAirlocks();
   },
   methods: {
-    startAirlock() {
-      this.$store.dispatch("ship/startAirlock");
+    startMainAirlock() {
+      this.$store.dispatch("ship/openKeepAirlock");
     },
 
-    closeAirlock() {
-      this.$store.dispatch("ship/closeAirlock");
+    closeMainAirlock() {
+      this.$store.dispatch("ship/closeKeepAirlock");
+    },
+
+    closeAgentAirlocks() {
+      this.$store.dispatch("ship/closeAgentAirlocks");
     },
   },
 });

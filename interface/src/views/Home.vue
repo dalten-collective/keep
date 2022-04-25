@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>Keep</h1>
-    <div v-if="agents.length > 0">
+    <div v-if="agents && agents.length > 0">
       <div v-for="agent in agents" :key="agent">
         <h3>{{ agent }}</h3>
         <button @click="testBackup(agent)">Test Backup</button>
@@ -39,6 +39,9 @@ export default defineComponent({
     testRestore(agent) {
       console.log("restoring");
       this.$store.dispatch("keep/testRestore", { agentName: agent });
+    },
+    closeAgentAirlock() {
+      this.$store.dispatch("ship/closeKeepAirlock");
     },
     activateAgent() {
       console.log("activating");
