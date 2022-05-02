@@ -1,9 +1,6 @@
 import airlock from "../api";
 
-interface AgentSubscription {
-  agentName: string;
-  subscriptionNumber: number;
-}
+import { AgentSubscription, KeepAgentSubscriptionStatus } from "@/types";
 
 export default {
   namespaced: true,
@@ -23,6 +20,7 @@ export default {
       }
       return null;
     },
+
     agentSubscriptions(state): Array<AgentSubscription> | [] {
       return state.subscriptions.filter((sub) => {
         return sub.agentName != "keep";
@@ -59,11 +57,38 @@ export default {
       );
     },
 
-    openAirlockToAgent({ dispatch }, agentName: string) {
+    openAirlockToAgent({ dispatch, commit }, agentName: string) {
       airlock.openAirlockTo(
         agentName,
-        (data) => {
+        (data: KeepAgentSubscriptionStatus) => {
+          // set up default if not present
+          commit("keep/setAgentStatus", { agentName }, { root: true });
+
+          // DEBUG:
           console.log("data ", data);
+          if (Object.prototype.hasOwnProperty.call(data, "pending")) {
+            const pending = data.pending;
+            // TODO: make these actions.
+            commit(
+              "keep/setPendingOnAgent",
+              { agentName, pending },
+              { root: true }
+            );
+          }
+
+          if (Object.prototype.hasOwnProperty.call(data, "saved")) {
+            const saved = data.saved;
+            commit(
+              "keep/setSavedOnAgent",
+              { agentName, saved },
+              { root: true }
+            );
+          }
+
+          if (Object.prototype.hasOwnProperty.call(data, "saved")) {
+            const auto = data.auto;
+            commit("keep/setAutoOnAgent", { agentName, auto }, { root: true });
+          }
         },
         (subscriptionNumber: number) => {
           dispatch("addSubscription", {
@@ -78,11 +103,15 @@ export default {
       commit("unsetSubscription", subscription);
     },
 
-    addSubscription({ state, commit, dispatch }, payload: AgentSubscription) {
-      const existing: Array<AgentSubscription> | [] =
-        state.subscriptions.filter((s: AgentSubscription) => {
-          return s.agentName === payload.agentName;
-        });
+    addSubscription(
+      { state, commit, dispatch },
+      payload: AgentSubscription
+    ) {
+      const existing:
+        | Array<AgentSubscription>
+        | [] = state.subscriptions.filter((s: AgentSubscription) => {
+        return s.agentName === payload.agentName;
+      });
       existing.forEach((sub) => {
         dispatch("removeSubscription", sub);
       });

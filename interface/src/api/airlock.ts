@@ -23,6 +23,7 @@ export function openAirlockTo(
 }
 
 export function openKeepAirlock(onEvent, onSubNumber: onSubNumber) {
+  urbitAPI.reset(); // First wipe all airlocks
   urbitAPI
     .subscribe({
       app: "keep",

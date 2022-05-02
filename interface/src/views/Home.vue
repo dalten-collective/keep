@@ -3,15 +3,19 @@
     <h1>Keep</h1>
     <div v-if="agents && agents.length > 0">
       <div v-for="agent in agents" :key="agent">
-        <h3>{{ agent }}</h3>
-        <button @click="testBackup(agent)">Test Backup</button>
-        <button @click="testRestore(agent)">Test Restore</button>
+        <KeepAgent :agentName="agent" />
       </div>
     </div>
     <div v-else>No keep agents on this ship</div>
     <hr />
     <input type="text" v-model="agentToActivate" />
     <button @click="activateAgent">Activate {{ agentToActivate }}</button>
+    <br />
+    <input type="text" placeholder="scry app" v-model="scryApp" />
+    <input type="text" placeholder="scry path" v-model="scryPath" />
+    <button @click="testScry">
+      Scry (to {{ scryApp }} with {{ scryPath }})
+    </button>
   </div>
 </template>
 
@@ -19,36 +23,40 @@
 import { defineComponent } from "vue";
 
 import { mapGetters } from "vuex";
+import { Scry } from "@urbit/http-api";
+
+import KeepAgent from "@/components/KeepAgent.vue"
 
 export default defineComponent({
   name: "HomeView",
-  components: {},
+  components: {
+    KeepAgent,
+  },
   computed: {
     ...mapGetters("keep", ["agents"]),
   },
   data() {
     return {
-      agentToActivate: "gora",
+      scryApp: "",
+      scryPath: "",
     };
   },
   methods: {
-    testBackup(agent) {
-      console.log("backing up");
-      this.$store.dispatch("keep/testBackup", { agentName: agent });
-    },
-    testRestore(agent) {
-      console.log("restoring");
-      this.$store.dispatch("keep/testRestore", { agentName: agent });
+    testScry() {
+      console.log("scrying ", this.scryApp, this.scryPath);
+      const scry: Scry = { app: this.scryApp, path: this.scryPath };
+      this.$store.dispatch("keep/scry", scry);
     },
     closeAgentAirlock() {
       this.$store.dispatch("ship/closeKeepAirlock");
     },
-    activateAgent() {
-      console.log("activating");
-      this.$store.dispatch("keep/activate", {
-        agentName: this.agentToActivate,
-      });
-    },
+    // TODO: remove
+    // activateAgent() {
+    //   console.log("activating");
+    //   this.$store.dispatch("keep/activate", {
+    //     agentName: this.agentToActivate,
+    //   });
+    // },
   },
 });
 </script>

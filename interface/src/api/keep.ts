@@ -1,4 +1,5 @@
 import urbitAPI from "./urbitAPI";
+import { Scry } from "@urbit/http-api";
 
 export default {
   activate(agentName: string) {
@@ -11,17 +12,33 @@ export default {
     });
   },
 
-  testBackup(agentName: string) {
+  scry(scry: Scry) {
+    urbitAPI
+      .scry(scry)
+      .then((r) => {
+        console.log(r);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  },
+
+  testBackup(payload: { agentName: string; ship: string }) {
+    // gets data: { pending: { status: "invite", ship: "sum" } }
     urbitAPI.poke({
-      app: agentName,
+      app: payload.agentName,
       mark: "keep",
       json: {
-        once: {
-          to: "~sum",
-        },
+        once: payload.ship,
       },
+    }).then((r) => {
+      console.log('res ', r)
+    }).catch((e) => {
+      // TODO: 'e' is undefined
+      console.log('err ', e)
     });
   },
+
   testRestore(agentName: string) {
     urbitAPI.poke({
       app: agentName,
