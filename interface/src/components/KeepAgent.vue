@@ -46,6 +46,7 @@ export default defineComponent({
       console.log("restoring");
       this.$store.dispatch("keep/testRestore", {
         agentName: this.agentName,
+        ship: this.backupShip,
       });
     },
   },

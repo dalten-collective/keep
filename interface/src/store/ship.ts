@@ -89,6 +89,13 @@ export default {
             const auto = data.auto;
             commit("keep/setAutoOnAgent", { agentName, auto }, { root: true });
           }
+
+          if (Object.prototype.hasOwnProperty.call(data, "restored")) {
+            // TODO: clear out any "pending: status: restore" items...
+            const restored = data.restored;
+            commit("keep/setRestoredOnAgent", { agentName, restored }, { root: true });
+          }
+
         },
         (subscriptionNumber: number) => {
           dispatch("addSubscription", {

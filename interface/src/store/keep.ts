@@ -4,6 +4,7 @@ import {
   PendingStatus,
   SavedStatus,
   AutoStatus,
+  RestoredStatus,
   KeepAgentStatus,
 } from "@/types";
 
@@ -47,6 +48,7 @@ export default {
             pending: [],
             auto: [],
             saved: [],
+            restored: [],
           },
         };
         state.activeAgents.push(agentStatus);
@@ -111,6 +113,23 @@ export default {
         // TODO: can this even happen?
       }
     },
+
+    setRestoredOnAgent(
+      state,
+      payload: { agentName: string; restored: Array<RestoredStatus> }
+    ) {
+      const existingAgent: KeepAgentStatus = state.activeAgents.find(
+        (a) => a.agentName === payload.agentName
+      );
+      if (existingAgent) {
+        // if already present in activeAgents, just update this key
+        existingAgent.status.restored = existingAgent.status.restored.concat(
+          payload.restored
+        );
+      } else {
+        // TODO: can this even happen?
+      }
+    },
   },
 
   actions: {
@@ -133,10 +152,10 @@ export default {
 
     testBackup({}, payload: { agentName: string; ship: string }) {
       // TODO: make sure ship name is prefixed with ~
-      keepApi.testBackup({ agentName: payload.agentName, ship: payload.ship });
+      keepApi.testBackup(payload);
     },
-    testRestore(payload: { agentName: string }) {
-      keepApi.testRestore(payload.agentName);
+    testRestore({}, payload: { agentName: string; ship: string }) {
+      keepApi.testRestore(payload);
     },
     activate(payload: { agentName: string }) {
       console.log(payload);

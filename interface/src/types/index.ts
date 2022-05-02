@@ -13,10 +13,16 @@ export interface AutoStatus {
   freq: number;
 }
 
+export interface RestoredStatus {
+  ship: string;
+  time: number;
+}
+
 export interface KeepAgentSubscriptionStatus {
   pending: Array<PendingStatus>;
   auto: Array<AutoStatus>;
   saved: Array<SavedStatus>;
+  restored: Array<RestoredStatus>;
 }
 
 export interface KeepAgentStatus {
