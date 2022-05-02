@@ -6,6 +6,10 @@ import {
   AutoStatus,
   RestoredStatus,
   KeepAgentStatus,
+  OnceRequest,
+  ManyRequest,
+  UnsetManyRequest,
+  RestoreRequest,
 } from "@/types";
 
 export default {
@@ -150,11 +154,19 @@ export default {
       commit("removeAgent", agentName);
     },
 
-    testBackup({}, payload: { agentName: string; ship: string }) {
+    testOnce({}, payload: OnceRequest) {
       // TODO: make sure ship name is prefixed with ~
-      keepApi.testBackup(payload);
+      keepApi.testOnce(payload);
     },
-    testRestore({}, payload: { agentName: string; ship: string }) {
+    testMany({}, payload: ManyRequest) {
+      // TODO: make sure ship name is prefixed with ~
+      keepApi.testMany(payload);
+    },
+    testUnsetMany({}, payload: UnsetManyRequest) {
+      // TODO: make sure ship name is prefixed with ~
+      keepApi.testUnsetMany(payload);
+    },
+    testRestore({}, payload: RestoreRequest) {
       keepApi.testRestore(payload);
     },
     activate(payload: { agentName: string }) {

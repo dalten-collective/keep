@@ -85,7 +85,7 @@ export default {
             );
           }
 
-          if (Object.prototype.hasOwnProperty.call(data, "saved")) {
+          if (Object.prototype.hasOwnProperty.call(data, "auto")) {
             const auto = data.auto;
             commit("keep/setAutoOnAgent", { agentName, auto }, { root: true });
           }
