@@ -41,13 +41,27 @@ export default {
 
   actions: {
     openKeepAirlock({ dispatch }) {
+        console.log("opening to keep...");
       airlock.openKeepAirlock(
         (data) => {
+          // TODO: will be data.agent (singular) on new agent registered
           console.log("data ", data);
-          const agents = data.agents;
-          dispatch("keep/setAgents", agents, { root: true });
+
+          { agent: 'thjing' }
+          if (Object.prototype.hasOwnProperty.call(data, "agent")) {
+            const agents = data.agent;
+            dispatch("keep/setAgents", agents, { root: true });
+          }
+
+          { agents: [ 'thjing', 'thing' ] }
+          if (Object.prototype.hasOwnProperty.call(data, "agents")) {
+            const agents = data.agents;
+            dispatch("keep/setAgents", agents, { root: true });
+          }
+
         },
         (subscriptionNumber: number) => {
+          console.log("keep sub: ", subscriptionNumber)
           // TODO: this should be close, I think.
           dispatch("addSubscription", {
             agentName: "keep",
@@ -65,6 +79,7 @@ export default {
           commit("keep/setAgentStatus", { agentName }, { root: true });
 
           // DEBUG:
+          console.log("agentName ", agentName);
           console.log("data ", data);
           if (Object.prototype.hasOwnProperty.call(data, "pending")) {
             const pending = data.pending;
@@ -81,6 +96,15 @@ export default {
             commit(
               "keep/setSavedOnAgent",
               { agentName, saved },
+              { root: true }
+            );
+          }
+
+          if (Object.prototype.hasOwnProperty.call(data, "active")) {
+            const active = data.active;
+            commit(
+              "keep/setActiveOnAgent",
+              { agentName, active },
               { root: true }
             );
           }

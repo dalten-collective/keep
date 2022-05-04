@@ -10,6 +10,7 @@ import {
   ManyRequest,
   UnsetManyRequest,
   RestoreRequest,
+  KeepAgentSubscriptionStatus,
 } from "@/types";
 
 export default {
@@ -17,7 +18,7 @@ export default {
   state() {
     return {
       agents: [] as Array<string>,
-      activeAgents: [] as Array<KeepAgentStatus>,
+      wrappedAgents: [] as Array<KeepAgentStatus>,
     };
   },
 
@@ -25,10 +26,26 @@ export default {
     agents(state): Array<string> {
       return state.agents;
     },
-    agentStatus: (state) => (agentName: string) => {
-      return state.activeAgents.find((sub: KeepAgentStatus) => {
+    activeAgents(state): Array<KeepAgentStatus> {
+      return state.wrappedAgents.filter((a) => {
+        return a.status.active === true;
+      });
+    },
+    inactiveAgents(state): Array<KeepAgentStatus> {
+      return state.wrappedAgents.filter((a) => {
+        return a.status.active === false;
+      });
+    },
+    agentStatus: (state) => (
+      agentName: string
+    ): KeepAgentSubscriptionStatus | null => {
+      const s = state.wrappedAgents.find((sub: KeepAgentStatus) => {
         return sub.agentName == agentName;
       });
+      if (s) {
+        return s.status;
+      }
+      return null;
     },
   },
 
@@ -41,7 +58,7 @@ export default {
     },
 
     setAgentStatus(state, payload: { agentName: string }) {
-      const existingAgent: KeepAgentStatus = state.activeAgents.find(
+      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
         (a) => a.agentName === payload.agentName
       );
       // Only set this empty status if we don't already have this agent.
@@ -53,9 +70,10 @@ export default {
             auto: [],
             saved: [],
             restored: [],
+            active: false,
           },
         };
-        state.activeAgents.push(agentStatus);
+        state.wrappedAgents.push(agentStatus);
       }
     },
 
@@ -63,7 +81,7 @@ export default {
       state,
       payload: { agentName: string; pending: Array<PendingStatus> }
     ) {
-      const existingAgent: KeepAgentStatus = state.activeAgents.find(
+      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
         (a) => a.agentName === payload.agentName
       );
       if (existingAgent) {
@@ -88,7 +106,7 @@ export default {
       state,
       payload: { agentName: string; saved: Array<SavedStatus> }
     ) {
-      const existingAgent: KeepAgentStatus = state.activeAgents.find(
+      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
         (a) => a.agentName === payload.agentName
       );
       if (existingAgent) {
@@ -105,7 +123,7 @@ export default {
       state,
       payload: { agentName: string; auto: Array<AutoStatus> }
     ) {
-      const existingAgent: KeepAgentStatus = state.activeAgents.find(
+      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
         (a) => a.agentName === payload.agentName
       );
       if (existingAgent) {
@@ -122,7 +140,7 @@ export default {
       state,
       payload: { agentName: string; restored: Array<RestoredStatus> }
     ) {
-      const existingAgent: KeepAgentStatus = state.activeAgents.find(
+      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
         (a) => a.agentName === payload.agentName
       );
       if (existingAgent) {
@@ -130,6 +148,18 @@ export default {
         existingAgent.status.restored = existingAgent.status.restored.concat(
           payload.restored
         );
+      } else {
+        // TODO: can this even happen?
+      }
+    },
+
+    setActiveOnAgent(state, payload: { agentName: string; active: boolean }) {
+      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
+        (a) => a.agentName === payload.agentName
+      );
+      if (existingAgent) {
+        // if already present in activeAgents, just update this key
+        existingAgent.status.active = payload.active;
       } else {
         // TODO: can this even happen?
       }
@@ -169,9 +199,11 @@ export default {
     testRestore({}, payload: RestoreRequest) {
       keepApi.testRestore(payload);
     },
-    activate(payload: { agentName: string }) {
-      console.log(payload);
+    activate({}, payload: { agentName: string }) {
       keepApi.activate(payload.agentName);
+    },
+    deactivate({}, payload: { agentName: string }) {
+      keepApi.deactivate(payload.agentName);
     },
   },
 };

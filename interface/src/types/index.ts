@@ -1,31 +1,32 @@
-export export interface PendingStatus {
+export interface PendingStatus {
   status: string;
   ship: string;
 }
 
-export export interface SavedStatus {
+export interface SavedStatus {
   ship: string;
   time: number;
 }
 
-export export interface AutoStatus {
+export interface AutoStatus {
   ship: string;
   freq: number;
 }
 
-export export interface RestoredStatus {
+export interface RestoredStatus {
   ship: string;
   time: number;
 }
 
-export export interface KeepAgentSubscriptionStatus {
+export interface KeepAgentSubscriptionStatus {
   pending: Array<PendingStatus>;
   auto: Array<AutoStatus>;
   saved: Array<SavedStatus>;
   restored: Array<RestoredStatus>;
+  active: boolean;
 }
 
-export export interface KeepAgentStatus {
+export interface KeepAgentStatus {
   agentName: string;
   status: KeepAgentSubscriptionStatus;
 }
@@ -34,7 +35,6 @@ export interface AgentSubscription {
   agentName: string;
   subscriptionNumber: number;
 }
-
 
 export interface OnceRequest {
   ship: string;

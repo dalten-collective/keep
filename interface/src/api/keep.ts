@@ -1,16 +1,47 @@
 import urbitAPI from "./urbitAPI";
 import { Scry } from "@urbit/http-api";
-import { OnceRequest, ManyRequest, UnsetManyRequest, RestoreRequest } from "@/types";
+import {
+  OnceRequest,
+  ManyRequest,
+  UnsetManyRequest,
+  RestoreRequest,
+} from "@/types";
 
 export default {
   activate(agentName: string) {
-    urbitAPI.poke({
-      app: agentName,
-      mark: "keep",
-      json: {
-        live: true,
-      },
-    });
+    urbitAPI
+      .poke({
+        app: agentName,
+        mark: "keep",
+        json: {
+          live: true,
+        },
+      })
+      .then((r) => {
+        console.log("res ", r);
+      })
+      .catch((e) => {
+        // TODO: 'e' is undefined
+        console.log("err ", e);
+      });
+  },
+
+  deactivate(agentName: string) {
+    urbitAPI
+      .poke({
+        app: agentName,
+        mark: "keep",
+        json: {
+          live: false,
+        },
+      })
+      .then((r) => {
+        console.log("res ", r);
+      })
+      .catch((e) => {
+        // TODO: 'e' is undefined
+        console.log("err ", e);
+      });
   },
 
   scry(scry: Scry) {
@@ -84,7 +115,6 @@ export default {
         console.log("err ", e);
       });
   },
-
 
   testRestore(payload: RestoreRequest) {
     urbitAPI

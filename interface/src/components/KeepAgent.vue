@@ -4,11 +4,23 @@
     <pre>
       {{ ourStatus }}
     </pre>
-    <input type="text" placeholder="ship to backup/restore with" v-model="backupShip" />
+    <pre>active: {{ active }}</pre>
+    <button v-if="!active" @click="activateAgent">Activate</button>
+    <button v-else @click="deactivateAgent">Deactivate</button>
+    <br />
+    <input
+      type="text"
+      placeholder="ship to backup/restore with"
+      v-model="backupShip"
+    />
     <button @click="testOnce()">Test Once</button>
     <button @click="testRestore()">Test Restore</button>
-    <br/>
-    <input type="text" placeholder="ship to backup to" v-model="backupShip" />
+    <br />
+    <input
+      type="text"
+      placeholder="ship to backup to"
+      v-model="backupShip"
+    />
     <input type="number" placeholder="frequency" v-model="freq" />
     <button @click="testMany()">Test Many</button>
     <button @click="unsetMany()">Unset Many</button>
@@ -18,7 +30,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
-import { OnceRequest, ManyRequest, UnsetManyRequest, RestoreRequest } from "@/types";
+import {
+  OnceRequest,
+  ManyRequest,
+  UnsetManyRequest,
+  RestoreRequest,
+} from "../types";
 
 export default defineComponent({
   name: "KeepAgent",
@@ -37,11 +54,33 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters("keep", ["agents", "agentStatus"]),
-    ourStatus(): string {
-      return this.agentStatus(this.agentName);
+    ourStatus() {
+      const status = this.agentStatus(this.agentName);
+      if (status) {
+        return status;
+      }
+      return null;
+    },
+    active() {
+      if (!this.ourStatus) {
+        return false;
+      }
+      return !!this.ourStatus.active;
     },
   },
   methods: {
+    activateAgent() {
+      console.log("activating");
+      this.$store.dispatch("keep/activate", {
+        agentName: this.agentName,
+      });
+    },
+    deactivateAgent() {
+      console.log("deactivating");
+      this.$store.dispatch("keep/deactivate", {
+        agentName: this.agentName,
+      });
+    },
     testOnce() {
       const request: OnceRequest = {
         agentName: this.agentName,
