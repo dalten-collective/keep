@@ -147,6 +147,7 @@
   ++  on-leave
     |=  =path
     ^-  (quip card agent:gall)
+    ?:  ?=(%keep -.path)  `this
     =^  cards  agent  (on-leave:ag path)
     [cards this]
   ::
