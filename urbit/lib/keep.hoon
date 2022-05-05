@@ -136,7 +136,7 @@
   ++  on-load
     |=  old=vase
     ^-  (quip card agent:gall)
-    ?^  our=(mole |.(!<([vase state-0] old)))
+    ?^  our=(mole |.(!<([vase _state] old)))
       =^  their  state  u.our
       =^  cards  agent  (on-load:ag their)
       [cards this]
@@ -172,6 +172,7 @@
   ++  on-agent
     |=  [=wire =sign:agent:gall]
     ^-  (quip card agent:gall)
+    ?:  ?=(%keep -.wire)  `this
     =^  cards  agent  (on-agent:ag wire sign)
     [cards this]
   ::

@@ -57,7 +57,7 @@
       %agent  [src.bowl dap.cmd]
       %poke   keep+!>([%data data key.cmd])
     ==  ==
-  ::  "De/register me," said a wrapper on our own ship.
+  ::  "I exist," said a wrapper on our own ship.
       %tell
     ?>  =(src.bowl our.bowl)
     :_  this(live (~(put in live) +.cmd))
