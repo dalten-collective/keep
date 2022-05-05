@@ -63,7 +63,6 @@ export default {
           dispatch("keep/handleKeepResponseType", data.type, { root: true });
           // TODO:
           dispatch("keep/handleKeepResponseDiff", data.diff, { root: true });
-
         },
         (subscriptionNumber: number) => {
           console.log("keep sub: ", subscriptionNumber);
@@ -92,15 +91,15 @@ export default {
           // TODO:
           dispatch(
             "keep/handleAgentResponseType",
-            { agentName, responseType: data.type },
+            { agentName, responseType: data.type, diff: data.diff },
             { root: true }
           );
           // TODO:
-          dispatch(
-            "keep/handleAgentResponseDiff",
-            { agentName, responseDiff: data.diff },
-            { root: true }
-          );
+          //dispatch(
+          //"keep/handleAgentResponseDiff",
+          //{ agentName, responseDiff: data.diff },
+          //{ root: true }
+          //);
         },
         (subscriptionNumber: number) => {
           dispatch("addSubscription", {

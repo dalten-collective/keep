@@ -5,6 +5,13 @@ import {
   SavedStatus,
   AutoStatus,
   RestoredStatus,
+  InviteStatus,
+  AutoOnDiff,
+  AutoOffDiff,
+  ActiveDiff,
+  PendingDiff,
+  RestoreDiff,
+  Diff,
   KeepAgentStatus,
   OnceRequest,
   ManyRequest,
@@ -13,6 +20,8 @@ import {
   KeepAgentSubscriptionStatus,
   KeepSubscriptionState,
   EventType,
+  LogMessage,
+  BackupDiff,
 } from "@/types";
 
 export default {
@@ -111,12 +120,101 @@ export default {
       });
     },
     // TODO
-    handleAgentResponseType({}, responseType: EventType) {
-      console.log("agent response type: ", responseType);
-    },
-    // TODO
-    handleAgentResponseDiff({}, responseDiff: object) {
-      console.log("agent response diff: ", responseDiff);
+    handleAgentResponseType(
+      { dispatch },
+      payload: { agentName: string; responseType: EventType; diff: Diff }
+    ) {
+      console.log("agent response type: ", payload.responseType);
+      console.log("agent response diff ", payload.diff);
+
+      if (payload.responseType === EventType.Pending) {
+        const d = payload.diff as PendingDiff;
+        const time = Date.now();
+        const ship = d.ship;
+        const status = d.status;
+        if (status === InviteStatus.Invite) {
+          const logMsg: LogMessage = {
+            msg: `Invite pending to ${ship}`,
+            time,
+          };
+          dispatch("message/addMessage", logMsg, { root: true });
+        }
+        if (status === InviteStatus.Restore) {
+          const logMsg: LogMessage = {
+            msg: `${ship} accepted invite`,
+            time,
+          };
+          dispatch("message/addMessage", logMsg, { root: true });
+        }
+      }
+
+      if (payload.responseType === EventType.Saved) {
+        const d = payload.diff as BackupDiff;
+        const time = d.time;
+        const ship = d.ship;
+        const logMsg: LogMessage = {
+          msg: `Backed up to ${ship} at ${time}`,
+          time,
+        };
+        dispatch("message/addMessage", logMsg, { root: true });
+      }
+
+      if (payload.responseType === EventType.Restored) {
+        const d = payload.diff as RestoreDiff;
+        const time = d.time;
+        const ship = d.ship;
+        const logMsg: LogMessage = {
+          msg: `Restored from ${ship} at ${time}`,
+          time,
+        };
+        dispatch("message/addMessage", logMsg, { root: true });
+      }
+
+      if (payload.responseType === EventType.Auto) {
+        if (
+          Object.prototype.hasOwnProperty.call(payload.diff, "freq") &&
+          payload.diff.freq
+        ) {
+          const d = payload.diff as AutoOnDiff;
+          const freq = d.freq;
+          const ship = d.ship;
+          const time = Date.now();
+          const logMsg: LogMessage = {
+            msg: `Recurring backups to ${ship} activated every ${freq} seconds`,
+            time,
+          };
+          dispatch("message/addMessage", logMsg, { root: true });
+        } else {
+          const d = payload.diff as AutoOffDiff;
+          const time = d.time;
+          const ship = d.ship;
+          const logMsg: LogMessage = {
+            msg: `Recurring backups to ${ship} stopped`,
+            time,
+          };
+          dispatch("message/addMessage", logMsg, { root: true });
+        }
+      }
+
+      if (payload.responseType === EventType.Active) {
+        const active = payload.diff as ActiveDiff;
+        const agent = payload.agentName;
+        if (active) {
+          const time = Date.now();
+          const logMsg: LogMessage = {
+            msg: `${agent} activated!`,
+            time,
+          };
+          dispatch("message/addMessage", logMsg, { root: true });
+        } else {
+          const time = Date.now();
+          const logMsg: LogMessage = {
+            msg: `${agent} deactivated!`,
+            time,
+          };
+          dispatch("message/addMessage", logMsg, { root: true });
+        }
+      }
     },
 
     removeAgent({ commit }, agentName: string) {

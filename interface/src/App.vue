@@ -1,8 +1,16 @@
 <template>
-  <router-view />
-  <button @click="startMainAirlock">Start Main airlock(s)</button>
-  <button @click="closeMainAirlock">Close keep airlock</button>
-  <button @click="closeAgentAirlocks">Close all agent airlocks</button>
+  <div>
+    <router-view />
+    <button @click="startMainAirlock">Start Main airlock(s)</button>
+    <button @click="closeMainAirlock">Close keep airlock</button>
+    <button @click="closeAgentAirlocks">Close all agent airlocks</button>
+    <div>
+      messages:
+      <ul>
+        <li v-for="m in messages" :key="m">{{ m }}</li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -15,6 +23,11 @@ export default defineComponent({
   unmounted() {
     this.closeMainAirlock();
     this.closeAgentAirlocks();
+  },
+  computed: {
+    messages() {
+      return this.$store.state.message.messages;
+    }
   },
   methods: {
     startMainAirlock() {
