@@ -8,11 +8,51 @@ export enum EventType {
   NewAgent = "agent", // new agent has been wrapped
 }
 
+export enum InviteStatus {
+  Invite = "invite",
+  Restore = "restore",
+}
+
 type Ship = string;
+
+export interface RestoreDiff {
+  ship: Ship;
+  time: number;
+}
+
+export interface BackupDiff {
+  ship: Ship;
+  time: number;
+}
+
+export interface AutoOnDiff {
+  ship: Ship;
+  freq: number;
+}
+
+export interface PendingDiff {
+  ship: Ship;
+  status: InviteStatus;
+}
+
+export type ActiveDiff = boolean;
+
+export interface AutoOffDiff {
+  ship: Ship;
+  time: number;
+}
+
+export type Diff =
+  | RestoreDiff
+  | BackupDiff
+  | AutoOnDiff
+  | AutoOffDiff
+  | ActiveDiff
+  | PendingDiff;
 
 export interface KeepSubscriptionResponse {
   state: KeepSubscriptionState;
-  diff: object; // TODO: define types of diffs
+  diff: Diff;
   type: EventType;
 }
 
@@ -84,4 +124,9 @@ export interface UnsetManyRequest {
 export interface RestoreRequest {
   ship: Ship;
   agentName: string;
+}
+
+export interface LogMessage {
+  msg: string;
+  time: number;
 }
