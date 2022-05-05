@@ -52,33 +52,41 @@
       ?~  paths
         ::  No. Initiate new connection.
         =/  key  (scot %uv (sham eny.bowl))
-        :_  this(pending (~(put by pending) to.cmd %invite key))
-        :-  (try-invite:json to.cmd)
+        =.  pending  (~(put by pending) to.cmd %invite key) ::
+        :_  this ::
+        ::  :_  this(pending (~(put by pending) to.cmd %invite key))
+        :-  (~(try-invite json state) to.cmd) :: (try-invite:json state to.cmd)
         :~  :*
           %pass   /keep/init/(scot %p to.cmd)
           %agent  [to.cmd %keep]
           %poke   keep-agent+!>([%init dap.bowl key])
         ==  ==
       ::  Yes. Just give the fact.
-      :_  this(last (~(put by last) to.cmd now.bowl))
+      :: :_  this(last (~(put by last) to.cmd now.bowl))
       =/  freq  (~(get by auto) to.cmd)
       =/  prev  (~(get by last) to.cmd)
+      =.  last  (~(put by last) to.cmd now.bowl) ::
+      :_  this ::
       %-  catunits
       :~  (bind (both `now.bowl freq) (cork add (wait to.cmd)))
           (bind (both prev freq) (cork add (rest to.cmd)))
           `[%give %fact paths noun+!>(+:on-save:ag)]
-          `(saved:json to.cmd now.bowl)
+          ::`(saved:json state to.cmd now.bowl)
+          `(~(saved json state) to.cmd now.bowl)
       ==
     ::  Set/unset repeating backups
         %many
       ?>  live
       ?>  =(src.bowl our.bowl)
-      :_  this(auto (putunit auto to.cmd freq.cmd))
+      ::  :_  this(auto (putunit auto to.cmd freq.cmd))
       =/  freq  (~(get by auto) to.cmd)
       =/  prev  (~(get by last) to.cmd)
+      =.  auto  (putunit auto to.cmd freq.cmd) ::
+      :_  this ::
       %-  catunits
       :~  (bind (both prev freq) (cork add (rest to.cmd)))
-          `(auto:json to.cmd freq.cmd)
+          ::`(auto:json state to.cmd freq.cmd)
+          `(~(auto json state) to.cmd freq.cmd)
           ?^  new=(bind (both prev freq.cmd) (cork add (wait to.cmd)))
             new
           (bind freq.cmd |=(* ((wait to.cmd) now.bowl)))
@@ -89,8 +97,11 @@
       ?>  =(src.bowl our.bowl)
       =/  key  (scot %uv (sham eny.bowl))
       ~&  cmd
-      :_  this(pending (~(put by pending) from.cmd %restore key))
-      :-  (try-restore:json from.cmd)
+      ::  :_  this(pending (~(put by pending) from.cmd %restore key))
+      =.  pending  (~(put by pending) from.cmd %restore key) ::
+      :_  this ::
+      :::-  (try-restore:json state from.cmd)
+      :-  (~(try-restore json state) from.cmd)
       :~  :*
         %pass   /keep/mend/(scot %p from.cmd)
         %agent  [from.cmd %keep]
@@ -101,19 +112,20 @@
       ?>  live
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
-      =.  pending  (~(del by pending) src.bowl)
       =^  cards  agent  (on-load:ag [-:on-save:ag data.cmd]) :: yolo
+      =.  pending  (~(del by pending) src.bowl)
       :_  this
       :_  cards
-      (restored:json src.bowl now.bowl)
+      (~(restored json state) src.bowl now.bowl)
+::      (restored:json state src.bowl now.bowl)
     ::  Turn wrapper on or off
         %live
       ?>  =(our.bowl src.bowl)
       ?:  =(live live.cmd)  `this
-      :_  this(live live.cmd)
-      :-  (live:json live.cmd)
-      ?.  live.cmd  ~
-      ~[(state:json state)]
+      =.  live  live.cmd ::
+      :_  this ::
+      ::  :_  this(live live.cmd)
+      ~[~(live json state)]
     ==
   ::
   ++  on-peek
@@ -161,7 +173,8 @@
     ::
         [%website ~]
       :_  this
-      ~[(live:json live) (state:json state)]
+      ~[~(initial json state)]
+::      ~[(initial:json state)]
     ::
         [%data term ~]
       ~|  %didnt-ask
@@ -214,35 +227,45 @@
 ::
 ++  json
   =,  enjs:format
-  |^
-  |%
+  |_  state=state-0
+  ++  initial  (website-card 'initial' ~)
+  ::
   ++  saved
-    |=  new=[@p @da]  (website-card (frond 'saved' (json-da new)))
+    |=  new=[@p @da]  (website-card 'saved' (json-da new))
   ::
   ++  auto
-    |=  new=[@p (unit @dr)]  (website-card (frond 'auto' (json-dr new)))
+    |=  new=[@p (unit @dr)]  (website-card 'auto' (json-dr new))
   ::
   ++  try-invite
-    |=  =@p  (website-card (frond 'pending' (json-pending [p %invite ~])))
+    |=  =@p  (website-card 'pending' (json-pending [p %invite]))
   ::
   ++  try-restore
-    |=  =@p  (website-card (frond 'pending' (json-pending [p %restore ~])))
+    |=  =@p  (website-card 'pending' (json-pending [p %restore]))
   ::
   ++  restored
-    |=  new=[@p @da]  (website-card (frond 'restored' (json-da new)))
+    |=  new=[@p @da]  (website-card 'restored' (json-da new))
   ::
-  ++  live
-    |=  live=?  (website-card (frond 'active' b+live))
+  ++  live  (website-card 'active' b+live.state)
   ::
-  ++  state
-    |=  state=state-0
-    %-  website-card
-    %-  pairs
-    :~  [%saved a+(turn ~(tap by last.state) json-da)]
-        [%auto a+(turn ~(tap by auto.state) |=([@ @] (json-dr +<- `+<+)))]
-        [%pending a+(turn ~(tap by pending.state) json-pending)]
+  ++  website-card
+    |=  [event=@t diff=^json]
+    ^-  card
+    :*  %give  %fact  ~[/keep/website]  %json
+        !>((pairs ~[[%type s+event] [%diff diff] [%state json-state]]))
     ==
-  --
+  ::
+  ++  json-state
+    %-  pairs
+    :~  [%live b+live.state]
+        [%saved a+(turn ~(tap by last.state) json-da)]
+        [%auto a+(turn ~(tap by auto.state) |=([@ @] (json-dr +<- `+<+)))]
+        :+  %pending
+          %a
+        %+  turn  ~(tap by pending.state)
+        |=  [=@p status=?(%invite %restore) *]
+        (json-pending p status)
+::        a+(turn ~(tap by pending.state) |=([=@p =@t *] (json-pending p t)))
+    ==
   ::
   ++  json-da
     |=  [=@p prev=@da]
@@ -258,13 +281,8 @@
     ==
   ::
   ++  json-pending
-    |=  [=@p status=?(%invite %restore) *]
+    |=  [=@p status=?(%invite %restore)]
     ^-  ^json
     (pairs ~[['ship' (ship p)] ['status' s+status]])
-  ::
-  ++  website-card
-    |=  =^json
-    ^-  card
-    [%give %fact ~[/keep/website] json+!>(json)]
   --
 --

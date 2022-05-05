@@ -20,6 +20,7 @@
 =*  state  -
 ^-  agent:gall
 ::
+=<
 |_  =bowl:gall
 +*  this  .
     def   ~(. (default-agent this %|) bowl)
@@ -62,7 +63,8 @@
     ?>  =(src.bowl our.bowl)
     :_  this(live (~(put in live) +.cmd))
     ?:  (~(has in live) dap.cmd)  ~
-    ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'agent' s+dap.cmd))]]
+    ~[(website-card 'agent' s+dap.cmd)]
+    :: ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'agent' s+dap.cmd))]]
   ==
 ::
 ++  on-agent
@@ -82,14 +84,25 @@
   ^-  (quip card _this)
   ?.  ?=([%website ~] path)  (on-watch:def path)
   :_  this
-  :~  :*
-    %give  %fact  ~[/website]
-    json+!>((frond:enjs:format 'agents' a+(turn ~(tap in live) (lead %s))))
-  ==  ==
+  ~[(website-card 'initial' ~)]
 ::
 ++  on-init   on-init:def
 ++  on-peek   on-peek:def
 ++  on-arvo   on-arvo:def
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def
+--
+::
+|%
+++  website-card
+  |=  [event=@t diff=json]
+  =,  enjs:format
+  ^-  card
+  :*  %give  %fact  ~[/website]  %json
+      !>  %-  pairs
+      :~  [%type s+event]
+          [%diff diff]
+          [%state (frond 'agents' a+(turn ~(tap in live) (lead %s)))]
+      ==
+  ==
 --
