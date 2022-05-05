@@ -4,8 +4,8 @@
     <pre>
       {{ ourStatus }}
     </pre>
-    <pre>active: {{ active }}</pre>
-    <button v-if="!active" @click="activateAgent">Activate</button>
+    <pre>active: {{ live }}</pre>
+    <button v-if="!live" @click="activateAgent">Activate</button>
     <button v-else @click="deactivateAgent">Deactivate</button>
     <br />
     <input
@@ -61,11 +61,11 @@ export default defineComponent({
       }
       return null;
     },
-    active() {
+    live() {
       if (!this.ourStatus) {
         return false;
       }
-      return !!this.ourStatus.active;
+      return !!this.ourStatus.live;
     },
   },
   methods: {

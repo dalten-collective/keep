@@ -1,6 +1,11 @@
 import airlock from "../api";
 
-import { AgentSubscription, KeepAgentSubscriptionStatus } from "@/types";
+import {
+  AgentSubscription,
+  KeepAgentSubscriptionResponse,
+  KeepSubscriptionResponse,
+  EventType,
+} from "@/types";
 
 export default {
   namespaced: true,
@@ -41,27 +46,27 @@ export default {
 
   actions: {
     openKeepAirlock({ dispatch }) {
-        console.log("opening to keep...");
+      console.log("opening to keep...");
       airlock.openKeepAirlock(
-        (data) => {
-          // TODO: will be data.agent (singular) on new agent registered
-          console.log("data ", data);
+        (data: KeepSubscriptionResponse) => {
+          console.log("keep data ", data);
 
-          { agent: 'thjing' }
-          if (Object.prototype.hasOwnProperty.call(data, "agent")) {
-            const agents = data.agent;
+          if (data.type === EventType.Initial) {
+            const agents = data.state.agents;
             dispatch("keep/setAgents", agents, { root: true });
           }
+          // TODO: handle "active" when a new wrapper comes online
+          // TODO: what other types are there for the main Keep subscription?
 
-          { agents: [ 'thjing', 'thing' ] }
-          if (Object.prototype.hasOwnProperty.call(data, "agents")) {
-            const agents = data.agents;
-            dispatch("keep/setAgents", agents, { root: true });
-          }
+          dispatch("keep/handleKeepResponseState", data.state, { root: true });
+          // TODO:
+          dispatch("keep/handleKeepResponseType", data.type, { root: true });
+          // TODO:
+          dispatch("keep/handleKeepResponseDiff", data.diff, { root: true });
 
         },
         (subscriptionNumber: number) => {
-          console.log("keep sub: ", subscriptionNumber)
+          console.log("keep sub: ", subscriptionNumber);
           // TODO: this should be close, I think.
           dispatch("addSubscription", {
             agentName: "keep",
@@ -74,52 +79,28 @@ export default {
     openAirlockToAgent({ dispatch, commit }, agentName: string) {
       airlock.openAirlockTo(
         agentName,
-        (data: KeepAgentSubscriptionStatus) => {
-          // set up default if not present
-          commit("keep/setAgentStatus", { agentName }, { root: true });
-
-          // DEBUG:
+        (data: KeepAgentSubscriptionResponse) => {
           console.log("agentName ", agentName);
-          console.log("data ", data);
-          if (Object.prototype.hasOwnProperty.call(data, "pending")) {
-            const pending = data.pending;
-            // TODO: make these actions.
-            commit(
-              "keep/setPendingOnAgent",
-              { agentName, pending },
-              { root: true }
-            );
-          }
+          console.log("sub-agent response ", data);
 
-          if (Object.prototype.hasOwnProperty.call(data, "saved")) {
-            const saved = data.saved;
-            commit(
-              "keep/setSavedOnAgent",
-              { agentName, saved },
-              { root: true }
-            );
-          }
+          dispatch(
+            "keep/handleAgentResponseState",
+            { agentName, responseState: data.state },
+            { root: true }
+          );
 
-          if (Object.prototype.hasOwnProperty.call(data, "active")) {
-            const active = data.active;
-            commit(
-              "keep/setActiveOnAgent",
-              { agentName, active },
-              { root: true }
-            );
-          }
-
-          if (Object.prototype.hasOwnProperty.call(data, "auto")) {
-            const auto = data.auto;
-            commit("keep/setAutoOnAgent", { agentName, auto }, { root: true });
-          }
-
-          if (Object.prototype.hasOwnProperty.call(data, "restored")) {
-            // TODO: clear out any "pending: status: restore" items...
-            const restored = data.restored;
-            commit("keep/setRestoredOnAgent", { agentName, restored }, { root: true });
-          }
-
+          // TODO:
+          dispatch(
+            "keep/handleAgentResponseType",
+            { agentName, responseType: data.type },
+            { root: true }
+          );
+          // TODO:
+          dispatch(
+            "keep/handleAgentResponseDiff",
+            { agentName, responseDiff: data.diff },
+            { root: true }
+          );
         },
         (subscriptionNumber: number) => {
           dispatch("addSubscription", {
@@ -134,10 +115,7 @@ export default {
       commit("unsetSubscription", subscription);
     },
 
-    addSubscription(
-      { state, commit, dispatch },
-      payload: AgentSubscription
-    ) {
+    addSubscription({ state, commit, dispatch }, payload: AgentSubscription) {
       const existing:
         | Array<AgentSubscription>
         | [] = state.subscriptions.filter((s: AgentSubscription) => {

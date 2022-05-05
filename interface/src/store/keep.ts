@@ -11,6 +11,8 @@ import {
   UnsetManyRequest,
   RestoreRequest,
   KeepAgentSubscriptionStatus,
+  KeepSubscriptionState,
+  EventType,
 } from "@/types";
 
 export default {
@@ -28,12 +30,12 @@ export default {
     },
     activeAgents(state): Array<KeepAgentStatus> {
       return state.wrappedAgents.filter((a) => {
-        return a.status.active === true;
+        return a.status.live === true;
       });
     },
     inactiveAgents(state): Array<KeepAgentStatus> {
       return state.wrappedAgents.filter((a) => {
-        return a.status.active === false;
+        return a.status.live === false;
       });
     },
     agentStatus: (state) => (
@@ -57,112 +59,18 @@ export default {
       state.agents = state.agents.filter((a: string) => a != agentName);
     },
 
-    setAgentStatus(state, payload: { agentName: string }) {
-      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
-        (a) => a.agentName === payload.agentName
-      );
-      // Only set this empty status if we don't already have this agent.
-      if (!existingAgent) {
-        const agentStatus: KeepAgentStatus = {
-          agentName: payload.agentName,
-          status: {
-            pending: [],
-            auto: [],
-            saved: [],
-            restored: [],
-            active: false,
-          },
-        };
-        state.wrappedAgents.push(agentStatus);
-      }
-    },
-
-    setPendingOnAgent(
+    setAgentStatus(
       state,
-      payload: { agentName: string; pending: Array<PendingStatus> }
+      payload: { agentName: string; responseState: KeepAgentSubscriptionStatus }
     ) {
-      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
-        (a) => a.agentName === payload.agentName
+      // Update or set this agent's state:
+      const agentIndex = state.wrappedAgents.findIndex(
+        (a: KeepAgentStatus) => a.agentName === payload.agentName
       );
-      if (existingAgent) {
-        // if already present in activeAgents, just update this key
-        existingAgent.status.pending = existingAgent.status.pending.concat(
-          payload.pending
-        );
-        // TODO: this concat pattern isn't great - sometimes the wire returns
-        // a duplicate entry. Say you already have a pending invite out to ~wet,
-        // if you try to back up to ~wet again, you'll get another
-        // { status: "invite", ship: "wet" }, and it'll concat to the list as a dupe.
-        // Either handle this on the backend or:
-        // - use a set here to avoid dupes
-        // - don't even allow backing up to a ship name that is already in your
-        //   pending list
-      } else {
-        // TODO: can this even happen?
-      }
-    },
-
-    setSavedOnAgent(
-      state,
-      payload: { agentName: string; saved: Array<SavedStatus> }
-    ) {
-      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
-        (a) => a.agentName === payload.agentName
-      );
-      if (existingAgent) {
-        // if already present in activeAgents, just update this key
-        existingAgent.status.saved = existingAgent.status.saved.concat(
-          payload.saved
-        );
-      } else {
-        // TODO: can this even happen?
-      }
-    },
-
-    setAutoOnAgent(
-      state,
-      payload: { agentName: string; auto: Array<AutoStatus> }
-    ) {
-      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
-        (a) => a.agentName === payload.agentName
-      );
-      if (existingAgent) {
-        // if already present in activeAgents, just update this key
-        existingAgent.status.auto = existingAgent.status.auto.concat(
-          payload.auto
-        );
-      } else {
-        // TODO: can this even happen?
-      }
-    },
-
-    setRestoredOnAgent(
-      state,
-      payload: { agentName: string; restored: Array<RestoredStatus> }
-    ) {
-      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
-        (a) => a.agentName === payload.agentName
-      );
-      if (existingAgent) {
-        // if already present in activeAgents, just update this key
-        existingAgent.status.restored = existingAgent.status.restored.concat(
-          payload.restored
-        );
-      } else {
-        // TODO: can this even happen?
-      }
-    },
-
-    setActiveOnAgent(state, payload: { agentName: string; active: boolean }) {
-      const existingAgent: KeepAgentStatus = state.wrappedAgents.find(
-        (a) => a.agentName === payload.agentName
-      );
-      if (existingAgent) {
-        // if already present in activeAgents, just update this key
-        existingAgent.status.active = payload.active;
-      } else {
-        // TODO: can this even happen?
-      }
+      state.wrappedAgents.splice(agentIndex, 1, {
+        agentName: payload.agentName,
+        status: payload.responseState,
+      } as KeepAgentStatus);
     },
   },
 
@@ -178,6 +86,37 @@ export default {
       agents.forEach((agentName: string) => {
         dispatch("ship/openAirlockToAgent", agentName, { root: true });
       });
+    },
+
+    handleKeepResponseState({}, responseState: KeepSubscriptionState) {
+      console.log("keep response state: ", responseState);
+    },
+    // TODO
+    handleKeepResponseType({}, responseType: EventType) {
+      console.log("keep response type: ", responseType);
+    },
+    // TODO
+    handleKeepResponseDiff({}, responseDiff: object) {
+      console.log("keep response diff: ", responseDiff);
+    },
+
+    handleAgentResponseState(
+      { commit },
+      payload: { agentName: string; responseState: KeepAgentSubscriptionStatus }
+    ) {
+      console.log("agent response state: ", payload.responseState);
+      commit("setAgentStatus", {
+        agentName: payload.agentName,
+        responseState: payload.responseState,
+      });
+    },
+    // TODO
+    handleAgentResponseType({}, responseType: EventType) {
+      console.log("agent response type: ", responseType);
+    },
+    // TODO
+    handleAgentResponseDiff({}, responseDiff: object) {
+      console.log("agent response diff: ", responseDiff);
     },
 
     removeAgent({ commit }, agentName: string) {

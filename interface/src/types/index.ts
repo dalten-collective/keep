@@ -1,20 +1,47 @@
+export enum EventType {
+  Initial = "initial", // first response on subscrtiption start
+  Saved = "saved", // backup has happened
+  Auto = "auto", // auto-backup configured
+  Pending = "pending", // backup-to ship invited
+  Restored = "restored", // backup has been restored
+  Active = "active", // wrapper 'live' has changed
+}
+
+type Ship = string;
+
+export interface KeepSubscriptionResponse {
+  state: KeepSubscriptionState;
+  diff: object; // TODO: define types of diffs
+  type: EventType;
+}
+
+export interface KeepAgentSubscriptionResponse {
+  state: KeepAgentSubscriptionStatus;
+  diff: object; // TODO: define types of diffs
+  type: EventType;
+}
+
+export interface KeepSubscriptionState {
+  agents: Array<Ship>;
+}
+
 export interface PendingStatus {
   status: string;
-  ship: string;
+  ship: Ship;
 }
 
 export interface SavedStatus {
-  ship: string;
+  ship: Ship;
   time: number;
 }
 
 export interface AutoStatus {
-  ship: string;
+  ship: Ship;
   freq: number;
 }
 
 export interface RestoredStatus {
-  ship: string;
+  ship: Ship;
   time: number;
 }
 
@@ -23,7 +50,7 @@ export interface KeepAgentSubscriptionStatus {
   auto: Array<AutoStatus>;
   saved: Array<SavedStatus>;
   restored: Array<RestoredStatus>;
-  active: boolean;
+  live: boolean;
 }
 
 export interface KeepAgentStatus {
@@ -37,23 +64,23 @@ export interface AgentSubscription {
 }
 
 export interface OnceRequest {
-  ship: string;
+  ship: Ship;
   agentName: string;
 }
 
 export interface ManyRequest {
-  ship: string;
+  ship: Ship;
   agentName: string;
   freq: number;
 }
 
 export interface UnsetManyRequest {
-  ship: string;
+  ship: Ship;
   agentName: string;
   freq: null;
 }
 
 export interface RestoreRequest {
-  ship: string;
+  ship: Ship;
   agentName: string;
 }
