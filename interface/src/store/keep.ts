@@ -92,8 +92,12 @@ export default {
       console.log("keep response state: ", responseState);
     },
     // TODO
-    handleKeepResponseType({}, responseType: EventType) {
-      console.log("keep response type: ", responseType);
+    handleKeepResponseType({}, payload: { diff: object, responseType: EventType }) {
+      console.log("keep response type: ", payload.responseType);
+      console.log("keep response diff: ", payload.diff);
+      if (payload.responseType == EventType.NewAgent) {
+        console.log('new agent! ', payload.diff)
+      }
     },
     // TODO
     handleKeepResponseDiff({}, responseDiff: object) {

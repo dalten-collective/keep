@@ -5,6 +5,7 @@ export enum EventType {
   Pending = "pending", // backup-to ship invited
   Restored = "restored", // backup has been restored
   Active = "active", // wrapper 'live' has changed
+  NewAgent = "agent", // new agent has been wrapped
 }
 
 type Ship = string;

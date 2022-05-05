@@ -60,9 +60,9 @@ export default {
 
           dispatch("keep/handleKeepResponseState", data.state, { root: true });
           // TODO:
-          dispatch("keep/handleKeepResponseType", data.type, { root: true });
+          //dispatch("keep/handleKeepResponseType", data.type, { root: true });
           // TODO:
-          dispatch("keep/handleKeepResponseDiff", data.diff, { root: true });
+          dispatch("keep/handleKeepResponseDiff", { diff: data.diff, type: data.type }, { root: true });
 
         },
         (subscriptionNumber: number) => {
