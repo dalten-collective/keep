@@ -14,4 +14,6 @@ As an end user, I would like to:
 - Back up an agent to a remote ship where I am whitelisted.
 - Un/set automatic repeating backups for any combination of agent and remote ship.
 - Restore my agent's state from a backup on a remote ship.
-- All of the above scenarios should also attempt to back up and restore any subscriptions, though restoration cannot be guaranteed to succeed. In case of failure, I should be alerted of this, so that I can try to figure out how to initiate subscription by other means.
+  - All of the above scenarios should also attempt to back up and restore any subscriptions, though restoration cannot be guaranteed to succeed. In case of failure, I should be alerted of this, so that I can try to figure out how to initiate subscription by other means.
+- Back up an agent to a file in the host OS.
+- Restore an agent from a file in the host OS (requires working get directory).
