@@ -66,8 +66,8 @@
       =.  last  (~(put by last) to.cmd now.bowl)
       :_  this
       %-  catunits
-      :~  (bind (both `now.bowl freq) (cork add (wait to.cmd)))
-          (bind (both prev freq) (cork add (rest to.cmd)))
+      :~  (bind (both `now.bowl freq) (cork add (wait to.cmd))) :: set next
+          (bind (both prev freq) (cork add (rest to.cmd))) :: unset old next
           `[%give %fact paths noun+!>(+:on-save:ag)]
           `(~(saved json state) to.cmd now.bowl)
       ==
@@ -80,11 +80,11 @@
       =.  auto  (putunit auto to.cmd freq.cmd)
       :_  this
       %-  catunits
-      :~  (bind (both prev freq) (cork add (rest to.cmd)))
+      :~  (bind (both prev freq) (cork add (rest to.cmd))) :: unset old next
           `(~(auto json state) to.cmd freq.cmd)
           ?^  new=(bind (both prev freq.cmd) (cork add (wait to.cmd)))
-            new
-          (bind freq.cmd |=(* ((wait to.cmd) now.bowl)))
+            new :: set next
+          (bind freq.cmd |=(* ((wait to.cmd) now.bowl))) :: set next now
       ==
     ::  Start repairing your state
         %mend
@@ -165,7 +165,6 @@
         [%website ~]
       :_  this
       ~[~(initial json state)]
-::      ~[(initial:json state)]
     ::
         [%data term ~]
       ~|  %didnt-ask
