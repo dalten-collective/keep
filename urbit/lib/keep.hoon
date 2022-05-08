@@ -46,6 +46,14 @@
     ::
     =/  cmd  !<(wrapper:poke vase)
     ?-  -.cmd
+    ::  Disk Utilities
+        %grab
+      ?~  rge=(grab our.bowl now.bowl dap.bowl path.cmd)
+      `this  (on-load u.rge)
+    ::
+        %drop
+      :_  this
+      [(drop our.bowl now.bowl dap.bowl note.cmd on-save) ~]
     ::  Back up your state once
         %once
       ?>  live
@@ -296,5 +304,34 @@
     |=  [=@p status=?(%invite %restore)]
     ^-  ^json
     (pairs ~[['ship' (ship p)] ['status' s+status]])
+  --
+++  drop
+  |=  [our=ship now=@da dap=dude note=@t vaz=vase]
+  =;  val=vase
+    :+  %pass  /keep/drop/(scot %da now)
+    [%agent [our %hood] %poke %drum-put val]
+  !>  ^-  [path jam]
+  :_  (jam vaz)
+  ;:  welp
+    /(scot %tas dap)
+    /(scot %tas (crip "{(trip dap)}|bak|{(scow %da now)}|{(trip note)}"))
+    /jam
+  ==
+++  grab
+  |=  [our=ship now=@da dap=dude p=path]
+  |^
+  ^-  (unit vase)
+  =/  arc=arch  .^(arch %cy p)
+  ?~  fil.arc  ~
+  ?~  chk=(check-file-name p)  ~
+  ?.  =(dap dap.u.chk)  ~
+  [~ ;;(vase (cue .^(@ %cx p)))]
+  ::
+  ++  check-file-name
+    |=  p=path
+    ^-  (unit [dap=@t wen=tarp not=@t])
+    ?~  nam=((unit @t) |-(?~(p ~ ?:(=([%hoon ~] t.p) `i.p $(p t.p)))))
+    ~  ;;  (unit [@t tarp @t])
+    (rush u.nam ;~((glue bar) sym ;~(pfix sig when:so) (star prn)))
   --
 --
