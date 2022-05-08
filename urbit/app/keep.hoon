@@ -61,10 +61,10 @@
   ::  "I exist," said a wrapper on our own ship.
       %tell
     ?>  =(src.bowl our.bowl)
-    :_  this(live (~(put in live) +.cmd))
-    ?:  (~(has in live) dap.cmd)  ~
+    ?:  (~(has in live) dap.cmd)  `this
+    =.  live  (~(put in live) dap.cmd)
+    :_  this
     ~[(website-card 'agent' s+dap.cmd)]
-    :: ~[[%give %fact ~[/website] json+!>((frond:enjs:format 'agent' s+dap.cmd))]]
   ==
 ::
 ++  on-agent
@@ -103,6 +103,5 @@
       :~  [%type s+event]
           [%diff diff]
           [%state (frond 'agents' a+(turn ~(tap in live) (lead %s)))]
-      ==
-  ==
+  ==  ==
 --
