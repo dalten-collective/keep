@@ -247,7 +247,7 @@
     %-  pairs
     :~  [%live b+live.state]
         [%saved a+(turn ~(tap by last.state) json-da)]
-        [%auto a+(turn ~(tap by auto.state) |=([@ @] (json-dr +<- `+<+)))]
+        [%auto a+(turn ~(tap by auto.state) |=([=@p =@dr] (json-dr p `dr)))]
         :+  %pending
           %a
         %+  turn  ~(tap by pending.state)
