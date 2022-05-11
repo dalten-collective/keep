@@ -72,11 +72,10 @@
       =.  last  (~(put by last) to.cmd now.bowl)
       :_  this
       %-  catunits
-      :~
-        (bind (both `now.bowl freq) (cork add (wait to.cmd))) :: set next
-        (bind (both prev freq) (cork add (rest to.cmd))) :: unset old next
-        `[%give %fact paths noun+!>([wex.bowl +:on-save:ag])]
-        `(~(saved json state) to.cmd now.bowl)
+      :~  (bind (both `now.bowl freq) (cork add (wait to.cmd))) :: set next
+          (bind (both prev freq) (cork add (rest to.cmd))) :: unset old next
+          `[%give %fact paths noun+!>([wex.bowl +:on-save:ag])]
+          `(~(saved json state) to.cmd now.bowl)
       ==
     ::  Set/unset repeating backups
         %many
