@@ -10,7 +10,7 @@
 ::
 +$  state-0
   $:  %0
-      kept=(map [dude ship] noun)
+      kept=(map [dude ship] [data=noun time=@da])
       live=(set dude)
   ==
 --
@@ -52,7 +52,7 @@
     :_  this
     ~|  [%has-no dap.cmd from=src.bowl]
     =/  data=noun
-      (~(got by kept) [dap.cmd src.bowl])
+      data:(~(got by kept) [dap.cmd src.bowl])
     :~  :*
       %pass   /recoveries/(scot %p src.bowl)/[dap.cmd]
       %agent  [src.bowl dap.cmd]
@@ -76,7 +76,9 @@
       %fact
     ~&  >  [%store-backup of=,.&3.wire from=src.bowl]
     ?.  ?=(%noun p.cage.sign)  `this
-    `this(kept (~(put by kept) [&3.wire src.bowl] !<(noun q.cage.sign)))
+    =.  kept  (~(put by kept) [&3.wire src.bowl] !<(noun q.cage.sign) now.bowl)
+    :_  this
+    ~[(website-card 'backup' (json-backup now.bowl &3.wire src.bowl))]
   ==
 ::
 ++  on-watch
@@ -95,13 +97,24 @@
 ::
 |%
 ++  website-card
+=,  enjs:format
   |=  [event=@t diff=json]
-  =,  enjs:format
   ^-  card
   :*  %give  %fact  ~[/website]  %json
       !>  %-  pairs
       :~  [%type s+event]
           [%diff diff]
-          [%state (frond 'agents' a+(turn ~(tap in live) (lead %s)))]
-  ==  ==
+          :-  %state
+          %-  pairs
+          :~
+            ['agents' a+(turn ~(tap in live) (lead %s))]
+            :-  'backups'
+            a+(turn ~(tap by kept) |=([to=[@ @p] [* =@da]] (json-backup da to)))
+  ==  ==  ==
+::
+++  json-backup
+=,  enjs:format
+  |=  [time=@da =dude =@p]
+  ^-  json
+  (pairs ~[ship+(ship p) agent+s+dude time+(sect time)])
 --
