@@ -97,9 +97,9 @@
 ::
 |%
 ++  website-card
-=,  enjs:format
   |=  [event=@t diff=json]
   ^-  card
+  =,  enjs:format
   :*  %give  %fact  ~[/website]  %json
       !>  %-  pairs
       :~  [%type s+event]
@@ -113,8 +113,8 @@
   ==  ==  ==
 ::
 ++  json-backup
-=,  enjs:format
   |=  [time=@da =dude =@p]
   ^-  json
+  =,  enjs:format
   (pairs ~[ship+(ship p) agent+s+dude time+(sect time)])
 --
