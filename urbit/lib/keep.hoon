@@ -112,17 +112,17 @@
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
-      =+  old=;;([wex=boat:gall state=noun] data.cmd)
-      =^  cards=(list card)  agent :: load back state. if missing subs, "kick".
+      =+  old=~|(%bad-shape ;;([wex=boat:gall state=noun] data.cmd))
+      =^  cards  agent :: load back state. if missing subs, fake a kick on each.
         %+  reel  (diff ~(tap by wex.old) ~(tap by wex.bowl))
         |:  :*  *[[=wire =ship @] *]
-                `[caz=(list card) =_agent]`(on-load:ag [-:on-save:ag state.old])
+                `[caz=(list card) =_ag]`(on-load:ag [-:on-save:ag state.old])
             ==
-        =+  (on-agent:agent(src.+< ship) wire %kick ~)
+        =+  (on-agent:ag(src.+< ship) wire %kick ~)
         [(weld caz -.-) +.-]
       :_  this
       :-  (~(restored json state) src.bowl now.bowl)
-      %+  weld  cards
+      %+  weld  `(list card)`cards
       %+  turn  (diff ~(tap by wex.bowl) ~(tap by wex.old)) :: leave if not old.
       |=  [[=wire =ship =dude] *]
       `card`[%pass wire %agent [ship dude] %leave ~]
