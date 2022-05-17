@@ -109,42 +109,28 @@
       ==  ==
     ::  Load this back
         %data
-      |^
       ?>  live
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
       =+  old=~|(%bad-shape ;;([wex=boat:gall sup=bitt:gall state=*] data.cmd))
       =^  cards  agent
-        %:  restore-subs
-          ~(tap by wex.old)
-          ~(tap by wex.dish)
-          |=  [[=wire =ship =dude] *]  [%pass wire %agent [ship dude] %leave ~]
-          |=  [=_ag [=wire =ship *] *]  (on-agent:ag(src.+< ship) wire %kick ~)
-          %:  restore-subs
-            ~(tap by sup.old)
-            ~(tap by sup.dish)
-            |=  [* =ship =path]  [%give %kick ~[path] `ship]
-            |=  [=_ag [* =ship =path]]  (on-leave:ag(src.+< ship) path)
-            (on-load:ag [-:on-save:ag state.old])
-          ==
-        ==
+        ;<  =_ag  write  (on-load:ag [-:on-save:ag state.old])
+        ;<  =_ag  write
+          %+  roll-write  (diff ~(tap by wex.old) ~(tap by wex.dish))
+          |:  [*[[=wire =ship *] *] ag=ag]
+          (on-agent:ag(src.+< ship) wire %kick ~)
+        ;<  ~  _foobar
+          %+  roll-write  (diff ~(tap by sup.old) ~(tap by sup.dish))
+          |:  [*[* =ship =path] ag=ag]  (on-leave:ag(src.+< ship) path)
+        %+  weld
+          %+  turn  (diff ~(tap by sup.bowl) ~(tap by sup.old))
+          |=  [duct =ship =path]  `card`[%give %kick ~[path] `ship]
+        %+  turn  (diff ~(tap by wex.bowl) ~(tap by wex.old))
+        |=  [[=wire =ship =dude] *]
+        `card`[%pass wire %agent [ship dude] %leave ~]
       :_  this
       [(~(restored json state) src.bowl now.bowl) cards]
-      ::
-      ++  restore-subs
-        |*  $:  old=(list)            dish=(list)
-                new=$-(* card)        gone=$-([_ag *] (quip card _ag))
-                prev=(quip card _ag)
-            ==
-        ^-  (quip card _ag)
-        =-  [(weld caz `(list card)`(turn (diff dish old) new)) ag]
-        ^-  [caz=(list card) =_ag]
-        %+  roll  (diff old dish)
-        |:  [args=+<+:gone `[caz=(list card) ag=_ag]`prev]
-        =+  (gone ag args)
-        [(weld caz -.-) +.-]
-      --
     ::  Turn wrapper on or off
         %live
       ?>  =(our.bowl src.bowl)

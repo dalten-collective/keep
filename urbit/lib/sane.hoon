@@ -73,18 +73,54 @@
       ==
   ?~  a  b  a
 ::
+++  roll-write
+  |*  [=(list) f=(arg-writer)]
+  ^+  (f)
+  %+  roll  list
+  |:  [arg=+<-:f prev=`_(f)``+<+:f]
+  ((write _+<+:f) prev (cury f arg))
+::
 ++  writer
-  |*  [a=(quip) f=$-(* (quip))]
-  =/  b  (f +.a)
-  ^+  b
-  [(weld -.b -.a) +.b]
+  |$  [w s]
+  $-  s  (quip w s)
 ::
-++  tell
-  |*  tale=*
-  |*  a=*
-  ^-  (quip _tale _a)
-  [~[tale] a]
+++  arg-writer
+  |$  [a s w]  $_
+  |*  [a =s]
+  ^-  (quip w ^s)
+  `s
 ::
+++  write
+  |=  =mold
+  |*  [a=(quip * mold) f=(writer * mold)]
+  ^+  a
+  =+  (f +.a)
+  [(weld -.a -.-) +.-]
+::
+++  foobar
+  |*  [a=(quip) f=$-(~ (list))]
+  ^+  a
+  [(weld -.a (f)) +.a]
+::
+++  tell2
+  |*  xs=(list)
+  |*  s=*
+  ^-  (quip _?>(?=(^ xs) i.xs) _s)
+  [xs s]
+  ::^-  (writer)
+  ::(lead list)
+::
+++  tells  lead
+::
+++  putter
+  |*  =(quip)
+  |*  _+.quip
+  quip
+::
+++  curry
+  |*  f=$-(^ *)
+  |*  a=_+<-:f
+  (cury f a)
 ::++  testupdate
 ::|^
 ::=/  =(map cord atom)  (my ~[['foo' 4] ['bar' 5]])
@@ -107,10 +143,4 @@
 ::   ?:  cond  tell
 ::
 ::
-++  testwrite
-  %.  %foo
-  ;~  writer
-    (tell 'bar')
-    (tell 'baz')
-  ==
 --
