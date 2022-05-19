@@ -73,32 +73,114 @@
       ==
   ?~  a  b  a
 ::
-++  roll-write
-  |*  [=(list) f=(arg-writer)]
-  ^+  (f)
-  %+  roll  list
-  |:  [arg=+<-:f prev=`_(f)``+<+:f]
-  ((write _+<+:f) prev (cury f arg))
+:: ++  roll-write
+::   |*  [=(list) f=(arg-writer)]
+::   ^+  (f)
+::   %+  roll  list
+::   |:  [arg=+<-:f prev=`_(f)``+<+:f]
+::   (write prev (cury f arg))
 ::
-++  writer
-  |$  [w s]
-  $-  s  (quip w s)
+:: ++  moll
+::   |*  a=$-([* $-()])
+::   |*  [adapter=$ xs=(list) f=_=>(~ |=([* *] +<+))]
+::   ^+  ,.+<+.b
+::
+::
+::   |*  [a=(list) b=_=>(~ |=([* *] +<+))]
+::   |-  ^+  ,.+<+.b
+::   ?~  a
+::     +<+.b
+::   $(a t.a, b b(+<+ (b i.a +<+.b)))
+::
+++  testwrite
+  =/  w  (writing ,@t ,@ud)
+  ;<  =@ud  bind:w  get:w
+  ;<  ~     bind:w  (tell:w (gulf ud (add ud 5)))
+  (pure:w +(ud))
+::
+++  writing
+  |*  [w=mold s=mold]
+  |%
+  ++  writer
+    |$  [a]
+    ::$_  ^|
+    ::|=  s  [*a *(list w) s]
+    $-  s  [a (quip w s)]
+  ::
+  ++  pure
+    |*  a=*
+    ^-  (writer _a)
+    |=  =s
+    [a `s]
+  ::
+  ++  bind
+    |*  a=mold
+    |*  [m=(writer a) f=$-(a (writer))]
+    ^-  (writer)
+    |=  =s
+    =+  `[=a w=(list w) =_s]`(m s)
+    =+  `[b=* w=(list ^w) =_s]`((f a) s)
+    [b (weld ^w w) s]
+  ::
+  ++  get
+    ^-  (writer s)
+    |=  =s
+    [s `s]
+  ::
+  ++  put
+    |=  =s
+    ^-  (writer ~)
+    |=  ^s
+    ``s
+  ::
+  :: ++  write
+  ::   |=  =(quip w s)
+  ::   ^-  (writer s)
+  ::   ;<  ~  bind  (tell -.quip)
+  ::   ;<  ~  bind  (put +.quip)
+  ::   (pure +.quip)
+  ::
+  ++  tell
+    |=  =(list w)
+    ^-  (writer ~)
+    |=  =s
+    `[list s]
+  ::
+  :: ++  all
+  ::   |=  =(quip w s)
+  ::   ^-  (writer ~)
+  ::   %+  foobar  (tell -.quip)
+  ::   (put +.quip)
+  :: ::
+  :: ++  throw
+  ::   |=  m=(writer)
+  ::   ^-  (writer ~)
+  ::   ((bind *) m |=(* (pure ~)))
+  ::
+  :: ++  foobar
+  ::   |*  [m=(writer ~) n=(writer)]
+  ::   ^+  n
+  ::   %+  ^|((bind *))  m
+  ::   |=  *  n
+  --
 ::
 ++  arg-writer
-  |$  [a s w]  $_
-  |*  [a =s]
-  ^-  (quip w ^s)
-  `s
+  |$  [a s w]
+  $-  [a s]  (quip w s)
+::
+:: ++  writeput
+::   |*  [a=(quip) f=$-(*)]
+
 ::
 ++  write
-  |=  =mold
-  |*  [a=(quip * mold) f=(writer * mold)]
-  ^+  a
-  =+  (f +.a)
-  [(weld -.a -.-) +.-]
+  |*  a=mold
+  |*  [[=a =(quip)] f=$-(a [* (quip)])]
+  ^+  (f)
+  =+  (f a)
+  [-< (weld -.quip ->-) ->+]
 ::
-++  foobar
-  |*  [a=(quip) f=$-(~ (list))]
+++  discard
+  |*  [a=(quip) f=$-(* (list))]
   ^+  a
   [(weld -.a (f)) +.a]
 ::
