@@ -65,14 +65,6 @@
   ^+  map
   (putunit map key (f (~(get by map) key)))
 ::
-++  first
-  |*  [a=(unit) b=(unit)]
-  ^-  %-  unit
-      $?  _?>(?=(^ a) u.a)
-          _?>(?=(^ b) u.b)
-      ==
-  ?~  a  b  a
-::
 :: ++  roll-write
 ::   |*  [=(list) f=(arg-writer)]
 ::   ^+  (f)
@@ -93,10 +85,106 @@
 ::   $(a t.a, b b(+<+ (b i.a +<+.b)))
 ::
 ++  testwrite
-  =/  w  (writing ,@t ,@ud)
-  ;<  =@ud  bind:w  get:w
-  ;<  ~     bind:w  (tell:w (gulf ud (add ud 5)))
-  (pure:w +(ud))
+  =/  w  (writing ,@t ,@tas)
+
+  %+  run:w  %a
+::  ^-  (writer:w term)
+  ;<  =@tas  bind:w  get:w
+  ;<  ~      bind:w  (tell:w (gulf tas (add tas 5)))
+::  %+  (bind:w ,~)  (put:w %bar)  |=  ~
+  ;<  ~      bind:w  (put:w %bar)
+  (pure:w %foo)
+::
+:: ++  roll-write
+::   |*  [bind=$-([* gate] *) xs=(list) f=$-([* *] *)]
+::   ^+  (f)
+::   %+  roll  xs
+::   |:  [arg=_+<-:f ]
+::
+++  turn-monad
+  |*  [a=mold m=monad]
+  |*  [xs=(list) f=$-(* (m:m a))]
+  =>  .(xs (turn xs f))
+::  =/  xs=(list _(f))  (turn xs f)
+  |-  ^-  (m:m (list a))
+  ?~  xs  (pure:m ~)
+  ;<  =a  bind:m  i.xs
+  ;<  as=(list ^a)  bind:m  ^$(xs t.xs)
+  (pure:m [a as])
+::
+++  test
+  |%
+  ++  unit
+    =/  m  unit-monad
+    =/  =(map @ud @ud)  (my ~[[1 3] [2 2] [3 420]])
+    ;<  a=@  bind:m  (~(get by map) 1)
+    ;<  *  bind:m  (~(get by map) a)
+    a
+  ::
+  ++  list
+    =/  m  list-monad
+    =/  =(map @t tape)  (my ~[[%a "foo"] [%f "bar"] [%o "baz"]])
+    ;<  a=@t  bind:m  (~(got by map) %a)
+    ;<  b=@t  bind:m  (~(got by map) a)
+    (pure:m b)
+  ::
+  ++  test-turn
+    ::^-  (^unit (^list @p))
+    %+  (turn-monad @p unit-monad)  `(^list @ud)`~[1 2 3 4 5]
+    |=  =@ud
+    ^-  (^unit @p)
+    =-  ~&  >  [in=ud out=-]  -
+    ?:  =(ud 4)  `~wicrum
+    ``@p`ud
+  --
+::
+++  unit-monad
+  %-  ~(make monad unit)
+  |%
+  ++  pure  some
+  ++  fmap  ^bind
+  ++  bind  _biff
+  --
+::
+++  list-monad
+  %-  ~(make monad list)
+  |%
+  ++  pure  |*(a=* `(list _a)`~[a])
+  ++  fmap  turn
+  ++  bind
+    |=  a=mold
+    |*  [xs=(list a) f=$-(a (list))]
+    ^+  (f)
+    (zing (turn xs f))
+  --
+::
+++  monad
+  =<  _(make)
+  =|  type=$-(mold mold)
+  |@
+  ++  make
+    |*  item=form
+    [m=type item]
+  ::
+  +$  made  _(make)
+  ::
+  +$  form
+    $_  ^?
+    |%
+    ++  pure
+      |*  a=*
+      *(type _a)
+    ::
+    ++  fmap
+      |*  [ma=(type) f=gate]
+      *(type _(f))
+    ::
+    ++  bind
+      |=  a=mold
+      |~  [ma=(type a) f=$-(a (type))]
+      (f)
+    --
+  --
 ::
 ++  writing
   |*  [w=mold s=mold]
@@ -117,10 +205,23 @@
     |*  a=mold
     |*  [m=(writer a) f=$-(a (writer))]
     ^-  (writer)
+    :: ^+  (f)
     |=  =s
     =+  `[=a w=(list w) =_s]`(m s)
     =+  `[b=* w=(list ^w) =_s]`((f a) s)
     [b (weld ^w w) s]
+  ::
+::   ++  bindwrite
+::     |*  a=mold
+::     |*  make=$-(* (writer a))
+::     |*  [input=_+<:make f=$-(a (writer))]
+::     ^-  (writer)
+::     |=  =s
+::     =+  `[=a w=(list w) =_s]`((make input) s)
+::     =+  `[b=* w=(list ^w) =_s]`((f a) s)
+::     [b (weld ^w w) s]
+:: ::    ;<  =s  bind  (write quip)
+:: ::    (f s)
   ::
   ++  get
     ^-  (writer s)
@@ -133,18 +234,35 @@
     |=  ^s
     ``s
   ::
-  :: ++  write
-  ::   |=  =(quip w s)
-  ::   ^-  (writer s)
-  ::   ;<  ~  bind  (tell -.quip)
-  ::   ;<  ~  bind  (put +.quip)
-  ::   (pure +.quip)
-  ::
   ++  tell
     |=  =(list w)
     ^-  (writer ~)
     |=  =s
     `[list s]
+  ::
+  ++  write
+    |=  =(quip w s)
+    ^-  (writer s)
+    |=  s
+    [+.quip -.quip +.quip]
+  ::
+  ++  seq
+    |*  [m=(writer) n=(writer)]
+    ^+  n
+    |=  =s
+    =+  `[* w=(list w) =_s]`(m s)
+    =+  `[b=* w=(list ^w) =_s]`(n s)
+    [b (weld ^w w) s]
+  ::
+  ++  run
+    |*  [=s =(writer)]
+    ^-  (quip w ^s)
+    +:(writer s)
+  ::
+  ++  rundef
+    |*  =writer
+    ^-  (quip w s)
+    (run *s writer)
   ::
   :: ++  all
   ::   |=  =(quip w s)
@@ -163,41 +281,6 @@
   ::   %+  ^|((bind *))  m
   ::   |=  *  n
   --
-::
-++  arg-writer
-  |$  [a s w]
-  $-  [a s]  (quip w s)
-::
-:: ++  writeput
-::   |*  [a=(quip) f=$-(*)]
-
-::
-++  write
-  |*  a=mold
-  |*  [[=a =(quip)] f=$-(a [* (quip)])]
-  ^+  (f)
-  =+  (f a)
-  [-< (weld -.quip ->-) ->+]
-::
-++  discard
-  |*  [a=(quip) f=$-(* (list))]
-  ^+  a
-  [(weld -.a (f)) +.a]
-::
-++  tell2
-  |*  xs=(list)
-  |*  s=*
-  ^-  (quip _?>(?=(^ xs) i.xs) _s)
-  [xs s]
-  ::^-  (writer)
-  ::(lead list)
-::
-++  tells  lead
-::
-++  putter
-  |*  =(quip)
-  |*  _+.quip
-  quip
 ::
 ++  curry
   |*  f=$-(^ *)
