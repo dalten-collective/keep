@@ -101,50 +101,49 @@
 ::   %+  roll  xs
 ::   |:  [arg=_+<-:f ]
 ::
-++  turn-monad
-  |*  [a=mold m=monad]
-  |*  [xs=(list) f=$-(* (m:m a))]
-  =>  .(xs (turn xs f))
-::  =/  xs=(list _(f))  (turn xs f)
-  |-  ^-  (m:m (list a))
-  ?~  xs  (pure:m ~)
-  ;<  =a  bind:m  i.xs
-  ;<  as=(list ^a)  bind:m  ^$(xs t.xs)
-  (pure:m [a as])
+:: ++  turn-monad
+::   |*  [a=mold m=monad]
+::   |*  [xs=(list) f=$-(* (m:m a))]
+::   =>  .(xs (turn xs f))
+::   |-  ^-  (m:m (list a))
+::   ?~  xs  (pure:m ~)
+::   ;<  =a  bind:m  i.xs
+::   ;<  as=(list ^a)  bind:m  ^$(xs t.xs)
+::   (pure:m [a as])
+:: ::
+:: ++  test
+::   |%
+::   ++  unit-m  ~
+::   ::   =/  m  unit-monad
+::   ::   =/  =(map @ud @ud)  (my ~[[1 3] [2 2] [3 420]])
+::   ::   ;<  a=@  bind:m  (~(get by map) 1)
+::   ::   ;<  *  bind:m  (~(get by map) a)
+::   ::   a
+::   :: ::
+::   ++  list-m  ~
+::   ::   =/  m  list-monad
+::   ::   =/  =(map @t tape)  (my ~[[%a "foo"] [%f "bar"] [%o "baz"]])
+::   ::   ;<  a=@t  bind:m  (~(got by map) %a)
+::   ::   ;<  b=@t  bind:m  (~(got by map) a)
+::   ::   (pure:m b)
+::   ::
+::   ++  turn-m
+::     ::^-  (^unit (^list @p))
+::     %+  (turn-monad @p unit-monad)  `(list @ud)`~[1 2 3 4 5]
+::     |=  =@ud
+::     ^-  (unit @p)
+::     =-  ~&  >  [in=ud out=-]  -
+::     ?:  =(ud 4)  `~wicrum
+::     ``@p`ud
+::   --
 ::
-++  test
-  |%
-  ++  unit
-    =/  m  unit-monad
-    =/  =(map @ud @ud)  (my ~[[1 3] [2 2] [3 420]])
-    ;<  a=@  bind:m  (~(get by map) 1)
-    ;<  *  bind:m  (~(get by map) a)
-    a
-  ::
-  ++  list
-    =/  m  list-monad
-    =/  =(map @t tape)  (my ~[[%a "foo"] [%f "bar"] [%o "baz"]])
-    ;<  a=@t  bind:m  (~(got by map) %a)
-    ;<  b=@t  bind:m  (~(got by map) a)
-    (pure:m b)
-  ::
-  ++  test-turn
-    ::^-  (^unit (^list @p))
-    %+  (turn-monad @p unit-monad)  `(^list @ud)`~[1 2 3 4 5]
-    |=  =@ud
-    ^-  (^unit @p)
-    =-  ~&  >  [in=ud out=-]  -
-    ?:  =(ud 4)  `~wicrum
-    ``@p`ud
-  --
-::
-++  unit-monad
-  %-  ~(make monad unit)
-  |%
-  ++  pure  some
-  ++  fmap  ^bind
-  ++  bind  _biff
-  --
+:: ++  unit-monad
+::   %-  ~(make monad unit)
+::   |%
+::   ++  pure  some
+::   ++  fmap  ^bind
+::   ++  bind  _biff
+::   --
 ::
 ++  list-monad
   %-  ~(make monad list)
@@ -152,21 +151,19 @@
   ++  pure  |*(a=* `(list _a)`~[a])
   ++  fmap  turn
   ++  bind
-    |=  a=mold
+    |*  a=mold
     |*  [xs=(list a) f=$-(a (list))]
     ^+  (f)
     (zing (turn xs f))
   --
 ::
-++  monad
-  =<  _(make)
+++  monad  ::  Look at monoid on L276 when you return to this!
+  =<  ,[m=$-(mold mold) form]
   =|  type=$-(mold mold)
   |@
   ++  make
     |*  item=form
     [m=type item]
-  ::
-  +$  made  _(make)
   ::
   +$  form
     $_  ^?
@@ -180,7 +177,7 @@
       *(type _(f))
     ::
     ++  bind
-      |=  a=mold
+      |~  a=mold
       |~  [ma=(type a) f=$-(a (type))]
       (f)
     --
@@ -269,43 +266,41 @@
   ::   ^-  (writer ~)
   ::   %+  foobar  (tell -.quip)
   ::   (put +.quip)
-  :: ::
-  :: ++  throw
-  ::   |=  m=(writer)
-  ::   ^-  (writer ~)
-  ::   ((bind *) m |=(* (pure ~)))
-  ::
-  :: ++  foobar
-  ::   |*  [m=(writer ~) n=(writer)]
-  ::   ^+  n
-  ::   %+  ^|((bind *))  m
-  ::   |=  *  n
   --
 ::
 ++  curry
   |*  f=$-(^ *)
   |*  a=_+<-:f
   (cury f a)
-::++  testupdate
-::|^
-::=/  =(map cord atom)  (my ~[['foo' 4] ['bar' 5]])
-::%^  update  map  'foo'
-::|=  x=(unit @)
-::^-  (unit @)
-::~
-::::
-::++  update
-::  |*  [=(map) key=* f=$-((unit) (unit))]
-::  ^+  map
 ::
-::  ?~  val=`(unit)`(f (~(get by map) key))
-::    (~(del by map) key)
-::  (~(put by map) key u.val)
-::--
-:: ++  when
-::   |=  [cond=? =_tell]
-::   ^+  tell
-::   ?:  cond  tell
+++  testmonoid
+  |*  mon=(type:monoid)
+  |*  a=m:mon
+  (plus:mon a a)
 ::
+++  example
+  ^-  (type:monoid @)
+  %-  (make:monoid @)
+  |%
+  ++  plus  add
+  --
 ::
+++  monoid
+  |%
+  ++  type
+    |$  [a]
+    [m=mold (form a)]
+  ::
+  ++  make
+    |*  a=mold
+    |=  item=(form a)
+    [m=a item]
+  ::
+  ++  form
+    |*  a=mold
+    $_  ^?
+    |%
+    ++  plus  *$-([a a] a)
+    --
+  --
 --

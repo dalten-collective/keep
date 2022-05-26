@@ -114,24 +114,30 @@
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
       =+  old=~|(%bad-shape ;;([wex=boat:gall sup=bitt:gall state=*] data.cmd))
-      :: =^  cards  agent
-      ::   ;<  =_ag  write  (on-load:ag [-:on-save:ag state.old])
-      ::   ::;<  =_ag  write  !!
-      ::     :: %+  roll-write  (diff ~(tap by wex.old) ~(tap by wex.dish))
-      ::     :: |:  [*[[=wire =ship *] *] ag=ag]
-      ::     :: (on-agent:ag(src.+< ship) wire %kick ~)
-      ::   ::;<  ~  _discard  !!
-      ::     :: %+  roll-write  (diff ~(tap by sup.old) ~(tap by sup.dish))
-      ::     :: |:  [*[* =ship =path] ag=ag]  (on-leave:ag(src.+< ship) path)
-      ::   :_  ag
-      ::   %+  weld
-      ::     %+  turn  (diff ~(tap by sup.bowl) ~(tap by sup.old))
-      ::     |=  [duct =ship =path]  `card`[%give %kick ~[path] `ship]
-      ::   %+  turn  (diff ~(tap by wex.bowl) ~(tap by wex.old))
-      ::   |=  [[=wire =ship =dude] *]
-      ::   `card`[%pass wire %agent [ship dude] %leave ~]
+      =/  w  (writing card _ag)
+      =^  cards  agent
+        %-  rundef:w
+        ;<  =_ag  bind:w  (write:w (on-load:ag [-:on-save:ag state.old]))
+        :: ;<  =_ag  bind:w
+        ::   %+  wurn  (diff ~(tap by wex.old) ~(tap by wex.dish))
+        ::
+        ::
+        ::   %^  roll-write  (bind:w _ag)  (diff ~(tap by wex.old) ~(tap by wex.dish))
+        ::   |:  [*[[=wire =ship *] *] ag=ag]
+        ::   (write:w (on-agent:ag(src.+< ship) wire %kick ~))
+      :: ::   ::;<  ~  _discard  !!
+      :: ::     :: %+  roll-write  (diff ~(tap by sup.old) ~(tap by sup.dish))
+      :: ::     :: |:  [*[* =ship =path] ag=ag]  (on-leave:ag(src.+< ship) path)
+      :: ::   :_  ag
+        ;<  ~  bind:w  %-  tell:w
+          %+  turn  (diff ~(tap by sup.bowl) ~(tap by sup.old))
+          |=  [duct =ship =path]  `card`[%give %kick ~[path] `ship]
+        %-  tell:w
+          %+  turn  (diff ~(tap by wex.bowl) ~(tap by wex.old))
+          |=  [[=wire =ship =dude] *]
+          `card`[%pass wire %agent [ship dude] %leave ~]
       :_  this
-      ~[(~(restored json state) src.bowl now.bowl)] :: cards]
+      [(~(restored json state) src.bowl now.bowl) cards]
     ::  Turn wrapper on or off
         %live
       ?>  =(our.bowl src.bowl)
