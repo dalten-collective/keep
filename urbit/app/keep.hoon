@@ -113,8 +113,8 @@
   ==  ==  ==
 ::
 ++  json-backup
-  |=  [tyme=@da =dude =@p]
+  |=  [=@da =dude =@p]
   ^-  json
   =,  enjs:format
-  (pairs ~[ship+(ship p) agent+s+dude time+(sect tyme)])
+  (pairs ~[ship+(ship p) agent+s+dude time+(sect da)])
 --
