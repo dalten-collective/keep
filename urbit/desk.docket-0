@@ -1,9 +1,9 @@
-:~  title+'Keep'
-    info+'Back up your Urbit.'
-    color+0x81.88c9
-    site+/apps/keep
-    base+'keep'
+:~  title+'Keep & Peat'
+    info+'Back up your urbit.'
+    color+0x59.4d5b
+    site+/apps/peat
+    glob-ames+[~zod 0v0]
     version+[0 0 1]
     website+'https://dalten.org/'
-    license+'AGPL'
+    license+'Get Rekt'
 ==
