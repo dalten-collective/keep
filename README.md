@@ -148,3 +148,33 @@ You will receive the same two objects as when initially subscribing, with the ex
 ## Scries
 
 Keep-enriched agents can be scried at `/keep/live/loob`. It will return a boolean, signifying whether the wrapper is active or not.
+
+# Development Setup
+
+You will need to create a fakezod and install the agent.  
+Run `bin/setup.sh` in a separate process and follow the instructions there. No changes will be made on your behalf.
+
+Once the agent is installed, proceed to setting up the interface (below).
+
+# Interface
+
+- Vue 3
+- Typescript
+- Vite (for proxying to the urbit web interface)
+- NPM (for package management, handled by `bin` scripts)
+
+## Setup
+
+npm-wrapping scripts are provided in the `bin/` directory. Follow the steps below to set up your local development environment:
+
+- `bin/install-js-dependencies.sh`
+- Have your fakeship from above running. Note the web interface port (ie. `dojo> http: web interface live on http://localhost:8080`)
+- Get your login code from the fakeship (`dojo> +code`)
+- Copy `interface/.env.example` to `interface/.env` (not checked into git) and edit the port there to reflect the web interface on your fakeship.
+- `bin/serve-interface.sh`
+- (For running multiple ships in multiple vite instances, you can bypass the bin script and run npm directly from the repo root, passing the ENV variable for the ship's interface a-la: `KEEP_URBIT_TARGET='http://localhost:8081' npm run serve --prefix interface`)
+
+The fakeship web interface should now be accessible at `http://localhost:3000` (provided by Vite). When you first visit the URL you should be prompted for your `+code` from above.
+
+The Vue interface for this application will be served from `http://localhost:3000/apps/keep/` (**note the trailing slash!**)
+

@@ -1,1 +1,3 @@
-install.sh
+interface/node_modules
+interface/.env
+interface/dist
