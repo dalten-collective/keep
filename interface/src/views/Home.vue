@@ -46,6 +46,7 @@ import { Scry } from "@urbit/http-api";
 
 import KeepAgent from "@/components/KeepAgent.vue";
 
+
 export default defineComponent({
   name: "HomeView",
   components: {

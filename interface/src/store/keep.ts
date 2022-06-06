@@ -62,6 +62,7 @@ export default {
 
   mutations: {
     setAgents(state, agents: Array<string>) {
+      console.log("setting agents ", agents)
       state.agents = agents;
     },
     removeAgent(state, agentName: string) {
@@ -76,10 +77,20 @@ export default {
       const agentIndex = state.wrappedAgents.findIndex(
         (a: KeepAgentStatus) => a.agentName === payload.agentName
       );
-      state.wrappedAgents.splice(agentIndex, 1, {
-        agentName: payload.agentName,
-        status: payload.responseState,
-      } as KeepAgentStatus);
+      if (agentIndex == -1) {
+        console.log("did not find ", payload.agentName, " in wrappedAgents")
+        console.log("all agents ", state.agents)
+        console.log("adding...")
+        state.wrappedAgents.push({
+          agentName: payload.agentName,
+          status: payload.responseState
+        });
+      } else {
+        state.wrappedAgents.splice(agentIndex, 1, {
+          agentName: payload.agentName,
+          status: payload.responseState,
+        } as KeepAgentStatus);
+      }
     },
   },
 
@@ -91,7 +102,15 @@ export default {
     },
 
     setAgents({ commit, dispatch }, agents: Array<string>) {
+      console.log('setting agents')
       commit("setAgents", agents);
+      //agents.forEach((agentName: string) => {
+        //dispatch("ship/openAirlockToAgent", agentName, { root: true });
+      //});
+    },
+
+    openAgentAirlocks({ commit, dispatch }, agents: Array<string>) {
+      console.log('opening airlocks')
       agents.forEach((agentName: string) => {
         dispatch("ship/openAirlockToAgent", agentName, { root: true });
       });
@@ -117,7 +136,7 @@ export default {
       { commit },
       payload: { agentName: string; responseState: KeepAgentSubscriptionStatus }
     ) {
-      console.log("agent response state: ", payload.responseState);
+      console.log("handle agent response state: ", payload.responseState);
       commit("setAgentStatus", {
         agentName: payload.agentName,
         responseState: payload.responseState,

@@ -53,7 +53,9 @@ export default {
 
           if (data.type === EventType.Initial) {
             const agents = data.state.agents;
-            dispatch("keep/setAgents", agents, { root: true });
+            dispatch("keep/setAgents", agents, { root: true }).then(() => {
+              dispatch("keep/openAgentAirlocks", agents, { root: true });
+            });
           }
           // TODO: handle "active" when a new wrapper comes online
           // TODO: what other types are there for the main Keep subscription?
