@@ -109,42 +109,31 @@
       ==  ==
     ::  Load this back
         %data
-      |^
       ?>  live
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
       =+  old=~|(%bad-shape ;;([wex=boat:gall sup=bitt:gall state=*] data.cmd))
-      =^  cards  agent
-        %:  restore-subs
-          ~(tap by wex.old)
-          ~(tap by wex.dish)
-          |=  [[=wire =ship =dude] *]  [%pass wire %agent [ship dude] %leave ~]
-          |=  [=_ag [=wire =ship *] *]  (on-agent:ag(src.+< ship) wire %kick ~)
-          %:  restore-subs
-            ~(tap by sup.old)
-            ~(tap by sup.dish)
-            |=  [* =ship =path]  [%give %kick ~[path] `ship]
-            |=  [=_ag [* =ship =path]]  (on-leave:ag(src.+< ship) path)
-            (on-load:ag [-:on-save:ag state.old])
-          ==
-        ==
-      :_  this
-      [(~(restored json state) src.bowl now.bowl) cards]
-      ::
-      ++  restore-subs
-        |*  $:  old=(list)            dish=(list)
-                new=$-(* card)        gone=$-([_ag *] (quip card _ag))
-                prev=(quip card _ag)
-            ==
-        ^-  (quip card _ag)
-        =-  [(weld caz `(list card)`(turn (diff dish old) new)) ag]
-        ^-  [caz=(list card) =_ag]
-        %+  roll  (diff old dish)
-        |:  [args=+<+:gone `[caz=(list card) ag=_ag]`prev]
-        =+  (gone ag args)
+      =^  cards0  agent  (on-load:ag [-:on-save:ag state.old])
+      =^  cards1=(list card)  agent
+        %+  roll  (diff ~(tap by wex.old) ~(tap by wex.dish))
+        |:  [*[[=wire =ship *] *] caz=*(list card) ag=agent]
+        =+  (on-agent:ag(src.+< ship) wire %kick ~)
         [(weld caz -.-) +.-]
-      --
+      =^  cards2=(list card)  agent
+        %+  roll  (diff ~(tap by sup.old) ~(tap by sup.dish))
+        |:  [*[* =ship =path] caz=*(list card) ag=agent]
+        =+  (on-leave:ag(src.+< ship) path)
+        [(weld caz -.-) +.-]
+      =/  cards3=(list card)
+        %+  turn  (diff ~(tap by sup.dish) ~(tap by sup.old))
+        |=  [* =ship =path]  [%give %kick ~[path] `ship]
+      =/  cards4=(list card)
+        %+  turn  (diff ~(tap by wex.dish) ~(tap by wex.old))
+        |=  [[=wire =ship =dude] *]  [%pass wire %agent [ship dude] %leave ~]
+      :_  this
+      :-  (~(restored json state) src.bowl now.bowl)
+      :(weld cards0 cards1 cards2 cards3 cards4)
     ::  Turn wrapper on or off
         %live
       ?>  =(our.bowl src.bowl)
