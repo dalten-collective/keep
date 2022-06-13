@@ -114,7 +114,8 @@
       ::  No. Request the data from the host.
           %.n
         =.  pending  (~(put by pending) p.from.cmd %restore key)
-        :-  (try-restore:json p.from.cmd)
+        :_  this
+        :-  (~(try-restore json state) p.from.cmd)
         :~  :*
           %pass   /keep/mend/(scot %p p.from.cmd)
           %agent  [p.from.cmd %keep]
