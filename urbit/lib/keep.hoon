@@ -48,12 +48,19 @@
     ?-  -.cmd
     ::  Disk Utilities
         %grab
+      ?>  live
       ?~  rge=(grab our.bowl now.bowl dap.bowl path.cmd)
-      `this  (on-load u.rge)
+        ~&  >>  no-file-at=path.cmd
+        `this
+      =^  cards  agent  (on-load:ag [-:on-save:ag u.rge]) :: yolo
+      :_  this
+      :_  cards
+      (restored:json src.bowl now.bowl)
     ::
         %drop
+      ?>  live
       :_  this
-      [(drop our.bowl now.bowl dap.bowl note.cmd on-save) ~]
+      [(drop our.bowl now.bowl dap.bowl note.cmd +:on-save:ag) ~]
     ::  Back up your state once
         %once
       ?>  live
@@ -305,33 +312,27 @@
     ^-  ^json
     (pairs ~[['ship' (ship p)] ['status' s+status]])
   --
+::
 ++  drop
-  |=  [our=ship now=@da dap=dude note=@t vaz=vase]
-  =;  val=vase
-    :+  %pass  /keep/drop/(scot %da now)
-    [%agent [our %hood] %poke %drum-put val]
-  !>  ^-  [path jam]
-  :_  (jam vaz)
-  ;:  welp
-    /(scot %tas dap)
-    /(scot %tas (crip "{(trip dap)}|bak|{(scow %da now)}|{(trip note)}"))
-    /jam
+  |=  [our=ship now=@da dap=dude note=@t non=noun]
+  :*  %pass   /keep/drop/(scot %da now)
+      %agent  [our %hood]
+      %poke   %drum-put
+      !>  ^-  [path jam]
+      :_  (jam non)
+      ;:  welp
+        /(scot %tas dap)
+        /(scot %tas (crip "{(trip dap)}|bak|{(scow %da now)}|{(trip note)}"))
+        /jam
+      ==
   ==
+::
 ++  grab
-  |=  [our=ship now=@da dap=dude p=path]
-  |^
-  ^-  (unit vase)
-  =/  arc=arch  .^(arch %cy p)
-  ?~  fil.arc  ~
-  ?~  chk=(check-file-name p)  ~
-  ?.  =(dap dap.u.chk)  ~
-  [~ ;;(vase (cue .^(@ %cx p)))]
-  ::
-  ++  check-file-name
-    |=  p=path
-    ^-  (unit [dap=@t wen=tarp not=@t])
-    ?~  nam=((unit @t) |-(?~(p ~ ?:(=([%hoon ~] t.p) `i.p $(p t.p)))))
-    ~  ;;  (unit [@t tarp @t])
-    (rush u.nam ;~((glue bar) sym ;~(pfix sig when:so) (star prn)))
-  --
+  |=  [our=ship now=@da dap=dude pat=path]
+  ^-  (unit noun)
+  ~|  not-a-jam-file=pat
+  ?>  =(%jam (rear pat))
+  %+  bind  fil:.^(arch %cy pat)
+  ~|  no-atom-at=pat
+  |=(* (cue .^(@ %cx pat)))
 --
