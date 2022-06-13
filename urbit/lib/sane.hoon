@@ -43,6 +43,23 @@
 ::
 ++  isnull  |=  *  ^-  ?  =(~ +<)
 ::
+++  unzip
+  |*  a=(list (pair))
+  %+  reel  a
+  |*  [i=(pair) b=(list _?>(?=(^ a) p.i.a)) c=(list _?>(?=(^ a) q.i.a))]
+  [[p.i b] [q.i c]]
+::
+++  diff
+  |*  [xs=(list) ys=(list)]
+  ^+  xs
+  (skip xs (curr contains ys))
+::
+++  uncurry
+  |*  f=$-(* $-(* *))
+  |*  [a=_+<:f b=_+<:(f)]
+  ^+  ((f))
+  ((f a) b)
+::
 ++  update
   |*  [=(map) key=* f=$-((unit) (unit))]
   ^+  map
