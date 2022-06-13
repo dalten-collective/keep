@@ -46,25 +46,16 @@
     ::
     =/  cmd  !<(wrapper:poke vase)
     ?-  -.cmd
-    ::  Disk Utilities
-        %grab
-      ?>  live
-      ?~  rge=(grab our.bowl now.bowl dap.bowl path.cmd)
-        ~&  >>  no-file-at=path.cmd
-        `this
-      =^  cards  agent  (on-load:ag [-:on-save:ag u.rge]) :: yolo
-      :_  this
-      :_  cards
-      (restored:json src.bowl now.bowl)
-    ::
-        %drop
-      ?>  live
-      :_  this
-      [(drop our.bowl now.bowl dap.bowl note.cmd +:on-save:ag) ~]
     ::  Back up your state once
         %once
       ?>  live
       ?>  =(src.bowl our.bowl)
+      =*  backup  [wex.dish sup.dish +:on-save:ag]
+      ?:  =(to.cmd our.bowl)
+        :_  this(last (~(put by last) to.cmd now.bowl))
+        :~  (drop our.bowl now.bowl dap.bowl backup)
+            (saved:json to.cmd now.bowl)
+        ==
       =/  paths
         ::  Already backing up to there?
         %+  murn  ~(val by sup.bowl)
@@ -90,7 +81,7 @@
       %-  catunits
       :~  (bind (both `now.bowl freq) (cork add (wait to.cmd))) :: set next
           (bind (both prev freq) (cork add (rest to.cmd))) :: unset old next
-          `[%give %fact paths noun+!>([wex.dish sup.dish +:on-save:ag])]
+          `[%give %fact paths noun+!>(backup)]
           `(~(saved json state) to.cmd now.bowl)
       ==
     ::  Set/unset repeating backups
@@ -113,15 +104,23 @@
       ?>  live
       ?>  =(src.bowl our.bowl)
       =/  key  (scot %uv (sham eny.bowl))
-      ~&  cmd
-      =.  pending  (~(put by pending) from.cmd %restore key)
-      :_  this
-      :-  (~(try-restore json state) from.cmd)
-      :~  :*
-        %pass   /keep/mend/(scot %p from.cmd)
-        %agent  [from.cmd %keep]
-        %poke   keep-agent+!>([%grab dap.bowl key])
-      ==  ==
+      ::  Restoring from a path?
+      ?-  -.from.cmd
+      ::  Yes. Read from the path and simulate a %data poke.
+          %.y
+        ?~  file=(read p.from.cmd)  ~&  >>  no-file-at=p.from.cmd  `this
+        %-  on-poke:this(pending (~(put by pending) our.bowl %restore key))
+        keep+!>([%data u.file key])
+      ::  No. Request the data from the host.
+          %.n
+        =.  pending  (~(put by pending) p.from.cmd %restore key)
+        :-  (try-restore:json p.from.cmd)
+        :~  :*
+          %pass   /keep/mend/(scot %p p.from.cmd)
+          %agent  [p.from.cmd %keep]
+          %poke   keep-agent+!>([%grab dap.bowl key])
+        ==  ==
+      ==
     ::  Load this back
         %data
       ?>  live
@@ -254,6 +253,29 @@
   ^-  card
   [%pass /keep/tell %agent [our %keep] %poke keep-agent+!>([%tell dap])]
 ::
+++  drop
+  |=  [our=ship now=@da dap=dude non=noun]
+  :*  %pass   /keep/drop/(scot %da now)
+      %agent  [our %hood]
+      %poke   %drum-put
+      !>  ^-  [path jam]
+      :_  (jam non)
+      ;:  welp
+        /(scot %tas dap)
+        /(scot %tas (crip "{(trip dap)}_bak_{(scow %da now)}"))
+        /jam
+      ==
+  ==
+::
+++  read
+  |=  =path
+  ^-  (unit noun)
+  ~|  not-a-jam-file=path
+  ?>  =(%jam (rear path))
+  %+  bind  fil:.^(arch %cy path)
+  ~|  no-atom-at=path
+  |=(* (cue .^(@ %cx path)))
+::
 ++  json
   =,  enjs:format
   |_  state=state-0
@@ -312,27 +334,4 @@
     ^-  ^json
     (pairs ~[['ship' (ship p)] ['status' s+status]])
   --
-::
-++  drop
-  |=  [our=ship now=@da dap=dude note=@t non=noun]
-  :*  %pass   /keep/drop/(scot %da now)
-      %agent  [our %hood]
-      %poke   %drum-put
-      !>  ^-  [path jam]
-      :_  (jam non)
-      ;:  welp
-        /(scot %tas dap)
-        /(scot %tas (crip "{(trip dap)}|bak|{(scow %da now)}|{(trip note)}"))
-        /jam
-      ==
-  ==
-::
-++  grab
-  |=  [our=ship now=@da dap=dude pat=path]
-  ^-  (unit noun)
-  ~|  not-a-jam-file=pat
-  ?>  =(%jam (rear pat))
-  %+  bind  fil:.^(arch %cy pat)
-  ~|  no-atom-at=pat
-  |=(* (cue .^(@ %cx pat)))
 --
