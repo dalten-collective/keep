@@ -18,7 +18,7 @@
     :~
       [%once (se %p)]
       [%many (ot ~[['to' (se %p)] ['freq' (cu (lift (cury mul ~s1)) (mu ni))]])]
-      [%mend (se %p)]
+      [%mend (cu |=(^ [=(%path +<-) +<+]) (of ~[ship+(se %p) path+pa]))]
       [%live bo]
     ==
   --
