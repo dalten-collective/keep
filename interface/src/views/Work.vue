@@ -1,90 +1,87 @@
 <template>
   <v-card>
-    <v-card
-      class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg"
-    >
-      <div class="tw-flex tw-flex-row tw-my-8">
-        <div class="tw-w-screen">
-          <div class="tw-flex tw-space-between tw-mb-4">
-            <div class="tw-grow">
-              <h3 class="tw-text-3xl tw-font-silom">Known Resources</h3>
-            </div>
-            <div>
-              <v-btn
-                :loading="knownPending"
-                :disabled="knownPending"
-                color="white"
-                variant="tonal"
-                class="tw-inline-block text-success"
-                @click="getKnown"
-              >
-                <v-icon start>mdi-cached</v-icon>
-                refresh
-              </v-btn>
-            </div>
-          </div>
 
-          <div v-if="!agents || agents.length === 0">
-            No keep agents on this ship
-          </div>
-
-          <div v-else>
-            <h2>Wrappers Active</h2>
-            <div v-if="activeAgents.length === 0">No active agents</div>
-            <div v-else v-for="agent in activeAgents" :key="agent">
-              <KeepAgent
-                :agent-name="agent.agentName"
-                style="border: 1px solid black; padding: 1em"
-              />
-            </div>
-
-            <hr />
-            <h2>Wrappers Inactive</h2>
-            <div v-if="inactiveAgents.length === 0">No inactive agents</div>
-            <div v-else v-for="agent in inactiveAgents" :key="agent">
-              <KeepAgent
-                :agent-name="agent.agentName"
-                style="border: 1px dashed black; padding: 1em"
-              />
-            </div>
-          </div>
-
-          <div v-if="agents && agents.length > 0"></div>
-
-          <hr />
-          <input type="text" v-model="agentToActivate" />
-          <br />
-          <input type="text" placeholder="scry app" v-model="scryApp" />
-          <input type="text" placeholder="scry path" v-model="scryPath" />
-          <button @click="testScry">
-            Scry (to {{ scryApp }} with {{ scryPath }})
-          </button>
-        </div>
+    <div class="d-flex" :class="mobileClasses">
+      <div class="flex-row d-flex">
+        <v-tabs
+          v-model="tab"
+          :direction="onSmall ? 'horizontal' : 'vertical'"
+          color="info"
+          class="tw-bg-secondary"
+        >
+          <v-tab value="active">
+            <v-icon start>mdi-flare</v-icon>
+            Active Agents
+          </v-tab>
+          <v-tab value="inactive">
+            <v-icon start>mdi-folder</v-icon>
+            Inactive Agents
+          </v-tab>
+        </v-tabs>
       </div>
-    </v-card>
+
+      <v-window v-model="tab">
+        <v-window-item value="active" class="tw-w-xl">
+          <v-card class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg">
+            <div class="tw-flex tw-flex-row tw-my-8">
+              <ActiveAgents class="tw-grow"/>
+            </div>
+          </v-card>
+        </v-window-item>
+
+        <v-window-item value="inactive" class="tw-w-xl">
+          <v-card class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg">
+            <div class="tw-flex tw-flex-row tw-my-8">
+              <v-card>
+                TODO
+              </v-card>
+            </div>
+          </v-card>
+        </v-window-item>
+      </v-window>
+    </div>
+
   </v-card>
 </template>
 
 <script lang="ts">
+import { useDisplay } from 'vuetify'
+
 import { defineComponent } from "vue";
 
 import { mapGetters } from "vuex";
 import { Scry } from "@urbit/http-api";
+
+import ActiveAgents from "@/components/ActiveAgents.vue";
 
 import KeepAgent from "@/components/KeepAgent.vue";
 
 export default defineComponent({
   name: "HomeView",
   components: {
-    KeepAgent,
+    KeepAgent, ActiveAgents
   },
   computed: {
     ...mapGetters("keep", ["agents", "activeAgents", "inactiveAgents"]),
+    mobileClasses() {
+      const smol = this.onSmall ? true : false
+      return {
+        'tw-flex-col': smol,
+        'tw-flex-row': !smol,
+      }
+    },
+
+    onSmall() {
+      const display = useDisplay()
+      return display.smAndDown.value
+    },
   },
   data() {
     return {
       scryApp: "",
       scryPath: "",
+      activePending: false,
+      tab: "active",
     };
   },
   methods: {
@@ -95,6 +92,14 @@ export default defineComponent({
     },
     closeAgentAirlock() {
       this.$store.dispatch("ship/closeKeepAirlock");
+    },
+
+    getActive() {
+      // TODO:
+      this.activePending = true;
+      setTimeout(() => {
+        this.activePending = false;
+      }, 400)
     },
   },
 });
