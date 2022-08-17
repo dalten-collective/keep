@@ -17,7 +17,7 @@ All keep-enriched agents can be poked with the mark `%keep` and support the foll
 ```hoon
 [%once to=ship]                 :: Backup
 [%many to=ship freq=(unit @dr)] :: Repeat backup
-[%mend from=ship]               :: Initiate recovery
+[%mend from=(each path ship)]   :: Initiate recovery
 [%live live=?]                  :: (De)activate. Deact before uninstall!
 ```
 
@@ -27,14 +27,15 @@ These can also come in the form of JSON:
 {"once": "~sampel-palnet"}
 {"many": {"to": "~sampel", "freq": 500}}
 {"many": {"to": "~palnet", "freq": null}}
-{"mend": "~sampel-palnet"}
+{"mend": {"ship": "~sampel-palnet"}}
+{"mend": {"path": "/path/to/jam"}}
 {"live": true}
 {"live": false}
 ```
 
 - `%once`
   Trigger a single backup to the specified ship.
-  If repeating backups are set for this ship, this resets the timer.
+  If repeating backups are set for this ship, this resets the timer. If the ship is our own, the backup will be written to the directory `pier/.urb/put`.
 - `%many`
   Set or unset repeating backups to the specified ship.
 
@@ -44,7 +45,7 @@ These can also come in the form of JSON:
 
   If setting repeating backups and this agent **has** been backed up to the specified ship at time `t`, this will trigger a backup immediately or at time `t+freq`, whichever comes last.
 - `%mend`
-  Load a backup from the specified ship.
+  Load a backup from the specified ship or a path in Clay.
 - `%live`
   Activate/deactivate the keep wrapper. Always initialized to false/deactivated.
 
@@ -54,6 +55,16 @@ These can also come in the form of JSON:
 
 ## Subscriptions
 
+All JSON objects sent from both the agent and wrappers will be on the form:
+
+```json
+{
+  "type": <string>,
+  "diff": <object>,
+  "state": <object>
+}
+```
+
 ### The `%keep` agent
 
 Subscribe to `/website` to get JSON objects specifying which keep-enriched agents that exist.
@@ -61,13 +72,21 @@ Subscribe to `/website` to get JSON objects specifying which keep-enriched agent
 After initial subscription, you will receive:
 
 ```json
-{"agents": ["agent0", "agent1", "agent2"]}
+{
+  "type": "initial",
+  "diff": null,
+  "state": {"agents": ["agent0", "agent1", "agent2"]}
+}
 ```
 
 Whenever a new agent becomes keep-enriched, you will receive:
 
 ```json
-{"agent": "agent3"}
+{
+  "type": "agent",
+  "diff": "agent3",
+  "state": {"agents": ["agent0", "agent1", "agent2", "agent3"]}
+}
 ```
 
 **Note** that these agents are not guaranteed to stay keep-enriched. Because of the way Gall works, the agent `%keep` has no way of knowing when the wrapper is removed from an agent. You'll have to try subscribing/scrying and be prepared to handle failures.
@@ -78,28 +97,26 @@ Subscribe to `/keep/website` to get JSON objects specifying new backups as well 
 
 #### After initial subscription
 
-You will receive two objects. One tells you whether the wrapper is active or not:
-
-```json
-{"active": false}
-```
-
-The other contains the current state:
-
 ```json
 {
-  "saved": [
-    {"ship": "~sampel", "time": 100},
-    {"ship": "~palnet", "time": 1000}
-  ],
-  "auto": [
-    {"ship": "~sampel", "freq": 500},
-    {"ship": "~palnet", "freq": 5000}
-  ],
-  "pending": [
-    {"ship": "~sampel", "status": "invite"},
-    {"ship": "~palnet", "status": "restore"}
-  ]
+  "type": "initial",
+  "diff": null,
+  "state":
+    {
+      "live": true,
+      "saved": [
+        {"ship": "~sampel", "time": 100},
+        {"ship": "~palnet", "time": 1000}
+      ],
+      "auto": [
+        {"ship": "~sampel", "freq": 500},
+        {"ship": "~palnet", "freq": 5000}
+      ],
+      "pending": [
+        {"ship": "~sampel", "status": "invite"},
+        {"ship": "~palnet", "status": "restore"}
+      ]
+    }
 }
 ```
 
@@ -109,41 +126,40 @@ The other contains the current state:
 
 Note that if the wrapper is deactivated, its state **may disappear without notice** and no automatic backups will be performed, so if the second object contains any information, treat it as a historical record rather than current fact. We still provide it, and frontends may choose to simply discard it, or display parts of it to the user. Obviously any entries in `saved` will still be correct.
 
-#### After a successful backup
+#### After state updates
 
 ```json
-{"saved": {"ship": "~sampel-palnet", "time": 555}}
+{
+  "type": <one of "active" "saved" "auto" "pending" "restored">,
+  "diff": <a new state row or a new value, depending on the type>,
+  "state": <the new state>
+}
 ```
 
-This has exactly the same format as the `"saved"` entry in the initial json object, except that it will not be an array but only a single object.
-
-#### After successfully (un)setting automatic backups
+A few examples:
+```json
+{
+  "type": "saved",
+  "diff": {"ship": "~sampel-palnet", "time": 555},
+  "state": <...>
+}
+```
 
 ```json
-{"auto": {"ship": "~sampel-palnet", "freq": 1000}}
+{
+  "type": "active",
+  "diff": true,
+  "state": <...>
+}
 ```
-
-Again, this has the same format as the `"auto"` entry in the initial json object, except that it's a single entry. Additionally, the frequency may be `null`, meaning that automatic backups were turned off.
-
-#### After initialized backup/restoration
 
 ```json
-{"pending": {"ship": "~sampel-palnet", "status": "invite"}}
+{
+  "type": "restored",
+  "diff": {"ship": "~sampel-palnet", "time": 600},
+  "state": <...>
+}
 ```
-
-This has the same format as the `"pending"` entry in the initial json object, except that it's a single entry.
-
-#### After successful restoration
-
-```json
-{"restored": {"ship": "~sampel-palnet", "time": 600}}
-```
-
-This means that at unix time `600`, the state was restored using the backup kept by `~sampel-palnet`.
-
-#### After successful (de)activation
-
-You will receive the same two objects as when initially subscribing, with the exception that if the wrapper was deactivated, you will not receive the object containing the current state.
 
 ## Scries
 
