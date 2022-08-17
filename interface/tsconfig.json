@@ -5,7 +5,7 @@
     "strict": true,
     "jsx": "preserve",
     "noImplicitAny": false,
-    "noImplicitThis": true,
+    "noImplicitThis": false,
     "noImplicitReturns": true,
     "moduleResolution": "node",
     "skipLibCheck": true,
@@ -16,7 +16,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env"
+      "webpack-env",
+      "vite/client"
     ],
     "paths": {
       "@/*": [

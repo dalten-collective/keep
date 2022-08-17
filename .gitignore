@@ -1,3 +1,6 @@
-interface/node_modules
-interface/.env
 interface/dist
+interface/node_modules/
+interface/package-lock.json
+interface/yarn.lock
+interface/.env
+vetur.config.js

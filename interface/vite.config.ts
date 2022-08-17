@@ -5,10 +5,17 @@ import dotenv = require("dotenv");
 import path = require("path");
 
 dotenv.config();
-const target = process.env.KEEP_URBIT_TARGET;
+const target = process.env.VITE_URBIT_TARGET;
+const base = process.env.VITE_URBIT_DESK;
+
+import vuetify from "vite-plugin-vuetify";
 
 export default defineConfig({
-  plugins: [vue(), urbitPlugin({ base: "keep", target })],
+  plugins: [
+    vue(),
+    urbitPlugin({ base, target }),
+    vuetify({ autoImport: true }),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
