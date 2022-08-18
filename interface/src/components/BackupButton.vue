@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="backupOpen">
+  <v-dialog v-model="backupOpen" fullscreen :scrim="false" scrollable>
     <template v-slot:activator="{ props }">
 
       <v-hover v-if="isRecurringBackup" v-slot="{ isHovering, props }">
@@ -9,8 +9,7 @@
           @click="openBackup"
           v-if="isHovering"
         >
-          <v-icon start>mdi-content-save</v-icon>
-          Backup once or change frequency
+          Change settings
         </v-btn>
         <v-btn
           v-bind="props" color="success"
@@ -19,7 +18,7 @@
           v-else
         >
           <v-icon start>mdi-cached</v-icon>
-          exporting frequently
+          Recurring backups enabled
         </v-btn>
       </v-hover>
 
@@ -49,6 +48,7 @@
         </div>
       </v-card-title>
 
+      <pre>{{ status }}</pre>
     <input
       type="text"
       placeholder="ship to backup/restore with"
@@ -187,12 +187,26 @@ import {
   UnsetManyRequest,
   RestoreRequest,
   KeepAgentSubscriptionStatus,
+  PendingStatus,
+  SavedStatus,
+  Ship,
 } from "../types";
+
+interface TargetStatus {
+  pending: Array<PendingStatus>;
+  saved: Array<SavedStatus>;
+}
 
 export default defineComponent({
   // props: ["resource", "ship"],
   props: {
-    backupStatus: {
+    ship: {
+      type: String as PropType<Ship>,
+      default: () => {
+        return "";
+      },
+    },
+    status: {
       type: Object as PropType<KeepAgentSubscriptionStatus>,
       default: () => {
         return {};
@@ -226,7 +240,7 @@ export default defineComponent({
   computed: {
     // ...mapGetters("peat", ["isRecurringSaved"]),
     isRecurringBackup() {
-      if (this.backupStatus.auto.length > 0) {
+      if (this.status.auto.length > 0) {
         return true;
       }
       return false;

@@ -1,20 +1,63 @@
 <template>
   <div>
-    <h3 class="tw-text-2xl">{{ agentName }}</h3>
+    {{ backupsByShip }}
+    <header class="tw-mb-4">
+      <h3 class="tw-text-2xl">{{ agentName }}</h3>
+    </header>
+
     <section class="tw-flex tw-flex-col">
-      <div v-if="ourStatus.saved.length > 0">
-        {{ ourStatus.saved }}
-      </div>
-      <div v-if="ourStatus.auto.length > 0">
-        auto status: {{ ourStatus.auto }}
-      </div>
-      <div v-if="ourStatus.pending.length > 0">
-        pending status: {{ ourStatus.pending }}
-      </div>
+      <article>
+        <h4 class="tw-text-lg">Live backup targets</h4>
+
+        <article v-if="backupsByShip.length == 0">
+          No backup targets configured
+        </article>
+
+        <article
+          v-else
+          v-for="target in backupsByShip"
+          :key="target[0]"
+          class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-border-peat tw-p-4"
+        >
+          <div>
+            <v-tooltip location="top" v-if="target[1].auto.length > 0">
+              <template v-slot:activator="{ props }">
+                <v-chip
+                  v-bind="props"
+                  variant="outlined"
+                  label
+                  color="info"
+                  class="mr-2"
+                >
+                  <span class="mr-2 tw-font-mono">~{{ target[0] }}</span>
+                  <v-icon color="info"> mdi-cached </v-icon>
+                </v-chip>
+              </template>
+              <span>Recurring backups enabled</span>
+            </v-tooltip>
+            <v-chip
+              v-else
+              v-bind="props"
+              variant="outlined"
+              label
+              color="info"
+              class="mr-2"
+            >
+              ~{{ target[0] }}
+            </v-chip>
+          </div>
+          <div>
+            <BackupButton :ship="target[0]" :status="target[1]" />
+          </div>
+        </article>
+      </article>
     </section>
+
     <footer class="tw-flex tw-flex-col md:tw-flex-row tw-justify-between">
       <div class="tw-flex tw-flex-col tw-align-middle tw-mb-4 md:tw-mb-0">
-        <BackupButton :backupStatus="ourStatus" />
+        <!--
+        <BackupButton :backup-status="ourStatus" />
+        -->
       </div>
       <RestoreButton />
     </footer>
@@ -63,6 +106,46 @@ export default defineComponent({
         return false;
       }
       return !!this.ourStatus.live;
+    },
+    backupsByShip() {
+      const shipList = new Set();
+      // TODO: test structure:
+      // const ourStatus = {
+      //   auto: [
+      //     { freq: 1000, ship: "zod" },
+      //     { freq: 9000, ship: "sum" },
+      //   ],
+      //   saved: [
+      //     { ship: "zod", time: 1660857853 },
+      //     { ship: "sum", time: 9999999999 },
+      //   ],
+      // };
+
+      this.ourStatus.saved.forEach((s) => {
+        shipList.add(s.ship);
+      });
+      this.ourStatus.auto.forEach((s) => {
+        shipList.add(s.ship);
+      });
+      const status = [];
+
+      shipList.forEach((ship) => {
+        const shipStatus = {
+          auto: this.ourStatus.auto
+            .filter((a) => a.ship === ship)
+            .map((a) => {
+              return { freq: a.freq };
+            }),
+          saved: this.ourStatus.saved
+            .filter((s) => s.ship === ship)
+            .map((s) => {
+              return { time: s.time };
+            }),
+        };
+        status.push([ship, shipStatus]);
+      });
+
+      return status;
     },
   },
   methods: {
