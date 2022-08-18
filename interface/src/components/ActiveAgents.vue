@@ -23,26 +23,18 @@
     <div v-if="!agents || agents.length === 0">No keep agents on this ship</div>
 
     <div v-else>
-      <h2>Wrappers Active</h2>
       <div v-if="activeAgents.length === 0">No active agents</div>
-      <div v-else v-for="agent in activeAgents" :key="agent">
+      <div v-else v-for="agent in activeAgents" :key="agent" class="tw-my-2">
         <KeepAgent
           :agent-name="agent.agentName"
-          style="border: 1px solid black; padding: 1em"
+          class="tw-p-2 tw-my-4 tw-bg-white tw-border tw-rounded-keep"
         />
       </div>
     </div>
 
-    <div v-if="agents && agents.length > 0"></div>
-
-    <hr />
-    <input type="text" v-model="agentToActivate" />
-    <br />
-    <input type="text" placeholder="scry app" v-model="scryApp" />
-    <input type="text" placeholder="scry path" v-model="scryPath" />
-    <button @click="testScry">
-      Scry (to {{ scryApp }} with {{ scryPath }})
-    </button>
+    <div v-if="agents && agents.length == 0">
+      TODO: No agents recognized
+    </div>
   </div>
 </template>
 

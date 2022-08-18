@@ -1,29 +1,26 @@
 <template>
   <div>
-    <h3>{{ agentName }}</h3>
-    <pre>
-      {{ ourStatus }}
-    </pre>
-    <pre>active: {{ live }}</pre>
-    <button v-if="!live" @click="activateAgent">Activate</button>
-    <button v-else @click="deactivateAgent">Deactivate</button>
+    <h3 class="tw-text-2xl">{{ agentName }}</h3>
+    <section class="tw-flex tw-flex-col">
+      <div v-if="ourStatus.saved.length > 0">
+        {{ ourStatus.saved }}
+      </div>
+      <div v-if="ourStatus.auto.length > 0">
+        auto status: {{ ourStatus.auto }}
+      </div>
+      <div v-if="ourStatus.pending.length > 0">
+        pending status: {{ ourStatus.pending }}
+      </div>
+    </section>
+    <footer class="tw-flex tw-flex-col md:tw-flex-row tw-justify-between">
+      <div class="tw-flex tw-flex-col tw-align-middle tw-mb-4 md:tw-mb-0">
+        <BackupButton :backupStatus="ourStatus" />
+      </div>
+      <RestoreButton />
+    </footer>
+    <v-btn v-if="!live" @click="activateAgent">Activate</v-btn>
+    <v-btn v-else @click="deactivateAgent">Deactivate</v-btn>
     <br />
-    <input
-      type="text"
-      placeholder="ship to backup/restore with"
-      v-model="backupShip"
-    />
-    <button @click="testOnce()">Test Once</button>
-    <button @click="testRestore()">Test Restore</button>
-    <br />
-    <input
-      type="text"
-      placeholder="ship to backup to"
-      v-model="backupShip"
-    />
-    <input type="number" placeholder="frequency" v-model="freq" />
-    <button @click="testMany()">Test Many</button>
-    <button @click="unsetMany()">Unset Many</button>
   </div>
 </template>
 
@@ -37,6 +34,9 @@ import {
   RestoreRequest,
 } from "../types";
 
+import BackupButton from "@/components/BackupButton.vue";
+import RestoreButton from "@/components/RestoreButton.vue";
+
 export default defineComponent({
   name: "KeepAgent",
   props: {
@@ -45,12 +45,9 @@ export default defineComponent({
       required: true,
     },
   },
-  components: {},
+  components: { BackupButton, RestoreButton },
   data() {
-    return {
-      backupShip: "",
-      freq: 100,
-    };
+    return {};
   },
   computed: {
     ...mapGetters("keep", ["agents", "agentStatus"]),
@@ -80,29 +77,6 @@ export default defineComponent({
       this.$store.dispatch("keep/deactivate", {
         agentName: this.agentName,
       });
-    },
-    testOnce() {
-      const request: OnceRequest = {
-        agentName: this.agentName,
-        ship: this.backupShip,
-      };
-      this.$store.dispatch("keep/testOnce", request);
-    },
-    testMany() {
-      const request: ManyRequest = {
-        agentName: this.agentName,
-        ship: this.backupShip,
-        freq: this.freq,
-      };
-      this.$store.dispatch("keep/testMany", request);
-    },
-    unsetMany() {
-      const request: UnsetManyRequest = {
-        agentName: this.agentName,
-        ship: this.backupShip,
-        freq: null,
-      };
-      this.$store.dispatch("keep/testMany", request);
     },
     testRestore() {
       const request: RestoreRequest = {
