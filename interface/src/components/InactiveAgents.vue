@@ -3,7 +3,7 @@
 
     <div class="tw-flex tw-space-between tw-mb-4">
       <div class="tw-grow">
-        <h3 class="tw-text-3xl tw-font-silom">Active Agents</h3>
+        <h3 class="tw-text-3xl tw-font-silom">Inactive Agents</h3>
       </div>
       <div>
         <v-btn
@@ -23,12 +23,11 @@
     <div v-if="!agents || agents.length === 0">No keep agents on this ship</div>
 
     <div v-else>
-      <h2>Wrappers Active</h2>
-      <div v-if="activeAgents.length === 0">No active agents</div>
-      <div v-else v-for="agent in activeAgents" :key="agent">
+      <div v-if="inactiveAgents.length === 0">No inactive agents</div>
+      <div v-else v-for="agent in inactiveAgents" :key="agent">
         <KeepAgent
           :agent-name="agent.agentName"
-          style="border: 1px solid black; padding: 1em"
+          style="border: 1px dashed black; padding: 1em"
         />
       </div>
     </div>
@@ -60,7 +59,7 @@ export default defineComponent({
     KeepAgent,
   },
   computed: {
-    ...mapGetters("keep", ["agents", "activeAgents"]),
+    ...mapGetters("keep", ["agents", "inactiveAgents"]),
   },
   data() {
     return {

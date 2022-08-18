@@ -33,7 +33,7 @@
           <v-card class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg">
             <div class="tw-flex tw-flex-row tw-my-8">
               <v-card>
-                TODO
+                <InactiveAgents class="tw-grow"/>
               </v-card>
             </div>
           </v-card>
@@ -53,13 +53,12 @@ import { mapGetters } from "vuex";
 import { Scry } from "@urbit/http-api";
 
 import ActiveAgents from "@/components/ActiveAgents.vue";
-
-import KeepAgent from "@/components/KeepAgent.vue";
+import InactiveAgents from "@/components/InactiveAgents.vue";
 
 export default defineComponent({
   name: "HomeView",
   components: {
-    KeepAgent, ActiveAgents
+    ActiveAgents, InactiveAgents,
   },
   computed: {
     ...mapGetters("keep", ["agents", "activeAgents", "inactiveAgents"]),
