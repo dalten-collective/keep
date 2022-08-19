@@ -61,6 +61,13 @@
       </div>
       <RestoreButton />
     </footer>
+
+    <v-text-field
+      v-model="newTarget"
+    >
+    </v-text-field>
+    <v-btn @click="doOnce">backup</v-btn>
+
     <v-btn v-if="!live" @click="activateAgent">Activate</v-btn>
     <v-btn v-else @click="deactivateAgent">Deactivate</v-btn>
     <br />
@@ -90,7 +97,9 @@ export default defineComponent({
   },
   components: { BackupButton, RestoreButton },
   data() {
-    return {};
+    return {
+      newTarget: '',
+    };
   },
   computed: {
     ...mapGetters("keep", ["agents", "agentStatus"]),
@@ -149,6 +158,14 @@ export default defineComponent({
     },
   },
   methods: {
+    doOnce() {
+      const request: OnceRequest = {
+        agentName: 'keep', // TODO: why this?
+        ship: this.newTarget,
+      };
+      this.$store.dispatch("keep/testOnce", request);
+    },
+
     activateAgent() {
       console.log("activating");
       this.$store.dispatch("keep/activate", {

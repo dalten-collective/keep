@@ -303,14 +303,14 @@ export default defineComponent({
 
     testOnce() {
       const request: OnceRequest = {
-        agentName: this.agentName,
+        agentName: 'keep', // TODO: why this?
         ship: this.backupShip,
       };
       this.$store.dispatch("keep/testOnce", request);
     },
     testMany() {
       const request: ManyRequest = {
-        agentName: this.agentName,
+        agentName: 'keep',
         ship: this.backupShip,
         freq: this.freq,
       };
@@ -318,7 +318,7 @@ export default defineComponent({
     },
     unsetMany() {
       const request: UnsetManyRequest = {
-        agentName: this.agentName,
+        agentName: 'keep',
         ship: this.backupShip,
         freq: null,
       };
