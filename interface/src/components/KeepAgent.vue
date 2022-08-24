@@ -49,6 +49,7 @@
           <div>
             <BackupButton :ship="target[0]" :agent-name="agentName" :status="target[1]" />
           </div>
+          <RestoreButton :ship="target[0]" :agent-name="agentName" />
         </article>
       </article>
     </section>
@@ -59,7 +60,6 @@
         <BackupButton :backup-status="ourStatus" />
         -->
       </div>
-      <RestoreButton />
     </footer>
 
     <v-text-field

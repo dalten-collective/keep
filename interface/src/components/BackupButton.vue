@@ -319,6 +319,7 @@ export default defineComponent({
           this.backupPending = false;
         })
     },
+
     testMany() {
       const request: ManyRequest = {
         agentName: this.agentName,

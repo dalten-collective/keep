@@ -124,6 +124,26 @@ export default {
       });
   },
 
+  mendFromShip(payload: RestoreRequest) {
+    urbitAPI
+      .poke({
+        app: payload.agentName,
+        mark: "keep",
+        json: {
+          mend: {
+            ship: siggedShip(payload.ship)
+          }
+        },
+      })
+      .then((r) => {
+        console.log("res ", r);
+      })
+      .catch((e) => {
+        // TODO: 'e' is undefined
+        console.log("err ", e);
+      });
+  },
+
   testRestore(payload: RestoreRequest) {
     urbitAPI
       .poke({

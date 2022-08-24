@@ -267,6 +267,9 @@ export default {
     testRestore({}, payload: RestoreRequest) {
       keepApi.testRestore(payload);
     },
+    mendFromShip({}, payload: RestoreRequest) {
+      keepApi.mendFromShip(payload)(payload);
+    },
     activate({}, payload: { agentName: string }) {
       keepApi.activate(payload.agentName);
     },

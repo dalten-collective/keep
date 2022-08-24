@@ -82,7 +82,6 @@
                       text="white"
                       @click="restore"
                       :loading="restorePending"
-                      :disabled="!formValid"
                     >Restore {{ ship }}'s {{ resource }}</v-btn
                     >
                   </div>
@@ -108,10 +107,21 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapState } from "vuex";
+import { RestoreRequest } from "../types";
 // import { Admin } from "@/types";
 
 export default defineComponent({
   // props: ["resource", "ship", "currentGroup"],
+  props: {
+    ship: {
+      type: String as PropType<Ship>,
+      default: "",
+    },
+    agentName: {
+      type: String,
+      default: "",
+    },
+  },
 
   data() {
     return {
@@ -119,7 +129,6 @@ export default defineComponent({
       restoreOpen: false,
       restorePending: false,
       showDone: false,
-      newGroup: '',
       newResourceName: '',
       adminPending: false,
       nameRules: [
@@ -139,13 +148,7 @@ export default defineComponent({
         // reset things
         this.restorePending = false;
         this.showDone = false;
-        this.newGroup = '';
         this.newResourceName = '';
-      }
-    },
-    newGroup(val: string) {
-      if (val) {
-        this.validateForm()
       }
     },
   },
@@ -167,26 +170,19 @@ export default defineComponent({
     },
 
     restore() {
-      this.validateForm()
+      // this.validateForm()
 
-      if (!this.formValid) {
-        return
-      }
+      // if (!this.formValid) {
+      //   return
+      // }
 
       this.restorePending = true;
-      const payload = {
-        // group: `~${ window.ship } ${ this.newGroup }`,
-        // 'new-resource-name': this.newResourceName,
-        // 'restore-resource': `${ this.ship } ${ this.resource }`,
+      const request: RestoreRequest = {
+        ship: this.ship,
+        agentName: this.agentName,
       };
-      // TODO:
+      this.$store.dispatch("keep/mendFromShip", request);
       this.restorePending = false;
-      // this.$store.dispatch("peat/restoreResource", payload)
-      //   .then((r) => {
-      //   this.showDone = true;
-      // }).finally(() => {
-      //   this.restorePending = false;
-      // });
     },
   },
 });
