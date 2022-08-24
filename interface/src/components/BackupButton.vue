@@ -38,6 +38,8 @@
       <v-card-title>
         <div class="tw-flex tw-flex-row tw-justify-between">
           <h2 class="tw-text-2xl">Backup</h2>
+          <pre>name: {{ agentName }}</pre>
+          <pre>ship: {{ ship }}</pre>
           <div>
             <span
               @click="backupOpen = !backupOpen"
@@ -49,13 +51,9 @@
       </v-card-title>
 
       <pre>{{ status }}</pre>
-    <input
-      type="text"
-      placeholder="ship to backup/restore with"
-      v-model="backupShip"
-    />
-    <button @click="testOnce()">Test Once</button>
+
     <button @click="testRestore()">Test Restore</button>
+
     <br />
     <input
       type="text"
@@ -88,7 +86,7 @@
             <div class="tw-my-2">
               <span class="tw-italic">Backup <span class="tw-font-mono tw-not-italic">TODO: ship</span>'s TODO: agent once</span>
             </div>
-            <v-btn color="success" text="white" :loading="backupPending" @click="singleBackup">
+            <v-btn color="success" text="white" :loading="backupPending" @click="backupOnce">
               Backup
             </v-btn
             >
@@ -198,13 +196,14 @@ interface TargetStatus {
 }
 
 export default defineComponent({
-  // props: ["resource", "ship"],
   props: {
     ship: {
       type: String as PropType<Ship>,
-      default: () => {
-        return "";
-      },
+      default: "",
+    },
+    agentName: {
+      type: String,
+      default: "",
     },
     status: {
       type: Object as PropType<KeepAgentSubscriptionStatus>,
@@ -233,6 +232,8 @@ export default defineComponent({
         // reset things
         this.backupPending = false;
         this.showDone = false;
+      } else {
+        this.backupShip = this.ship;
       }
     },
   },
@@ -301,16 +302,26 @@ export default defineComponent({
       this.backupOpen = true;
     },
 
-    testOnce() {
+    backupOnce() {
+      // TODO: use loading state somewhere
+      this.backupPending = true;
+
       const request: OnceRequest = {
-        agentName: 'keep', // TODO: why this?
+        agentName: this.agentName,
         ship: this.backupShip,
       };
-      this.$store.dispatch("keep/testOnce", request);
+      this.$store.dispatch("keep/testOnce", request)
+        .then((r) => {
+          // TODO: this doesn't return anything.
+          console.log('backup done ', r)
+        })
+        .finally(() => {
+          this.backupPending = false;
+        })
     },
     testMany() {
       const request: ManyRequest = {
-        agentName: 'keep',
+        agentName: this.agentName,
         ship: this.backupShip,
         freq: this.freq,
       };
@@ -318,7 +329,7 @@ export default defineComponent({
     },
     unsetMany() {
       const request: UnsetManyRequest = {
-        agentName: 'keep',
+        agentName: this.agentName,
         ship: this.backupShip,
         freq: null,
       };

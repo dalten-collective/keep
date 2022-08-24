@@ -7,6 +7,13 @@ import {
   RestoreRequest,
 } from "@/types";
 
+function siggedShip(ship) {
+  if (ship[0] === '~') {
+    return ship
+  }
+  return `~${ ship }`
+}
+
 export default {
   activate(agentName: string) {
     urbitAPI
@@ -57,11 +64,12 @@ export default {
 
   testOnce(payload: OnceRequest) {
     // gets data: { pending: { status: "invite", ship: "sum" } }
+
     urbitAPI
       .poke({
         app: payload.agentName,
         mark: "keep",
-        json: { once: payload.ship },
+        json: { once: siggedShip(payload.ship) },
       })
       .then((r) => {
         console.log("res ", r);
@@ -80,7 +88,7 @@ export default {
         mark: "keep",
         json: {
           many: {
-            to: payload.ship,
+            to: siggedShip(payload.ship),
             freq: payload.freq,
           },
         },
@@ -102,7 +110,7 @@ export default {
         mark: "keep",
         json: {
           many: {
-            to: payload.ship,
+            to: siggedShip(payload.ship),
             freq: payload.freq,
           },
         },
@@ -121,7 +129,7 @@ export default {
       .poke({
         app: payload.agentName,
         mark: "keep",
-        json: { mend: payload.ship },
+        json: { mend: siggedShip(payload.ship) },
       })
       .then((r) => {
         console.log("res ", r);

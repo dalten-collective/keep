@@ -13,7 +13,13 @@ export enum InviteStatus {
   Restore = "restore",
 }
 
-type Ship = string;
+export type Ship = string;
+
+export interface Backup {
+  ship: Ship;
+  agent: string;
+  time: number;
+}
 
 export interface RestoreDiff {
   ship: Ship;
@@ -64,6 +70,7 @@ export interface KeepAgentSubscriptionResponse {
 
 export interface KeepSubscriptionState {
   agents: Array<Ship>;
+  backups: Array<Backup>;
 }
 
 export interface PendingStatus {

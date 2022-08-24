@@ -9,6 +9,7 @@ import {
   AutoOnDiff,
   AutoOffDiff,
   ActiveDiff,
+  Backup,
   PendingDiff,
   RestoreDiff,
   Diff,
@@ -30,6 +31,7 @@ export default {
     return {
       agents: [] as Array<string>,
       wrappedAgents: [] as Array<KeepAgentStatus>,
+      backups: [] as Array<Backup>,
     };
   },
 
@@ -92,6 +94,10 @@ export default {
         } as KeepAgentStatus);
       }
     },
+
+    setBackups(state, backups: Array<Backup>) {
+      state.backups = backups;
+    },
   },
 
   actions: {
@@ -116,9 +122,11 @@ export default {
       });
     },
 
-    handleKeepResponseState({}, responseState: KeepSubscriptionState) {
+    handleKeepResponseState({ commit }, responseState: KeepSubscriptionState) {
       console.log("keep response state: ", responseState);
+      commit("setBackups", responseState.backups)
     },
+
     // TODO
     handleKeepResponseType({}, payload: { diff: object, responseType: EventType }) {
       console.log("keep response type: ", payload.responseType);

@@ -47,7 +47,7 @@
             </v-chip>
           </div>
           <div>
-            <BackupButton :ship="target[0]" :status="target[1]" />
+            <BackupButton :ship="target[0]" :agent-name="agentName" :status="target[1]" />
           </div>
         </article>
       </article>

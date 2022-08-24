@@ -17,6 +17,10 @@
             <v-icon start>mdi-folder</v-icon>
             Inactive Agents
           </v-tab>
+          <v-tab value="holdingBackups">
+            <v-icon start>mdi-folder</v-icon>
+            Holding Backups
+          </v-tab>
         </v-tabs>
       </div>
 
@@ -38,6 +42,19 @@
             </div>
           </v-card>
         </v-window-item>
+
+        <v-window-item value="holdingBackups" class="tw-w-xl">
+          <v-card class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg">
+            <div class="tw-flex tw-flex-row tw-my-8">
+              <v-card-text>
+                <div class="tw-grow">
+                  Backups held
+                  <pre>{{ backups }}</pre>
+                </div>
+              </v-card-text>
+            </div>
+          </v-card>
+        </v-window-item>
       </v-window>
     </div>
 
@@ -49,7 +66,7 @@ import { useDisplay } from 'vuetify'
 
 import { defineComponent } from "vue";
 
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { Scry } from "@urbit/http-api";
 
 import ActiveAgents from "@/components/ActiveAgents.vue";
@@ -62,6 +79,7 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters("keep", ["agents", "activeAgents", "inactiveAgents"]),
+    ...mapState("keep", ["backups"]),
     mobileClasses() {
       const smol = this.onSmall ? true : false
       return {
