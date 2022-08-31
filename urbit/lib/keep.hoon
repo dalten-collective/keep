@@ -3,9 +3,38 @@
 ::  usage: %-(agent:keep your-agent)
 ::
 /-  *keep
-/+  default-agent, *sane
+/+  default-agent, *sane, agentio, trans
 ::
 |%
+::  This is the meat of the logic. The rest is bookkeeping and logistics.
+::  The agent is the agent to be restored from the backup. The bowl is the
+::  bowl that the agent will see, i.e. it should be stripped of keep's subs.
+::
+++  restore
+  |=  [=agent:gall =bowl:gall backup=noun]
+  ^-  (quip card _agent)
+  =.  agent  ~(. agent bowl)
+  =/  old  ~|(%bad-shape ;;([wex=boat:gall sup=bitt:gall state=*] backup))
+  =^  cards0  agent  (on-load:agent [-:on-save:agent state.old])
+  =^  cards1=(list card)  agent
+    %+  roll  (diff ~(tap by wex.old) ~(tap by wex.bowl))
+    |:  *[[[=wire =ship *] *] caz=(list card) ag=_agent]
+    =+  (on-agent:ag(src.+< ship) wire %kick ~)
+    [(weld caz -.-) +.-]
+  =^  cards2=(list card)  agent
+    %+  roll  (diff ~(tap by sup.old) ~(tap by sup.bowl))
+    |:  *[[* =ship =path] caz=(list card) ag=_agent]
+    =+  (on-leave:ag(src.+< ship) path)
+    [(weld caz -.-) +.-]
+  =/  cards3=(list card)
+    %+  turn  (diff ~(tap by sup.bowl) ~(tap by sup.old))
+    |=  [* =ship =path]  [%give %kick ~[path] `ship]
+  =/  cards4=(list card)
+    %+  turn  (diff ~(tap by wex.bowl) ~(tap by wex.old))
+    |=  [[=wire =ship =dude] *]  [%pass wire %agent [ship dude] %leave ~]
+  :_  agent
+  :(weld cards0 cards1 cards2 cards3 cards4)
+::
 +$  versioned-state
   $%  state-0
   ==
@@ -13,8 +42,8 @@
 +$  state-0
   $:  %0
       live=_|
-      last=(map ship @da)
-      auto=(map ship @dr)
+      last=(map (unit ship) @da)
+      auto=(map (unit ship) @dr)
       pending=(map ship [?(%invite %restore) term])
   ==
 ::
@@ -36,6 +65,12 @@
       bowl  +<(sup our.sup)
       dish  +<(sup their.sup)  ::TODO change eny too?
       ag    ~(. agent dish)
+      io    ~(. agentio bowl)
+      rest  |=  u=(unit ship)
+            ~(rest pass:io keep/rest/?~(u /put /ship/(scot %p u.u)))
+      wait  |=  u=(unit ship)
+            ~(wait pass:io keep/wait/?~(u /put /ship/(scot %p u.u)))
+      tell  (~(poke-our pass:io /keep/tell) %keep keep-agent+!>(tell+dap.bowl))
   ::
   ++  on-poke
     |=  [=mark =vase]
@@ -51,10 +86,11 @@
       ?>  live
       ?>  =(src.bowl our.bowl)
       =*  backup  [wex.dish sup.dish +:on-save:ag]
-      ?:  =(to.cmd our.bowl)
+      ::  Back up to put dir or to a ship?
+      ?~  to.cmd
         :_  this(last (~(put by last) to.cmd now.bowl))
-        :~  (drop our.bowl now.bowl dap.bowl backup)
-            (saved:json to.cmd now.bowl)
+        :~  (drop our.bowl now.bowl dap.bowl backup) ::TODO set timer
+            (~(saved json state) to.cmd now.bowl)
         ==
       =/  paths
         ::  Already backing up to there?
@@ -65,23 +101,21 @@
       ?~  paths
         ::  No. Initiate new connection.
         =/  key  (scot %uv (sham eny.bowl))
-        =.  pending  (~(put by pending) to.cmd %invite key)
+        =.  pending  (~(put by pending) u.to.cmd %invite key)
         :_  this
-        :-  (~(try-invite json state) to.cmd)
-        :~  :*
-          %pass   /keep/init/(scot %p to.cmd)
-          %agent  [to.cmd %keep]
-          %poke   keep-agent+!>([%init dap.bowl key])
-        ==  ==
+        :~  (~(try-invite json state) u.to.cmd)
+            %+  ~(poke pass:io /keep/init/(scot %p u.to.cmd))  u.to.cmd^%keep
+            keep-agent+!>([%init dap.bowl key])
+        ==
       ::  Yes. Just give the fact.
       =/  freq  (~(get by auto) to.cmd)
       =/  prev  (~(get by last) to.cmd)
       =.  last  (~(put by last) to.cmd now.bowl)
       :_  this
       %-  catunits
-      :~  (bind (both `now.bowl freq) (cork add (wait to.cmd))) :: set next
+      :~  (bind (both `now.bowl freq) (cork add (wait to.cmd))) :: (behn wait+to.cmd))) :: set next
           (bind (both prev freq) (cork add (rest to.cmd))) :: unset old next
-          `[%give %fact paths noun+!>(backup)]
+          `(fact:io noun+!>(backup) paths) :: `[%give %fact paths noun+!>(backup)]
           `(~(saved json state) to.cmd now.bowl)
       ==
     ::  Set/unset repeating backups
@@ -103,24 +137,20 @@
         %mend
       ?>  live
       ?>  =(src.bowl our.bowl)
-      =/  key  (scot %uv (sham eny.bowl))
-      ::  Restoring from a path?
-      ?-  -.from.cmd
-      ::  Yes. Read from the path and simulate a %data poke.
-          %.y
-        ?~  file=(read p.from.cmd)  ~&  >>  no-file-at=p.from.cmd  `this
-        %-  on-poke:this(pending (~(put by pending) our.bowl %restore key))
-        keep+!>([%data u.file key])
-      ::  No. Request the data from the host.
-          %.n
-        =.  pending  (~(put by pending) p.from.cmd %restore key)
+      ::  Restoring from a jam file?
+      ?~  from.cmd
+        ::  Yes. Read from the path and restore.
+        ?~  file=(read from.cmd)  ~&  >>  no-file-at=from.cmd  `this ::TODO actually read a file
+        =^  cards  agent  (restore agent dish u.file)
         :_  this
-        :-  (~(try-restore json state) p.from.cmd)
-        :~  :*
-          %pass   /keep/mend/(scot %p p.from.cmd)
-          %agent  [p.from.cmd %keep]
-          %poke   keep-agent+!>([%grab dap.bowl key])
-        ==  ==
+        [(~(restored json state) ~ now.bowl) cards]
+      ::  No. Request the data from the host.
+      =>  .(from.cmd u.from.cmd)
+      =/  key  (scot %uv (sham eny.bowl))
+      :_  this(pending (~(put by pending) from.cmd %restore key))
+      :~  (~(try-restore json state) from.cmd)
+          %+  ~(poke pass:io /keep/grab/(scot %p from.cmd))  [from.cmd %keep]
+          keep-agent+!>(`agent:poke`grab+dap.bowl^key)
       ==
     ::  Load this back
         %data
@@ -128,27 +158,9 @@
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
-      =+  old=~|(%bad-shape ;;([wex=boat:gall sup=bitt:gall state=*] data.cmd))
-      =^  cards0  agent  (on-load:ag [-:on-save:ag state.old])
-      =^  cards1=(list card)  agent
-        %+  roll  (diff ~(tap by wex.old) ~(tap by wex.dish))
-        |:  [*[[=wire =ship *] *] caz=*(list card) ag=agent]
-        =+  (on-agent:ag(src.+< ship) wire %kick ~)
-        [(weld caz -.-) +.-]
-      =^  cards2=(list card)  agent
-        %+  roll  (diff ~(tap by sup.old) ~(tap by sup.dish))
-        |:  [*[* =ship =path] caz=*(list card) ag=agent]
-        =+  (on-leave:ag(src.+< ship) path)
-        [(weld caz -.-) +.-]
-      =/  cards3=(list card)
-        %+  turn  (diff ~(tap by sup.dish) ~(tap by sup.old))
-        |=  [* =ship =path]  [%give %kick ~[path] `ship]
-      =/  cards4=(list card)
-        %+  turn  (diff ~(tap by wex.dish) ~(tap by wex.old))
-        |=  [[=wire =ship =dude] *]  [%pass wire %agent [ship dude] %leave ~]
+      =^  cards  agent  (restore agent dish data.cmd)
       :_  this
-      :-  (~(restored json state) src.bowl now.bowl)
-      :(weld cards0 cards1 cards2 cards3 cards4)
+      [(~(restored json state) `src.bowl now.bowl) cards]
     ::  Turn wrapper on or off
         %live
       ?>  =(our.bowl src.bowl)
@@ -169,7 +181,7 @@
     ^-  (quip card agent:gall)
     =^  cards  agent  on-init:ag
     :_  this
-    [(tell our.bowl dap.bowl) cards]
+    [tell cards]
   ::
   ++  on-save
     ?.  live  on-save:ag
@@ -178,13 +190,12 @@
   ++  on-load
     |=  old=vase
     ^-  (quip card agent:gall)
-    =/  tell-card  (tell our.bowl dap.bowl)
     ?^  our=(mole |.(!<([vase _state] old)))
       =^  their  state  u.our
       =^  cards  agent  (on-load:ag their)
-      [[tell-card cards] this]
+      [[tell cards] this]
     =^  cards  agent  (on-load:ag old)
-    [[tell-card cards] this]
+    [[tell cards] this]
   ::
   ++  on-leave
     |=  =path
@@ -202,6 +213,7 @@
     ?+  +.path  (on-watch:def path)
     ::
         [%website ~]
+      ?>  =(src.bowl our.bowl)
       :_  this
       ~[~(initial json state)]
     ::
@@ -209,7 +221,7 @@
       ~|  %didnt-ask
       ?>  =([%invite &3.path] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
-      (on-poke(src.+< our.bowl) %keep !>([%once src.bowl]))
+      (on-poke(src.+< our.bowl) %keep !>(`wrapper:poke`once+`src.bowl))
     ==
   ::
   ++  on-agent
@@ -225,10 +237,10 @@
     ?.  ?=(%keep -.wire)
       =^  cards  agent  (on-arvo:ag wire sign-arvo)
       [cards this]
-    ?.  ?=([%timer @ *] +.wire)        (on-arvo:def wire sign-arvo)
-    ?.  ?=([%behn %wake *] sign-arvo)  (on-arvo:def wire sign-arvo)
-    ?^  error.sign-arvo                (on-arvo:def wire sign-arvo)
-    (on-poke %keep !>([%once (slav %p &3.wire)]))
+    ?.  ?=([%timer %wait ?(%put %ship) *] +.wire)  (on-arvo:def wire sign-arvo)
+    ?.  ?=([%behn %wake *] sign-arvo)              (on-arvo:def wire sign-arvo)
+    ?^  error.sign-arvo                            (on-arvo:def wire sign-arvo)
+    (on-poke %keep !>(`wrapper:poke`once+`(slav %p &3.wire))) ::TODO change entry from &3
   ::
   ++  on-fail
     |=  [=term =tang]
@@ -236,23 +248,6 @@
     =^  cards  agent  (on-fail:ag term tang)
     [cards this]
   --
-::
-++  rest
-  |=  =ship
-  |=  =@da
-  ^-  card
-  [%pass /keep/cancel/(scot %p ship) %arvo %b %rest da]
-::
-++  wait
-  |=  =ship
-  |=  =@da
-  ^-  card
-  [%pass /keep/timer/(scot %p ship) %arvo %b %wait da]
-::
-++  tell
-  |=  [our=ship dap=dude]
-  ^-  card
-  [%pass /keep/tell %agent [our %keep] %poke keep-agent+!>([%tell dap])]
 ::
 ++  drop
   |=  [our=ship now=@da dap=dude non=noun]
@@ -268,7 +263,7 @@
       ==
   ==
 ::
-++  read
+++  read  ::TODO read from UI somehow??
   |=  =path
   ^-  (unit noun)
   ~|  not-a-jam-file=path
@@ -283,10 +278,10 @@
   ++  initial  (website-card 'initial' ~)
   ::
   ++  saved
-    |=  new=[@p @da]  (website-card 'saved' (json-da new))
+    |=  new=[(unit @p) @da]  (website-card 'saved' (json-da new))
   ::
   ++  auto
-    |=  new=[@p (unit @dr)]  (website-card 'auto' (json-dr new))
+    |=  new=[(unit @p) (unit @dr)]  (website-card 'auto' (json-dr new))
   ::
   ++  try-invite
     |=  =@p  (website-card 'pending' (json-pending [p %invite]))
@@ -295,7 +290,7 @@
     |=  =@p  (website-card 'pending' (json-pending [p %restore]))
   ::
   ++  restored
-    |=  new=[@p @da]  (website-card 'restored' (json-da new))
+    |=  new=[(unit @p) @da]  (website-card 'restored' (json-da new))
   ::
   ++  live  (website-card 'active' b+live.state)
   ::
@@ -309,7 +304,10 @@
     %-  pairs
     :~  [%live b+live.state]
         [%saved a+(turn ~(tap by last.state) json-da)]
-        [%auto a+(turn ~(tap by auto.state) |=([=@p =@dr] (json-dr p `dr)))]
+    ::
+        :-  %auto
+        a+(turn ~(tap by auto.state) |=([=(unit @p) =@dr] (json-dr unit `dr)))
+    ::
         :+  %pending
           %a
         %+  turn  ~(tap by pending.state)
@@ -318,15 +316,15 @@
     ==
   ::
   ++  json-da
-    |=  [=@p prev=@da]
+    |=  [place=(unit @p) prev=@da]
     ^-  ^json
-    (pairs ~[['ship' (ship p)] ['time' (sect prev)]])
+    (pairs ~[['ship' (bindcast place ship)] ['time' (sect prev)]])
   ::
   ++  json-dr
-    |=  [=@p freq=(unit @dr)]
+    |=  [place=(unit @p) freq=(unit @dr)]
     ^-  ^json
     %-  pairs
-    :~  ['ship' (ship p)]
+    :~  ['ship' (bindcast place ship)]
         ['freq' (bindcast freq (corl numb (curr div ~s1)))]
     ==
   ::
