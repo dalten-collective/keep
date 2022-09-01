@@ -1,37 +1,10 @@
 <template>
   <v-dialog v-model="backupOpen" fullscreen :scrim="false" scrollable>
     <template v-slot:activator="{ props }">
-
-      <v-hover v-if="isRecurringBackup" v-slot="{ isHovering, props }">
-        <v-btn
-          v-bind="props" color="success"
-          text="white"
-          @click="openBackup"
-          v-if="isHovering"
-        >
-          Change settings
-        </v-btn>
-        <v-btn
-          v-bind="props" color="success"
-          text="white"
-          @click="openBackup"
-          v-else
-        >
-          <v-icon start>mdi-cached</v-icon>
-          Recurring backups enabled
-        </v-btn>
-      </v-hover>
-
-      <v-btn
-        v-else
-        v-bind="props" color="success"
-        text="white"
-        @click="openBackup"
-      >
+      <v-btn v-bind="props" color="success" text="white" @click="openBackup">
         <v-icon start>mdi-content-save</v-icon>
         backup
       </v-btn>
-
     </template>
 
     <v-card class="tw-w-96 tw-border-4 tw-border-primary tw-bg-surface tw-p-4">
@@ -52,17 +25,13 @@
 
       <pre>{{ status }}</pre>
 
-    <button @click="testRestore()">Test Restore</button>
+      <button @click="testRestore()">Test Restore</button>
 
-    <br />
-    <input
-      type="text"
-      placeholder="ship to backup to"
-      v-model="backupShip"
-    />
-    <input type="number" placeholder="frequency" v-model="freq" />
-    <button @click="testMany()">Test Many</button>
-    <button @click="unsetMany()">Unset Many</button>
+      <br />
+      <input type="text" placeholder="ship to backup to" v-model="backupShip" />
+      <input type="number" placeholder="frequency" v-model="freq" />
+      <button @click="testMany()">Test Many</button>
+      <button @click="unsetMany()">Unset Many</button>
 
       <v-card-text>
         <div class="tw-mt-2">
@@ -77,19 +46,25 @@
                   >mdi-help-circle-outline</v-icon
                 >
               </template>
-              <span
-                >TODO:
-              </span>
+              <span>TODO: </span>
             </v-tooltip>
           </div>
           <div>
             <div class="tw-my-2">
-              <span class="tw-italic">Backup <span class="tw-font-mono tw-not-italic">TODO: ship</span>'s TODO: agent once</span>
+              <span class="tw-italic"
+                >Backup
+                <span class="tw-font-mono tw-not-italic">TODO: ship</span>'s
+                TODO: agent once</span
+              >
             </div>
-            <v-btn color="success" text="white" :loading="backupPending" @click="backupOnce">
-              Backup
-            </v-btn
+            <v-btn
+              color="success"
+              text="white"
+              :loading="backupPending"
+              @click="backupOnce"
             >
+              Backup
+            </v-btn>
           </div>
         </div>
 
@@ -112,61 +87,70 @@
           </div>
 
           <v-form>
-              <v-row>
-                <v-col cols="12">
-                  <v-select
-                    :items="daysOptions"
-                    label="Days"
-                    v-model="frequencyDays"
-                    hide-details="auto"
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <v-select
-                    :items="hoursOptions"
-                    label="Hours"
-                    v-model="frequencyHours"
-                    hide-details="auto"
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <v-select
-                    :items="minutesOptions"
-                    label="Minutes"
-                    v-model="frequencyMinutes"
-                    hide-details="auto"
-                  />
-                </v-col>
-              </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-select
+                  :items="daysOptions"
+                  label="Days"
+                  v-model="frequencyDays"
+                  hide-details="auto"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-select
+                  :items="hoursOptions"
+                  label="Hours"
+                  v-model="frequencyHours"
+                  hide-details="auto"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-select
+                  :items="minutesOptions"
+                  label="Minutes"
+                  v-model="frequencyMinutes"
+                  hide-details="auto"
+                />
+              </v-col>
+            </v-row>
 
-              <div>
-                <div class="tw-my-4">
-                  <div>
-                    <span class="tw-mr-2">{{ displayFrequency }}</span>
-                    <span class="tw-text-gray-400">({{ hoonedFrequcency }})</span>
-                  </div>
-                </div>
-                <div class="tw-mb-1">
-                  <v-btn color="success" :loading="backupPending" text="white" @click="frequentBackup">
-                    Backup frequently
-                  </v-btn>
+            <div>
+              <div class="tw-my-4">
+                <div>
+                  <span class="tw-mr-2">{{ displayFrequency }}</span>
+                  <span class="tw-text-gray-400">({{ hoonedFrequcency }})</span>
                 </div>
               </div>
-              <div v-if="backupPending">
-                <v-alert type="info" variant="tonal">
-                  Backup has started. You might notice your ship hanging while this completes... You can close this page - or watch.
-                </v-alert>
+              <div class="tw-mb-1">
+                <v-btn
+                  color="success"
+                  :loading="backupPending"
+                  text="white"
+                  @click="frequentBackup"
+                >
+                  Backup frequently
+                </v-btn>
               </div>
-              <div v-if="showDone">
-                <v-alert type="success" variant="tonal">
-                  Backup complete! Check your 
-                  <span class="tw-font-mono">.urb/put/{{ship}}/{{ resource }}.</span> directory.
-                </v-alert>
-              </div>
+            </div>
+            <div v-if="backupPending">
+              <v-alert type="info" variant="tonal">
+                Backup has started. You might notice your ship hanging while
+                this completes... You can close this page - or watch.
+              </v-alert>
+            </div>
+            <div v-if="showDone">
+              <v-alert type="success" variant="tonal">
+                Backup complete! Check your
+                <span class="tw-font-mono"
+                  >.urb/put/{{ ship }}/{{ resource }}.</span
+                >
+                directory.
+              </v-alert>
+            </div>
           </v-form>
         </div>
       </v-card-text>
@@ -228,7 +212,8 @@ export default defineComponent({
 
   watch: {
     backupOpen(val) {
-      if (!val) { // closing
+      if (!val) {
+        // closing
         // reset things
         this.backupPending = false;
         this.showDone = false;
@@ -292,8 +277,8 @@ export default defineComponent({
       return this.formatFreqAsHoon({
         days: this.frequencyDays,
         hours: this.frequencyHours,
-        minutes: this.frequencyMinutes
-      })
+        minutes: this.frequencyMinutes,
+      });
     },
   },
 
@@ -310,14 +295,15 @@ export default defineComponent({
         agentName: this.agentName,
         ship: this.backupShip,
       };
-      this.$store.dispatch("keep/testOnce", request)
+      this.$store
+        .dispatch("keep/testOnce", request)
         .then((r) => {
           // TODO: this doesn't return anything.
-          console.log('backup done ', r)
+          console.log("backup done ", r);
         })
         .finally(() => {
           this.backupPending = false;
-        })
+        });
     },
 
     testMany() {
@@ -337,12 +323,10 @@ export default defineComponent({
       this.$store.dispatch("keep/testMany", request);
     },
 
-    formatFreqAsHoon(freq: { days: number, minutes: number, hours: number }) {
+    formatFreqAsHoon(freq: { days: number; minutes: number; hours: number }) {
       const d = freq.days ? `${"d" + freq.days}` : "";
       const h = freq.hours ? `${"h" + freq.hours}` : "";
-      const m = freq.minutes
-        ? `${"m" + freq.minutes}`
-        : "";
+      const m = freq.minutes ? `${"m" + freq.minutes}` : "";
       const worm = [d, h, m].filter(Boolean); // trim out empties
       return `~${worm.join(".")}`;
     },

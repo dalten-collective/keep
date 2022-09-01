@@ -18,7 +18,7 @@
           :key="target[0]"
           class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-border-peat tw-p-4"
         >
-          <div>
+          <div class="tw-flex-grow">
             <v-tooltip location="top" v-if="target[1].auto.length > 0">
               <template v-slot:activator="{ props }">
                 <v-chip
@@ -45,14 +45,17 @@
               ~{{ target[0] }}
             </v-chip>
           </div>
-          <div>
-            <BackupButton
-              :ship="target[0]"
-              :agent-name="agentName"
-              :status="target[1]"
-            />
+
+          <div class="tw-flex tw-flex-row tw-justify-end tw-flex-grow">
+            <div class="tw-mr-2">
+              <BackupButton
+                :ship="target[0]"
+                :agent-name="agentName"
+                :status="target[1]"
+              />
+            </div>
+            <RestoreButton :ship="target[0]" :agent-name="agentName" />
           </div>
-          <RestoreButton :ship="target[0]" :agent-name="agentName" />
         </article>
       </article>
 
