@@ -403,6 +403,10 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
     /*@apply tw-py-2;*/
   /*}*/
 
+  input {
+    padding-bottom: 0 !important; /* stop it riding up into the label */
+  }
+
   button.tw {
     @apply tw-rounded-md;
     @apply tw-p-1;

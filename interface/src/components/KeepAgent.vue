@@ -28,7 +28,7 @@
                   color="info"
                   class="mr-2"
                 >
-                  <span class="mr-2 tw-font-mono">~{{ target[0] }}</span>
+                  <span class="mr-2 tw-font-mono">{{ $filters.sigShip(target[0]) }}</span>
                   <v-icon color="info"> mdi-cached </v-icon>
                 </v-chip>
               </template>
@@ -42,7 +42,7 @@
               color="info"
               class="mr-2"
             >
-              ~{{ target[0] }}
+              <span class="mr-2 tw-font-mono">{{ $filters.sigShip(target[0]) }}</span>
             </v-chip>
           </div>
 
@@ -63,7 +63,7 @@
         <h4 class="my-2 tw-text-lg">Outstanding Invites</h4>
         <p class="my-2 tw-text-sm">You've initiated a backup to these ships, but they haven't yet responded. Either they don't have %keep installed or they haven't accepted your request yet.</p>
         <ul class="my-2 tw-list-disc">
-          <li v-for="p in pending" class="tw-ml-4">
+          <li v-for="p in pending" :key="p.ship" class="tw-ml-4">
             <span class="tw-font-mono tw-italic tw-text-gray-400">{{ $filters.sigShip(p.ship) }}</span>
             <!-- <v-btn>Remove</v-btn> -->
           </li>
