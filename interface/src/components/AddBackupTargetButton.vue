@@ -25,21 +25,8 @@
         <div class="tw-mt-2">
           <div class="tw-mb-2">
             <span class="tw-font-bold"
-              >Begin sending backups to one of your moons.</span
+              >Begin sending backups to another ship.</span
             >
-            <!--
-            <v-tooltip location="top">
-              <template v-slot:activator="{ props }">
-                <v-icon
-                  v-bind="props"
-                  size="x-small"
-                  class="tw-ml-1 tw-cursor-pointer tw-mb-2 tw-opacity-50"
-                  >mdi-help-circle-outline</v-icon
-                >
-              </template>
-              <span>TODO: </span>
-            </v-tooltip>
-            -->
           </div>
 
           <v-form ref="form" v-model="formValid">
@@ -50,22 +37,31 @@
             />
             -->
 
-            <v-text-field
-              label="Moon @p"
-              v-model="backupShip"
-              required
-              :rules="[(v) => !!v || 'Cannot be blank']"
-            />
+            <div class="tw-mb-2">
+              <v-text-field
+                label="~sampel-palnet"
+                v-model="backupShip"
+                required
+                :rules="[(v) => !!v || 'Cannot be blank']"
+              />
+            </div>
 
-            <v-btn
-              color="success"
-              text="white"
-              :loading="addPending"
-              :disabled="addPending || !formValid"
-              @click="addTarget"
-            >
-              Add Target
-            </v-btn>
+            <div>
+              <v-btn
+                color="success"
+                text="white"
+                :loading="addPending"
+                :disabled="addPending || !formValid"
+                @click="addTarget"
+              >
+                Add Target
+              </v-btn>
+            </div>
+            <div class="tw-my-2">
+              <v-alert type="info" variant="tonal" class="tw-text-sm">
+                If the target ship doesn't yet have %keep installed, they'll need to install it before backups will start.
+              </v-alert>
+            </div>
 
           </v-form>
 

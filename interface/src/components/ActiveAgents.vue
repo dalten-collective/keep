@@ -20,7 +20,11 @@
       </div>
     </div>
 
-    <div v-if="!agents || agents.length === 0">No keep agents on this ship</div>
+    <div v-if="!agents || agents.length === 0">
+      <v-alert type="warning">
+        No appropriate agents installed or configured yet. <router-link class="tw-underline" :to="{ name: 'learn' }">Learn more</router-link>
+      </v-alert>
+    </div>
 
     <div v-else>
       <div v-if="activeAgents.length === 0">No active agents</div>
@@ -32,9 +36,6 @@
       </div>
     </div>
 
-    <div v-if="agents && agents.length == 0">
-      TODO: No agents recognized
-    </div>
   </div>
 </template>
 
