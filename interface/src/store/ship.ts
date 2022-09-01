@@ -82,7 +82,7 @@ export default {
         agentName,
         (data: KeepAgentSubscriptionResponse) => {
           console.log("agentName ", agentName);
-          console.log("sub-agent response ", data);
+          console.log(`sub-agent response ('${ agentName }' agent)`, data);
 
           dispatch(
             "keep/handleAgentResponseState",

@@ -32,6 +32,7 @@ export default {
       agents: [] as Array<string>,
       wrappedAgents: [] as Array<KeepAgentStatus>,
       backups: [] as Array<Backup>,
+      pending: [] as Array,
     };
   },
 
@@ -144,7 +145,7 @@ export default {
       { commit },
       payload: { agentName: string; responseState: KeepAgentSubscriptionStatus }
     ) {
-      console.log("handle agent response state: ", payload.responseState);
+      console.log(`handle '${ payload.agentName }' agent response state: `, payload.responseState);
       commit("setAgentStatus", {
         agentName: payload.agentName,
         responseState: payload.responseState,
@@ -253,15 +254,18 @@ export default {
     },
 
     testOnce({}, payload: OnceRequest) {
-      // TODO: make sure ship name is prefixed with ~
-      keepApi.testOnce(payload);
+      return keepApi.testOnce(payload)
+        .then((r) => {
+          return r
+        })
+        .catch(e => {
+          throw e.response
+        });
     },
     testMany({}, payload: ManyRequest) {
-      // TODO: make sure ship name is prefixed with ~
       keepApi.testMany(payload);
     },
     testUnsetMany({}, payload: UnsetManyRequest) {
-      // TODO: make sure ship name is prefixed with ~
       keepApi.testUnsetMany(payload);
     },
     testRestore({}, payload: RestoreRequest) {

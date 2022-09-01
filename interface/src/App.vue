@@ -39,6 +39,7 @@
 
     <v-main class="tw-container tw-mx-auto tw-my-8">
       <router-view></router-view>
+      <Message />
       <!--
       <button @click="startMainAirlock">Start Main airlock(s)</button>
       <button @click="closeMainAirlock">Close keep airlock</button>
@@ -56,9 +57,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import Message from "@/components/Message.vue"
 import logo from "@/assets/quartus-logo-white-square-no-text.png";
 
 export default defineComponent({
+  components: { Message },
   data() {
     return {
       logo,
@@ -85,9 +88,6 @@ export default defineComponent({
     this.closeAgentAirlocks();
   },
   computed: {
-    messages() {
-      return this.$store.state.message.messages;
-    },
   },
   methods: {
     startMainAirlock() {

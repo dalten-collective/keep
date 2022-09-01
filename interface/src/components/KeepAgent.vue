@@ -1,8 +1,7 @@
 <template>
   <div>
-    {{ backupsByShip }}
     <header class="tw-mb-4">
-      <h3 class="tw-text-2xl">{{ agentName }}</h3>
+      <h3 class="tw-text-2xl">%{{ agentName }}</h3>
     </header>
 
     <section class="tw-flex tw-flex-col">
@@ -47,30 +46,40 @@
             </v-chip>
           </div>
           <div>
-            <BackupButton :ship="target[0]" :agent-name="agentName" :status="target[1]" />
+            <BackupButton
+              :ship="target[0]"
+              :agent-name="agentName"
+              :status="target[1]"
+            />
           </div>
           <RestoreButton :ship="target[0]" :agent-name="agentName" />
         </article>
       </article>
+
+      <article v-if="pending.length > 0">
+        <h4 class="my-2 tw-text-lg">Outstanding Invites</h4>
+        <p class="my-2 tw-text-sm">You've initiated a backup to these ships, but they haven't yet responded. Either they don't have %keep installed or they haven't accepted your request yet.</p>
+        <ul class="my-2 tw-list-disc">
+          <li v-for="p in pending" class="tw-ml-4">
+            <span class="tw-font-mono tw-italic tw-text-gray-400">{{ sigShip(p.ship) }}</span>
+            <!-- <v-btn>Remove</v-btn> -->
+          </li>
+        </ul>
+      </article>
     </section>
 
-    <footer class="tw-flex tw-flex-col md:tw-flex-row tw-justify-between">
-      <div class="tw-flex tw-flex-col tw-align-middle tw-mb-4 md:tw-mb-0">
-        <!--
-        <BackupButton :backup-status="ourStatus" />
-        -->
+    <footer class="tw-flex tw-flex-col tw-justify-end tw-text-right tw-align-middle md:tw-mb-0">
+      <div>
+        <AddBackupTargetButton :agent-name="agentName" />
       </div>
     </footer>
 
-    <v-text-field
-      v-model="newTarget"
-    >
-    </v-text-field>
-    <v-btn @click="doOnce">backup</v-btn>
 
+    <!--
     <v-btn v-if="!live" @click="activateAgent">Activate</v-btn>
     <v-btn v-else @click="deactivateAgent">Deactivate</v-btn>
-    <br />
+    -->
+
   </div>
 </template>
 
@@ -86,6 +95,9 @@ import {
 
 import BackupButton from "@/components/BackupButton.vue";
 import RestoreButton from "@/components/RestoreButton.vue";
+import AddBackupTargetButton from "@/components/AddBackupTargetButton.vue";
+
+import { siggedShip } from "@/api/keep";
 
 export default defineComponent({
   name: "KeepAgent",
@@ -95,10 +107,10 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { BackupButton, RestoreButton },
+  components: { BackupButton, RestoreButton, AddBackupTargetButton },
   data() {
     return {
-      newTarget: '',
+      newTarget: "",
     };
   },
   computed: {
@@ -156,11 +168,19 @@ export default defineComponent({
 
       return status;
     },
+
+    pending() {
+      return this.ourStatus.pending
+    }
   },
   methods: {
+    sigShip(ship) {
+      return siggedShip(ship);
+    },
+
     doOnce() {
       const request: OnceRequest = {
-        agentName: 'keep', // TODO: why this?
+        agentName: "keep", // TODO: why this?
         ship: this.newTarget,
       };
       this.$store.dispatch("keep/testOnce", request);

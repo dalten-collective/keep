@@ -7,7 +7,7 @@ import {
   RestoreRequest,
 } from "@/types";
 
-function siggedShip(ship) {
+export function siggedShip(ship) {
   if (ship[0] === '~') {
     return ship
   }
@@ -62,10 +62,9 @@ export default {
       });
   },
 
-  testOnce(payload: OnceRequest) {
+  testOnce(payload: OnceRequest): Promise<any> {
     // gets data: { pending: { status: "invite", ship: "sum" } }
-
-    urbitAPI
+    return urbitAPI
       .poke({
         app: payload.agentName,
         mark: "keep",
@@ -73,10 +72,12 @@ export default {
       })
       .then((r) => {
         console.log("res ", r);
+        return r
       })
       .catch((e) => {
         // TODO: 'e' is undefined
         console.log("err ", e);
+        throw e.response
       });
   },
 
