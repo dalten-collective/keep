@@ -4,9 +4,14 @@
       <h3 class="tw-text-2xl">%{{ agentName }}</h3>
     </header>
 
-    <section class="tw-flex tw-flex-col">
+    <section v-if="!live" class="tw-flex tw-flex-col">
+      <v-btn color="success" v-if="!live" @click="activateAgent">Activate</v-btn>
+      <v-btn v-else @click="deactivateAgent">Deactivate</v-btn>
+    </section>
+
+    <section v-else class="tw-flex tw-flex-col">
       <article>
-        <h4 class="tw-text-lg">Live backup targets</h4>
+        <h4 class="tw-text-lg tw-mb-4">Live backup targets</h4>
 
         <article v-if="backupsByShip.length == 0">
           No backup targets configured
@@ -16,7 +21,7 @@
           v-else
           v-for="target in backupsByShip"
           :key="target[0]"
-          class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-border-peat tw-p-4"
+          class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
         >
           <div class="tw-flex-grow">
             <v-tooltip location="top" v-if="target[1].auto.length > 0">
@@ -69,19 +74,14 @@
           </li>
         </ul>
       </article>
+
+      <footer class="tw-flex tw-flex-col tw-justify-end tw-text-right tw-align-middle md:tw-mb-0">
+        <div>
+          <AddBackupTargetButton :agent-name="agentName" />
+        </div>
+      </footer>
     </section>
 
-    <footer class="tw-flex tw-flex-col tw-justify-end tw-text-right tw-align-middle md:tw-mb-0">
-      <div>
-        <AddBackupTargetButton :agent-name="agentName" />
-      </div>
-    </footer>
-
-
-    <!--
-    <v-btn v-if="!live" @click="activateAgent">Activate</v-btn>
-    <v-btn v-else @click="deactivateAgent">Deactivate</v-btn>
-    -->
 
   </div>
 </template>
@@ -109,6 +109,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    inactive: {
+      type: Boolean,
+      default: false,
+    }
   },
   components: { BackupButton, RestoreButton, AddBackupTargetButton },
   data() {

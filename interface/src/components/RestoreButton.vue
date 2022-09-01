@@ -23,19 +23,31 @@
       <v-card-text>
         <div class="tw-mt-2">
           <section class="tw-my-2 tw-mb-4 tw-text-sm">
+
             <p class="tw-my-2">Double-check these details:</p>
-            <ul class="tw-list-disc">
-              <li class="tw-ml-4"><span>Agent: </span> %{{ agentName }}</li>
-              <li class="tw-ml-4">
-                <span>Saved On: </span> {{ lastBackupOn.toLocaleString() }}
-              </li>
-              <li class="tw-ml-4">
-                <span>Source: </span>
-                <span class="tw-whitespace tw-font-mono">{{
-                  $filters.sigShip(ship)
-                }}</span>
-              </li>
-            </ul>
+
+            <div class="keep-info-items tw-grid-cols-3">
+              <v-chip label color="surface" class="keep-info-label" size="small"
+                >Agent</v-chip
+              >
+              <div class="keep-info-data">%{{ agentName }}</div>
+            </div>
+            <div class="keep-info-items tw-grid-cols-3">
+              <v-chip label color="surface" class="keep-info-label" size="small"
+                >Saved On</v-chip
+              >
+              <div class="keep-info-data">
+                {{ lastBackupOn.toLocaleString() }}
+              </div>
+            </div>
+            <div class="keep-info-items tw-grid-cols-3">
+              <v-chip label color="surface" class="keep-info-label" size="small"
+                >Source</v-chip
+              >
+              <div class="keep-info-data">
+                {{ $filters.sigShip(ship) }}
+              </div>
+            </div>
 
             <v-alert class="tw-my-2" type="warning">
               Warning! This will replace %{{ agentName }}'s current state on
@@ -67,7 +79,8 @@
 
                 <div class="tw-flex tw-justify-around tw-mt-4">
                   <v-btn @click="confirmOpen = false" flat class="mr-4"
-                    >Wait, no. Cancel</v-btn>
+                    >Wait, no. Cancel</v-btn
+                  >
                   <v-btn
                     color="error"
                     text="white"

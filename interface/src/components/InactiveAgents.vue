@@ -4,6 +4,12 @@
     <div class="tw-flex tw-space-between tw-mb-4">
       <div class="tw-grow">
         <h3 class="tw-text-3xl tw-font-silom">Inactive Agents</h3>
+        <p class="tw-my-2">
+          These agents are properly wrapped and ready for %keep, but are not yet <span class="tw-font-bold">live</span>. Activate them here to begin backing up.
+        </p>
+        <p class="tw-my-2">
+          <router-link class="tw-underline" :to="{ name: 'learn' }">Learn more</router-link> about wrapping.
+        </p>
       </div>
       <div>
         <v-btn
@@ -20,10 +26,16 @@
       </div>
     </div>
 
-    <div v-if="!agents || agents.length === 0">No keep agents on this ship</div>
+    <div v-if="!agents || agents.length === 0">
+      No keep agents on this ship
+      <hr />
+    </div>
 
     <div v-else>
-      <div v-if="inactiveAgents.length === 0">No inactive agents</div>
+      <div v-if="inactiveAgents.length === 0">
+        No inactive agents
+        <hr />
+      </div>
       <div v-else v-for="agent in inactiveAgents" :key="agent">
         <KeepAgent
           :agent-name="agent.agentName"
@@ -32,9 +44,7 @@
       </div>
     </div>
 
-    <div v-if="agents && agents.length > 0"></div>
-
-    <hr />
+    <!--
     <input type="text" v-model="agentToActivate" />
     <br />
     <input type="text" placeholder="scry app" v-model="scryApp" />
@@ -42,6 +52,7 @@
     <button @click="testScry">
       Scry (to {{ scryApp }} with {{ scryPath }})
     </button>
+    -->
   </div>
 </template>
 

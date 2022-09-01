@@ -36,9 +36,7 @@
         <v-window-item value="inactive" class="tw-w-xl">
           <v-card class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg">
             <div class="tw-flex tw-flex-row tw-my-8">
-              <v-card>
-                <InactiveAgents class="tw-grow"/>
-              </v-card>
+              <InactiveAgents class="tw-grow"/>
             </div>
           </v-card>
         </v-window-item>
@@ -46,12 +44,7 @@
         <v-window-item value="holdingBackups" class="tw-w-xl">
           <v-card class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg">
             <div class="tw-flex tw-flex-row tw-my-8">
-              <v-card-text>
-                <div class="tw-grow">
-                  Backups held
-                  <pre>{{ backups }}</pre>
-                </div>
-              </v-card-text>
+              <HeldBackups class="tw-grow"/>
             </div>
           </v-card>
         </v-window-item>
@@ -71,11 +64,12 @@ import { Scry } from "@urbit/http-api";
 
 import ActiveAgents from "@/components/ActiveAgents.vue";
 import InactiveAgents from "@/components/InactiveAgents.vue";
+import HeldBackups from "@/components/HeldBackups.vue";
 
 export default defineComponent({
   name: "HomeView",
   components: {
-    ActiveAgents, InactiveAgents,
+    ActiveAgents, InactiveAgents, HeldBackups
   },
   computed: {
     ...mapGetters("keep", ["agents", "activeAgents", "inactiveAgents"]),

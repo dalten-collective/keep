@@ -527,6 +527,21 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
   .v-overlay__content .v-card {
     border-radius: 10px !important;
   }
+
+  .keep-info-items {
+    @apply tw-items-center;
+    @apply tw-mb-1;
+    @apply tw-grid;
+    @apply tw-grid-cols-6;
+    @apply tw-gap-4;
+    max-width: 46rem;
+  }
+  .keep-info-label {
+    @apply tw-col-span-1;
+  }
+  .keep-info-data {
+    @apply tw-col-span-2;
+  }
 }
 
 @tailwind components;

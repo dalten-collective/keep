@@ -28,21 +28,52 @@
               Settings for %{{ agentName }}'s backups with
               <span class="tw-font-mono">{{ $filters.sigShip(ship) }}</span>
             </p>
-            <ul v-if="isRecurringBackup || haveSaved" class="tw-list-disc">
-              <li v-if="haveSaved" class="tw-ml-4">
-                Last backup saved on
-                {{
-                  $filters.sectToDate(status.saved[0].time).toLocaleString()
-                }}.
-              </li>
-              <li v-if="isRecurringBackup" class="tw-ml-4">
-                Currently performing automatic backups {{ autoBackupPrint }}.
-              </li>
-              <li v-else class="tw-ml-4">Not performing automatic backups.</li>
-            </ul>
+
+            <section v-if="isRecurringBackup || haveSaved" class="tw-my-2">
+              <article class="tw-border tw-rounded-keep tw-p-4 tw-mb-4">
+                <div
+                  class="keep-info-items"
+                >
+                  <v-chip
+                    label
+                    color="surface"
+                    class="keep-info-label"
+                    size="small"
+                    >Last backup</v-chip
+                  >
+                  <div class="keep-info-data">
+                    {{
+                      $filters.sectToDate(status.saved[0].time).toLocaleString()
+                    }}
+                  </div>
+                </div>
+
+                <div
+                  class="keep-info-items"
+                  style="max-width: 46rem"
+                >
+                  <v-chip
+                    label
+                    color="surface"
+                    class="keep-info-label"
+                    size="small"
+                    >Recurring</v-chip
+                  >
+                  <div class="keep-info-data">
+                    <span v-if="isRecurringBackup">
+                      {{ autoBackupPrint }}
+                    </span>
+                    <span v-else> Not performing automatic backups </span>
+                  </div>
+                </div>
+              </article>
+            </section>
+
           </section>
 
-          <section class="tw-mb-2 tw-bg-surface tw-rounded-keep tw-shadow-inner tw-p-4">
+          <section
+            class="tw-mb-2 tw-bg-surface tw-rounded-keep tw-shadow-inner tw-p-4"
+          >
             <h4 class="tw-text-lg tw-mb-2">One-time backup</h4>
             <div class="tw-flex tw-flex-row">
               <div class="mr-4">
@@ -55,27 +86,32 @@
                   Backup Once
                 </v-btn>
               </div>
-              <div class="tw-my-2">
-                  <p>
-                    Backup %{{ agentName }} to
-                    <span class="tw-font-mono">{{ $filters.sigShip(ship) }}</span>
-                    one time, now.
-                  </p>
-                  <p v-if="isRecurringBackup">Since you already have recurring backups enabled, this will also re-start the frequency timer from right now.</p>
+              <div class="tw-mb-2">
+                <p>
+                  Backup %{{ agentName }} to
+                  <span class="tw-font-mono">{{ $filters.sigShip(ship) }}</span>
+                  one time, now.
+                </p>
+                <p v-if="isRecurringBackup">
+                  Since you already have recurring backups enabled, this will
+                  also re-start the frequency timer from right now.
+                </p>
               </div>
             </div>
 
             <hr class="tw-my-4" />
 
             <h4 class="tw-text-lg tw-mb-2">Recurring backup</h4>
-            <v-form ref="recurringForm" v-model="recurringValid" class="tw-flex tw-flex-col">
+            <v-form
+              ref="recurringForm"
+              v-model="recurringValid"
+              class="tw-flex tw-flex-col"
+            >
               <div class="tw-my-2 tw-flex tw-flex-row">
                 <template v-if="isRecurringBackup">
                   Currently backing up {{ autoBackupPrint }}.
                 </template>
-                <template v-else>
-                  Not backing up on a schedule yet.
-                </template>
+                <template v-else> Not backing up on a schedule yet. </template>
               </div>
               <div class="tw-flex tw-flex-row">
                 <div class="mr-4">
@@ -89,10 +125,7 @@
                     <template v-if="isRecurringBackup">
                       Change Frequency
                     </template>
-                    <template v-else>
-                      Set Recurring backup
-                    </template>
-                    
+                    <template v-else> Set Recurring backup </template>
                   </v-btn>
                 </div>
                 <div class="tw-flex-grow">
@@ -109,7 +142,9 @@
               </div>
 
               <div v-if="isRecurringBackup">
-                <v-btn color="success" @click="unsetMany">Stop recurring backups</v-btn>
+                <v-btn color="success" @click="unsetMany"
+                  >Stop recurring backups</v-btn
+                >
               </div>
             </v-form>
 
@@ -130,7 +165,6 @@
                   directory.
                 </v-alert>
               </div>
-
             </div>
           </section>
         </div>
@@ -181,7 +215,7 @@ export default defineComponent({
   data() {
     return {
       backupShip: "",
-      freq: '',
+      freq: "",
       backupOpen: false,
       backupPending: false,
       showDone: false,
@@ -191,7 +225,7 @@ export default defineComponent({
 
   mounted() {
     if (this.isRecurringSaved) {
-      this.freq = this.status.auto[0].freq
+      this.freq = this.status.auto[0].freq;
     }
   },
 
@@ -210,16 +244,16 @@ export default defineComponent({
       if (is) {
         this.freq = this.status.auto[0].freq;
       }
-    }
+    },
   },
 
   computed: {
     // ...mapGetters("peat", ["isRecurringSaved"]),
     haveFreq() {
-      if  (this.isRecurringBackup) {
-        return this.status.auto[0].freq
+      if (this.isRecurringBackup) {
+        return this.status.auto[0].freq;
       }
-      return 240
+      return 240;
     },
     isRecurringBackup() {
       if ("auto" in this.status && this.status.auto.length > 0) {
@@ -244,7 +278,7 @@ export default defineComponent({
 
   methods: {
     validateRecurring() {
-      this.$refs.recurringForm.validate()
+      this.$refs.recurringForm.validate();
     },
 
     openBackup() {
@@ -261,17 +295,16 @@ export default defineComponent({
       };
       this.$store
         .dispatch("keep/testOnce", request)
-        .then((r) => {
-        })
+        .then((r) => {})
         .finally(() => {
           this.backupPending = false;
         });
     },
 
     testMany() {
-      this.validateRecurring()
+      this.validateRecurring();
       if (!this.recurringValid) {
-        return
+        return;
       }
 
       const request: ManyRequest = {
@@ -310,7 +343,6 @@ export default defineComponent({
       //     this.showDone = true;
       //   });
     },
-
   },
 });
 </script>
