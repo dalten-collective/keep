@@ -12,9 +12,6 @@
         <div class="tw-flex tw-flex-row tw-justify-between">
           <h2 class="tw-text-2xl">Backup</h2>
           <div>
-            <p class="tw-text-sm">Settings for %{{ agentName }}'s backups with {{ $filters.sigShip(ship) }}</p>
-          </div>
-          <div>
             <span
               @click="backupOpen = !backupOpen"
               class="tw-text-sm tw-cursor-pointer tw-underline"
@@ -24,19 +21,24 @@
         </div>
       </v-card-title>
 
-      <pre>{{ status }}</pre>
-
-      <button @click="testRestore()">Test Restore</button>
-
-      <br />
-      <input type="text" placeholder="ship to backup to" v-model="backupShip" />
-      <input type="number" placeholder="frequency" v-model="freq" />
-      <button @click="testMany()">Test Many</button>
-      <button @click="unsetMany()">Unset Many</button>
-
       <v-card-text>
         <div class="tw-mt-2">
-          <div class="tw-mb-2">
+          <section class="tw-my-2 tw-mb-4 tw-text-sm">
+            <p class="tw-mb-2">Settings for %{{ agentName }}'s backups with {{ $filters.sigShip(ship) }}</p>
+            <ul v-if="isRecurringBackup || haveSaved" class="tw-list-disc">
+              <li v-if="haveSaved" class="tw-ml-4">
+                Last backup saved on {{ $filters.sectToDate(status.saved[0].time).toLocaleString() }}.
+              </li>
+              <li v-if="isRecurringBackup" class="tw-ml-4">
+                Currently performing automatic backups {{ autoBackupPrint }}.
+              </li>
+              <li v-else class="tw-ml-4">
+                Not performing automatic backups.
+              </li>
+            </ul>
+          </section>
+
+          <section class="tw-mb-2">
             <span class="tw-font-bold">One-time export</span>
             <v-tooltip location="top">
               <template v-slot:activator="{ props }">
@@ -49,7 +51,8 @@
               </template>
               <span>TODO: </span>
             </v-tooltip>
-          </div>
+          </section>
+
           <div>
             <div class="tw-my-2">
               <span class="tw-italic"
@@ -70,6 +73,15 @@
         </div>
 
         <hr class="tw-my-4" />
+
+      <pre>{{ status }}</pre>
+
+      <button @click="testRestore()">Test Restore</button>
+
+      <input type="text" placeholder="ship to backup to" v-model="backupShip" />
+      <input type="number" placeholder="frequency" v-model="freq" />
+      <button @click="testMany()">Test Many</button>
+      <button @click="unsetMany()">Unset Many</button>
 
         <div>
           <div class="tw-mb-2">
@@ -227,10 +239,23 @@ export default defineComponent({
   computed: {
     // ...mapGetters("peat", ["isRecurringSaved"]),
     isRecurringBackup() {
-      if (this.status.auto.length > 0) {
+      if ('auto' in this.status && this.status.auto.length > 0) {
         return true;
       }
       return false;
+    },
+    haveSaved() {
+      if ('saved' in this.status && this.status.saved.length > 0) {
+        return true;
+      }
+      return false;
+    },
+
+    autoBackupPrint() {
+      if (!this.isRecurringBackup) {
+        return ''
+      }
+      return `every ${ this.status.auto[0].freq } seconds`
     },
 
     daysOptions(): Array<number> {
