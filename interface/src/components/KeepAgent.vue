@@ -64,7 +64,7 @@
         <p class="my-2 tw-text-sm">You've initiated a backup to these ships, but they haven't yet responded. Either they don't have %keep installed or they haven't accepted your request yet.</p>
         <ul class="my-2 tw-list-disc">
           <li v-for="p in pending" class="tw-ml-4">
-            <span class="tw-font-mono tw-italic tw-text-gray-400">{{ sigShip(p.ship) }}</span>
+            <span class="tw-font-mono tw-italic tw-text-gray-400">{{ $filters.sigShip(p.ship) }}</span>
             <!-- <v-btn>Remove</v-btn> -->
           </li>
         </ul>
@@ -177,10 +177,6 @@ export default defineComponent({
     }
   },
   methods: {
-    sigShip(ship) {
-      return siggedShip(ship);
-    },
-
     doOnce() {
       const request: OnceRequest = {
         agentName: "keep", // TODO: why this?

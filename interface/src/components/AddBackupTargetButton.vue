@@ -72,7 +72,7 @@
           <div class="my-2">
             <div v-if="showDone">
               <v-alert type="success" variant="tonal">
-                Backup initiaited to <span class="tw-font-mono">{{ sigShip(backupShip) }}</span>! You can close this.
+                Backup initiaited to <span class="tw-font-mono">{{ $filters.sigShip(backupShip) }}</span>! You can close this.
               </v-alert>
             </div>
             <div v-if="showFail">
@@ -131,9 +131,6 @@ export default defineComponent({
   methods: {
     openModal() {
       this.open = true;
-    },
-    sigShip(ship) {
-      return siggedShip(ship);
     },
 
     validateForm() {

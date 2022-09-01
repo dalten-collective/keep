@@ -3,7 +3,7 @@
     <template v-slot:activator="{ props }">
       <v-btn v-bind="props" color="success" text="white" @click="openBackup">
         <v-icon start>mdi-content-save</v-icon>
-        backup
+        Backup
       </v-btn>
     </template>
 
@@ -11,8 +11,9 @@
       <v-card-title>
         <div class="tw-flex tw-flex-row tw-justify-between">
           <h2 class="tw-text-2xl">Backup</h2>
-          <pre>name: {{ agentName }}</pre>
-          <pre>ship: {{ ship }}</pre>
+          <div>
+            <p class="tw-text-sm">Settings for %{{ agentName }}'s backups with {{ $filters.sigShip(ship) }}</p>
+          </div>
           <div>
             <span
               @click="backupOpen = !backupOpen"
