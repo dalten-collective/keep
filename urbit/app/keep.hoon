@@ -40,7 +40,6 @@
   ?-  -.cmd
   ::  "Subscribe to my stuff," said someone else's wrapper.
       %init
-    ?>  (team:title [src our]:bowl) :: Only backup to moons for now.
     :_  this
     :~  :*
       %pass   /backups/(scot %p src.bowl)/[dap.cmd]

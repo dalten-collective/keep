@@ -1,11 +1,7 @@
 <template>
-  <v-dialog v-model="restoreOpen">
+  <v-dialog v-model="restoreOpen" width="500">
     <template v-slot:activator="{ props }">
-      <v-btn
-        v-bind="props" color="success"
-        text="white"
-        @click="openRestore"
-      >
+      <v-btn v-bind="props" color="success" text="white" @click="openRestore">
         <v-icon start>mdi-content-duplicate</v-icon>
         restore</v-btn
       >
@@ -25,79 +21,77 @@
       </v-card-title>
 
       <v-card-text>
+        <div class="tw-mt-2">
+          <section class="tw-my-2 tw-mb-4 tw-text-sm">
+            <p class="tw-my-2">Double-check these details:</p>
+            <ul class="tw-list-disc">
+              <li class="tw-ml-4"><span>Agent: </span> %{{ agentName }}</li>
+              <li class="tw-ml-4">
+                <span>Saved On: </span> {{ lastBackupOn.toLocaleString() }}
+              </li>
+              <li class="tw-ml-4">
+                <span>Source: </span>
+                <span class="tw-whitespace tw-font-mono">{{
+                  $filters.sigShip(ship)
+                }}</span>
+              </li>
+            </ul>
 
-        <hr class="tw-my-4" />
+            <v-alert class="tw-my-2" type="warning">
+              Warning! This will replace %{{ agentName }}'s current state on
+              {{ $filters.sigShip(ourShip) }} with the state saved by
+              <span class="tw-font-mono">{{ $filters.sigShip(ship) }}</span>
+            </v-alert>
+          </section>
 
-        <div>
-          <div class="tw-mb-2">
-            <span class="tw-font-bold">Restore resource</span>
-            <v-tooltip location="top">
-              <template v-slot:activator="{ props }">
-                <v-icon
-                  v-bind="props"
-                  size="x-small"
-                  class="tw-ml-1 tw-cursor-pointer tw-mb-2 tw-opacity-50"
-                  >mdi-help-circle-outline</v-icon
-                >
-              </template>
-              <span>The resource will be re-created with a new name (which can be the same as the old name) in the group of your choosing.</span>
-            </v-tooltip>
+          <v-dialog v-model="confirmOpen" persistent max-width="500px">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                color="success"
+                text="white"
+                @click="confirmRestore"
+                :loading="restorePending"
+                :disabled="lastBackupSect === 0"
+                >Restore</v-btn
+              >
+            </template>
+            <v-card class="tw-bg-white">
+              <v-card-title> Are you sure? </v-card-title>
+              <v-card-text>
+                <div class="tw-my-4">
+                  If you confirm, your agent state will be replaced with the
+                  backup version. Any changes you've made since the backup will
+                  be lost.
+                </div>
+
+                <div class="tw-flex tw-justify-around tw-mt-4">
+                  <v-btn @click="confirmOpen = false" flat class="mr-4"
+                    >Wait, no. Cancel</v-btn>
+                  <v-btn
+                    color="error"
+                    text="white"
+                    @click="restore"
+                    :loading="restorePending"
+                    :disabled="lastBackupSect === 0"
+                    >I'm sure, Proceed!</v-btn
+                  >
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+
+          <div v-if="restorePending">
+            <v-alert type="info" variant="tonal">
+              Restore has started. You might notice your ship hanging while this
+              completes... You can close this page - or watch.
+            </v-alert>
           </div>
-          <v-form ref="form" v-model="formValid">
-              <div v-if="false">
-              <!--
-              <v-row>
-                <v-col cols="12">
-                  <v-select
-                    :items="groupOptions"
-                    label="New group"
-                    required
-                    v-model="newGroup"
-                    :loading="adminPending"
-                    :disabled="groupOptions.length === 0"
-                    :rules="[(v) => !!v || 'Must choose a group']"
-                    persistent-hint
-                    :hint="groupOptions.length === 0 ? 'You aren\'t the admin of any groups' : ''"
-                    hide-details="auto"
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <v-text-field
-                    label="New resource name"
-                    v-model="newResourceName"
-                    :rules="nameRules"
-                    hide-details="auto"
-                  />
-                </v-col>
-              </v-row>
-              -->
-              </div> <!-- false -->
-              <v-row>
-                <v-col cols="12">
-                  <div class="tw-mb-1">
-                    <v-btn
-                      color="success"
-                      text="white"
-                      @click="restore"
-                      :loading="restorePending"
-                    >Restore {{ ship }}'s {{ resource }}</v-btn
-                    >
-                  </div>
-                  <div v-if="restorePending">
-                    <v-alert type="info" variant="tonal">
-                      Restore has started. You might notice your ship hanging while this completes... You can close this page - or watch.
-                    </v-alert>
-                  </div>
-                  <div v-if="showDone">
-                    <v-alert type="success" variant="tonal">
-                      Restore complete! Check Groups.
-                    </v-alert>
-                  </div>
-                </v-col>
-              </v-row>
-          </v-form>
+          <div v-if="showDone">
+            <v-alert type="success" variant="tonal">
+              Restore complete! Check Groups.
+            </v-alert>
+          </div>
         </div>
       </v-card-text>
     </v-card>
@@ -106,12 +100,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapState } from "vuex";
 import { RestoreRequest } from "../types";
-// import { Admin } from "@/types";
+import type { PropType } from "vue";
+
+import { KeepAgentSubscriptionStatus, Ship } from "../types";
 
 export default defineComponent({
-  // props: ["resource", "ship", "currentGroup"],
   props: {
     ship: {
       type: String as PropType<Ship>,
@@ -121,6 +115,12 @@ export default defineComponent({
       type: String,
       default: "",
     },
+    status: {
+      type: Object as PropType<KeepAgentSubscriptionStatus>,
+      default: () => {
+        return {};
+      },
+    },
   },
 
   data() {
@@ -129,35 +129,31 @@ export default defineComponent({
       restoreOpen: false,
       restorePending: false,
       showDone: false,
-      newResourceName: '',
-      adminPending: false,
-      nameRules: [
-        (v: string) => !!v || 'Resource name is required',
-        (v: string) => /^[\w-]+$/.test(v) || 'Must use kebab-case-for-name; no special characters',
-        (v: string) => /^[a-zA-Z].*$/.test(v) || 'First character must be a letter'
-      ],
+      confirmOpen: false,
     };
   },
 
   watch: {
     restoreOpen(val: boolean) {
-      // if (val && this.groupOptions.length === 0) {
-      //   // this.getAdmin()
-      // }
-      if (!val) { // closing
+      if (!val) {
+        // closing
         // reset things
         this.restorePending = false;
         this.showDone = false;
-        this.newResourceName = '';
       }
     },
   },
 
   computed: {
-    // ...mapState("peat", ["admin"]),
-    // groupOptions() {
-    //   return this.admin.map((a: Admin) => a.name)
-    // }
+    lastBackupSect() {
+      if ("saved" in this.status && this.status.saved.length > 0) {
+        return this.status.saved[0].time;
+      }
+      return 0;
+    },
+    lastBackupOn() {
+      return this.$filters.sectToDate(this.lastBackupSect);
+    },
   },
 
   mounted() {
@@ -165,17 +161,16 @@ export default defineComponent({
   },
 
   methods: {
+    confirmRestore() {
+      this.confirmOpen = true;
+    },
+
     validateForm() {
-      this.$refs.form.validate()
+      this.$refs.form.validate();
     },
 
     restore() {
-      // this.validateForm()
-
-      // if (!this.formValid) {
-      //   return
-      // }
-
+      this.confirmOpen = false;
       this.restorePending = true;
       const request: RestoreRequest = {
         ship: this.ship,

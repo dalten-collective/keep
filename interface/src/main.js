@@ -10,6 +10,7 @@ loadFonts();
 
 const app = createApp(App);
 
+app.config.globalProperties.ourShip = window.ship;
 app.config.globalProperties.$filters = {
   sigShip(ship) {
     if (ship[0] === "~") {
@@ -21,6 +22,7 @@ app.config.globalProperties.$filters = {
     // for taking Urbit's sect:enjs:format and converting to js-friendly
     return new Date(sects * 1000);
   },
+
 };
 
 app.use(router).use(store).use(vuetify).mount("#app");

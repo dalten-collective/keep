@@ -54,7 +54,7 @@
                 :status="target[1]"
               />
             </div>
-            <RestoreButton :ship="target[0]" :agent-name="agentName" />
+            <RestoreButton :ship="target[0]" :status="target[1]" :agent-name="agentName" />
           </div>
         </article>
       </article>
