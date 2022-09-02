@@ -1,6 +1,6 @@
-/+  default-agent, verb, dbug, twice, trans
+/+  default-agent, verb, dbug, trans
 ::
-%+  trans:trans  twice/twice
+%-  tool:trans
 %+  verb  &
 %-  agent:dbug
 ::
