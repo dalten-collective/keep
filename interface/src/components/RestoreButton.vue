@@ -94,15 +94,15 @@
             </v-card>
           </v-dialog>
 
-          <div v-if="restorePending">
+          <div v-if="restorePending" class="tw-mt-2">
             <v-alert type="info" variant="tonal">
               Restore has started. You might notice your ship hanging while this
               completes... You can close this page - or watch.
             </v-alert>
           </div>
-          <div v-if="showDone">
+          <div v-if="showDone" class="tw-mt-2">
             <v-alert type="success" variant="tonal">
-              Restore complete! Check Groups.
+              Restore complete! Launch %{{ agentName }} to check.
             </v-alert>
           </div>
         </div>
@@ -189,8 +189,13 @@ export default defineComponent({
         ship: this.ship,
         agentName: this.agentName,
       };
-      this.$store.dispatch("keep/mendFromShip", request);
-      this.restorePending = false;
+      this.$store.dispatch("keep/mendFromShip", request)
+      .then((r) => {
+        this.showDone = true;
+      })
+      .finally(() => {
+        this.restorePending = false;
+      })
     },
   },
 });

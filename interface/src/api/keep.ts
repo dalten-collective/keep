@@ -81,7 +81,6 @@ export function testOnce(payload: OnceRequest): Promise<any> {
 }
 
 export function testMany(payload: ManyRequest) {
-  // gets data: { pending: { status: "invite", ship: "sum" } }
   return urbitAPI
     .poke({
       app: payload.agentName,
@@ -95,10 +94,12 @@ export function testMany(payload: ManyRequest) {
     })
     .then((r) => {
       console.log("res ", r);
+      return r
     })
     .catch((e) => {
       // TODO: 'e' is undefined
       console.log("err ", e);
+      return e
     });
 }
 
@@ -117,10 +118,12 @@ export function testUnsetMany(payload: UnsetManyRequest) {
     })
     .then((r) => {
       console.log("res ", r);
+      return r
     })
     .catch((e) => {
       // TODO: 'e' is undefined
       console.log("err ", e);
+      return e
     });
 }
 
@@ -137,10 +140,12 @@ export function mendFromShip(payload: RestoreRequest) {
     })
     .then((r) => {
       console.log("res ", r);
+      return r
     })
     .catch((e) => {
       // TODO: 'e' is undefined
       console.log("err ", e);
+      return e
     });
 }
 
@@ -153,9 +158,11 @@ export function testRestore(payload: RestoreRequest) {
     })
     .then((r) => {
       console.log("res ", r);
+      return r
     })
     .catch((e) => {
       // TODO: 'e' is undefined
       console.log("err ", e);
+      return e
     });
 }

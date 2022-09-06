@@ -301,6 +301,8 @@ export default {
 
         // TODO: handle as dif?
 
+        // TODO: also remove from pending.
+
         const logMsg: LogMessage = {
           msg: `Restored %${payload.agentName} from ${ship} at ${time}`,
           time,
@@ -386,21 +388,51 @@ export default {
           throw e.response;
         });
     },
+
     testMany({}, payload: ManyRequest) {
-      keepApi.testMany(payload);
+      return keepApi.testMany(payload)
+        .then((r) => {
+          return r
+        })
+        .catch((e) => {
+          throw e.response;
+        });
     },
+
     testUnsetMany({}, payload: UnsetManyRequest) {
-      keepApi.testUnsetMany(payload);
+      return keepApi.testUnsetMany(payload)
+        .then((r) => {
+          return r
+        })
+        .catch((e) => {
+          throw e.response;
+        });
     },
+
     testRestore({}, payload: RestoreRequest) {
-      keepApi.testRestore(payload);
+      return keepApi.testRestore(payload)
+        .then((r) => {
+          return r
+        })
+        .catch((e) => {
+          throw e.response;
+        });
     },
+
     mendFromShip({}, payload: RestoreRequest) {
-      keepApi.mendFromShip(payload)(payload);
+      return keepApi.mendFromShip(payload)
+        .then((r) => {
+          return r
+        })
+        .catch((e) => {
+          throw e.response;
+        });
     },
+
     activate({}, payload: { agentName: string }) {
       keepApi.activate(payload.agentName);
     },
+
     deactivate({}, payload: { agentName: string }) {
       keepApi.deactivate(payload.agentName);
     },

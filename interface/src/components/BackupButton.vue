@@ -31,9 +31,7 @@
 
             <section v-if="isRecurringBackup || haveSaved" class="tw-my-2">
               <article class="tw-border tw-rounded-keep tw-p-4 tw-mb-4">
-                <div
-                  class="keep-info-items"
-                >
+                <div class="keep-info-items">
                   <v-chip
                     label
                     color="surface"
@@ -48,10 +46,7 @@
                   </div>
                 </div>
 
-                <div
-                  class="keep-info-items"
-                  style="max-width: 46rem"
-                >
+                <div class="keep-info-items" style="max-width: 46rem">
                   <v-chip
                     label
                     color="surface"
@@ -68,7 +63,6 @@
                 </div>
               </article>
             </section>
-
           </section>
 
           <section
@@ -80,7 +74,8 @@
                 <v-btn
                   color="success"
                   text="white"
-                  :loading="backupPending"
+                  :loading="backupPending || autoSetPending"
+                  :disabled="backupPending || autoSetPending"
                   @click="backupOnce"
                 >
                   Backup Once
@@ -118,9 +113,11 @@
                   <v-btn
                     color="success"
                     text="white"
-                    :loading="backupPending"
+                    :loading="backupPending || autoSetPending"
                     @click="testMany"
-                    :disabled="backupPending || !recurringValid"
+                    :disabled="
+                      backupPending || autoSetPending || !recurringValid
+                    "
                   >
                     <template v-if="isRecurringBackup">
                       Change Frequency
@@ -149,7 +146,6 @@
             </v-form>
 
             <div>
-              <!-- TODO: once pokes stop closing modals -->
               <div v-if="backupPending">
                 <v-alert type="info" variant="tonal">
                   Backup has started. You might notice your ship hanging while
@@ -158,11 +154,29 @@
               </div>
               <div v-if="showDone">
                 <v-alert type="success" variant="tonal">
-                  Backup complete! Check your
-                  <span class="tw-font-mono"
-                    >.urb/put/{{ ship }}/{{ resource }}.</span
-                  >
-                  directory.
+                  Backup complete!
+                </v-alert>
+              </div>
+              <div v-if="autoSetPending">
+                <v-alert type="info" variant="tonal">
+                  Recurring backup has started. You might notice your ship
+                  hanging while this completes... You can close this page - or
+                  watch.
+                </v-alert>
+              </div>
+              <div v-if="autoOffPending">
+                <v-alert type="info" variant="tonal">
+                  Turning off automatic backups...
+                </v-alert>
+              </div>
+              <div v-if="showAutoSetDone">
+                <v-alert type="success" variant="tonal">
+                  Recurring backups set!
+                </v-alert>
+              </div>
+              <div v-if="showAutoOffDone">
+                <v-alert type="success" variant="tonal">
+                  Recurring backups turned off!
                 </v-alert>
               </div>
             </div>
@@ -220,6 +234,10 @@ export default defineComponent({
       backupPending: false,
       showDone: false,
       recurringValid: false,
+      autoSetPending: false,
+      showAutoSetDone: false,
+      autoOffPending: false,
+      showAutoOffDone: false,
     };
   },
 
@@ -288,6 +306,8 @@ export default defineComponent({
     backupOnce() {
       // TODO: use loading state somewhere
       this.backupPending = true;
+      this.showDone = false;
+      this.showAutoSetDone = false;
 
       const request: OnceRequest = {
         agentName: this.agentName,
@@ -295,10 +315,10 @@ export default defineComponent({
       };
       this.$store
         .dispatch("keep/testOnce", request)
-        .then((r) => {
-          })
+        .then((r) => {})
         .finally(() => {
           this.backupPending = false;
+          this.showDone = true;
         });
     },
 
@@ -307,22 +327,42 @@ export default defineComponent({
       if (!this.recurringValid) {
         return;
       }
+      this.autoSetPending = true;
+      this.showDone = false;
+      this.showAutoSetDone = false;
 
       const request: ManyRequest = {
         agentName: this.agentName,
         ship: this.backupShip,
         freq: parseInt(this.freq),
       };
-      this.$store.dispatch("keep/testMany", request);
+      this.$store
+        .dispatch("keep/testMany", request)
+        .then((r) => {})
+        .finally(() => {
+          this.autoSetPending = false;
+          this.showAutoSetDone = true;
+        });
     },
 
     unsetMany() {
+      this.autoOffPending = true;
+      this.showDone = false;
+      this.showAutoSetDone = false;
+      this.showAutoOffDone = false;
+
       const request: UnsetManyRequest = {
         agentName: this.agentName,
         ship: this.backupShip,
         freq: null,
       };
-      this.$store.dispatch("keep/testMany", request);
+      this.$store
+        .dispatch("keep/testMany", request)
+        .then((r) => {})
+        .finally(() => {
+          this.autoOffPending = false;
+          this.showAutoOffDone = true;
+        });
     },
 
     singleBackup() {
