@@ -6,7 +6,9 @@
     </header>
 
     <section v-if="!live" class="tw-flex tw-flex-col">
-      <v-btn color="success" v-if="!live" @click="activateAgent">Activate</v-btn>
+      <v-btn color="success" v-if="!live" @click="activateAgent"
+        >Activate</v-btn
+      >
     </section>
 
     <section v-else class="tw-flex tw-flex-col">
@@ -33,7 +35,9 @@
                   color="info"
                   class="mr-2"
                 >
-                  <span class="mr-2 tw-font-mono">{{ $filters.sigShip(target[0]) }}</span>
+                  <span class="mr-2 tw-font-mono">{{
+                    $filters.sigShip(target[0])
+                  }}</span>
                   <v-icon color="info"> mdi-cached </v-icon>
                 </v-chip>
               </template>
@@ -47,7 +51,9 @@
               color="info"
               class="mr-2"
             >
-              <span class="mr-2 tw-font-mono">{{ $filters.sigShip(target[0]) }}</span>
+              <span class="mr-2 tw-font-mono">{{
+                $filters.sigShip(target[0])
+              }}</span>
             </v-chip>
           </div>
 
@@ -59,30 +65,40 @@
                 :status="target[1]"
               />
             </div>
-            <RestoreButton :ship="target[0]" :status="target[1]" :agent-name="agentName" />
+            <RestoreButton
+              :ship="target[0]"
+              :status="target[1]"
+              :agent-name="agentName"
+            />
           </div>
         </article>
       </article>
 
       <article v-if="pending.length > 0">
         <h4 class="my-2 tw-text-lg">Outstanding Invites</h4>
-        <p class="my-2 tw-text-sm">You've initiated a backup to these ships, but they haven't yet responded. Either they don't have %keep installed or they haven't accepted your request yet.</p>
+        <p class="my-2 tw-text-sm">
+          You've initiated a backup to these ships, but they haven't yet
+          responded. Either they don't have %keep installed or they haven't
+          accepted your request yet.
+        </p>
         <ul class="my-2 tw-list-disc">
           <li v-for="p in pending" :key="p.ship" class="tw-ml-4">
-            <span class="tw-font-mono tw-italic tw-text-gray-400">{{ $filters.sigShip(p.ship) }}</span>
+            <span class="tw-font-mono tw-italic tw-text-gray-400">{{
+              $filters.sigShip(p.ship)
+            }}</span>
             <!-- <v-btn>Remove</v-btn> -->
           </li>
         </ul>
       </article>
 
-      <footer class="tw-flex tw-flex-col tw-justify-end tw-text-right tw-align-middle md:tw-mb-0">
+      <footer
+        class="tw-flex tw-flex-col tw-justify-end tw-text-right tw-align-middle md:tw-mb-0"
+      >
         <div>
           <AddBackupTargetButton :agent-name="agentName" />
         </div>
       </footer>
     </section>
-
-
   </div>
 </template>
 
@@ -112,7 +128,7 @@ export default defineComponent({
     inactive: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   components: { BackupButton, RestoreButton, AddBackupTargetButton },
   data() {
@@ -173,12 +189,38 @@ export default defineComponent({
         status.push([ship, shipStatus]);
       });
 
-      return status;
+      return status.sort((a, b) => {
+        // compare lengths (ship type)
+        if (a[0].length < b[0].length) {
+          return -1;
+        }
+        if (a[0].length > b[0].length) {
+          return 1;
+        }
+
+        // Then order recurring to the top
+        if (a[1].auto.length > 0) {
+          return -1;
+        }
+        if (a[1].auto.length === 0) {
+          return 1;
+        }
+
+        // then alphabetize
+        if (a[0] < b[0]) {
+          return -1;
+        }
+        if (a[0] > b[0]) {
+          return 1;
+        }
+
+        return 0;
+      });
     },
 
     pending() {
-      return this.ourStatus.pending
-    }
+      return this.ourStatus.pending;
+    },
   },
   methods: {
     doOnce() {
