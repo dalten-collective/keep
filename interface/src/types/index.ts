@@ -1,6 +1,7 @@
 export enum EventType {
   Initial = "initial", // first response on subscrtiption start
-  Saved = "saved", // backup has happened
+  Backup = "backup", // WE did a backup for someone else
+  Saved = "saved", // OUR backup landed with someone else
   Auto = "auto", // auto-backup configured
   Pending = "pending", // backup-to ship invited
   Restored = "restored", // backup has been restored
@@ -26,7 +27,13 @@ export interface RestoreDiff {
   time: number;
 }
 
+export interface SavedDiff {
+  ship: Ship;
+  time: number;
+}
+
 export interface BackupDiff {
+  agent: string;
   ship: Ship;
   time: number;
 }
@@ -51,6 +58,7 @@ export interface AutoOffDiff {
 export type Diff =
   | RestoreDiff
   | BackupDiff
+  | SavedDiff
   | AutoOnDiff
   | AutoOffDiff
   | ActiveDiff

@@ -53,18 +53,28 @@ export default {
 
           if (data.type === EventType.Initial) {
             const agents = data.state.agents;
-            dispatch("keep/setAgents", agents, { root: true }).then(() => {
-              dispatch("keep/openAgentAirlocks", agents, { root: true });
-            });
+            dispatch("keep/setAgents", agents, { root: true }).then(
+              () => {
+                dispatch("keep/openAgentAirlocks", agents, {
+                  root: true,
+                });
+              }
+            );
           }
           // TODO: handle "active" when a new wrapper comes online
           // TODO: what other types are there for the main Keep subscription?
 
-          dispatch("keep/handleKeepResponseState", data.state, { root: true });
+          dispatch("keep/handleKeepResponseState", data.state, {
+            root: true,
+          });
           // TODO:
           //dispatch("keep/handleKeepResponseType", data.type, { root: true });
           // TODO:
-          dispatch("keep/handleKeepResponseDiff", data.diff, { root: true });
+          dispatch(
+            "keep/handleKeepResponseDiff",
+            { diff: data.diff, responseType: data.type },
+            { root: true }
+          );
         },
         (subscriptionNumber: number) => {
           console.log("keep sub: ", subscriptionNumber);
@@ -82,7 +92,10 @@ export default {
         agentName,
         (data: KeepAgentSubscriptionResponse) => {
           console.log("agentName ", agentName);
-          console.log(`sub-agent response ('${ agentName }' agent)`, data);
+          console.log(
+            `sub-agent response ('${agentName}' agent)`,
+            data
+          );
 
           // Only set full state on initial. all else through diffs (below)
           if (data.type == "initial") {
@@ -93,18 +106,11 @@ export default {
             );
           }
 
-          // TODO:
           dispatch(
             "keep/handleAgentResponseType",
             { agentName, responseType: data.type, diff: data.diff },
             { root: true }
           );
-          // TODO:
-          //dispatch(
-          //"keep/handleAgentResponseDiff",
-          //{ agentName, responseDiff: data.diff },
-          //{ root: true }
-          //);
         },
         (subscriptionNumber: number) => {
           dispatch("addSubscription", {
@@ -119,7 +125,10 @@ export default {
       commit("unsetSubscription", subscription);
     },
 
-    addSubscription({ state, commit, dispatch }, payload: AgentSubscription) {
+    addSubscription(
+      { state, commit, dispatch },
+      payload: AgentSubscription
+    ) {
       const existing:
         | Array<AgentSubscription>
         | [] = state.subscriptions.filter((s: AgentSubscription) => {

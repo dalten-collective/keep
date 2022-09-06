@@ -174,6 +174,8 @@ export default defineComponent({
           return "tw-bg-error";
         case "pend":
           return "tw-bg-warning";
+        case "info":
+          return "tw-bg-info";
         default:
           return "tw-bg-gray-400";
       }

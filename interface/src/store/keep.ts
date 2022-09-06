@@ -7,6 +7,7 @@ import {
   RestoredStatus,
   InviteStatus,
   AutoOnDiff,
+  BackupDiff,
   AutoOffDiff,
   ActiveDiff,
   Backup,
@@ -22,7 +23,7 @@ import {
   KeepSubscriptionState,
   EventType,
   LogMessage,
-  BackupDiff,
+  SavedDiff,
 } from "@/types";
 
 export default {
@@ -107,6 +108,17 @@ export default {
       state.backups = backups;
     },
 
+    updateBackup(state, payload: { dif: BackupDiff; agent: string }) {
+      // remove if existing (by agent AND ship)
+      state.backups = state.backups.filter((b) => {
+        if (b.ship != payload.dif.ship || b.agent != payload.agent) {
+          return b
+        }
+      })
+      // add
+      state.backups.push(payload.dif);
+    },
+
     addPending(state, payload: { dif: PendingDiff; agent: string }) {
       const agent = state.wrappedAgents.find((a) => {
         return a.agentName == payload.agent;
@@ -114,46 +126,52 @@ export default {
       agent.status.pending.push(payload.dif);
     },
 
-    updateSaved(state, payload: { dif: BackupDiff; agent: string }) {
+    updateSaved(state, payload: { dif: SavedDiff; agent: string }) {
       const agent = state.wrappedAgents.find((a) => {
         return a.agentName == payload.agent;
       });
 
       // remove if existing
-      if (agent.status.saved.map((s) => s.ship).includes(payload.dif.ship)) {
+      if (
+        agent.status.saved.map((s) => s.ship).includes(payload.dif.ship)
+      ) {
         agent.status.saved = agent.status.saved.filter((s) => {
-          return s.ship !== payload.dif.ship
-        })
+          return s.ship !== payload.dif.ship;
+        });
       }
       // add new status to saved
-      agent.status.saved.push(payload.dif)
+      agent.status.saved.push(payload.dif);
     },
 
-    updateAuto(state, payload: { dif: AutoOnDiff; agent: string}) {
+    updateAuto(state, payload: { dif: AutoOnDiff; agent: string }) {
       const agent: KeepAgentStatus = state.wrappedAgents.find((a) => {
         return a.agentName == payload.agent;
       });
 
       // remove if existing
-      if (agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)) {
+      if (
+        agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)
+      ) {
         agent.status.auto = agent.status.auto.filter((s) => {
-          return s.ship !== payload.dif.ship
-        })
+          return s.ship !== payload.dif.ship;
+        });
       }
       // add new status to auto
-      agent.status.auto.push(payload.dif)
+      agent.status.auto.push(payload.dif);
     },
 
-    removeAuto(state, payload: { dif: AutoOffDiff; agent: string}) {
+    removeAuto(state, payload: { dif: AutoOffDiff; agent: string }) {
       const agent: KeepAgentStatus = state.wrappedAgents.find((a) => {
         return a.agentName == payload.agent;
       });
 
       // remove if existing
-      if (agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)) {
+      if (
+        agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)
+      ) {
         agent.status.auto = agent.status.auto.filter((s) => {
-          return s.ship !== payload.dif.ship
-        })
+          return s.ship !== payload.dif.ship;
+        });
       }
     },
 
@@ -163,7 +181,7 @@ export default {
       });
 
       if (!agent.status.live) {
-        agent.status.live = true
+        agent.status.live = true;
       }
     },
 
@@ -173,7 +191,7 @@ export default {
       });
 
       if (agent.status.live) {
-        agent.status.live = false
+        agent.status.live = false;
       }
     },
   },
@@ -219,9 +237,30 @@ export default {
         console.log("new agent! ", payload.diff);
       }
     },
-    // TODO
-    handleKeepResponseDiff({}, responseDiff: object) {
-      console.log("keep response diff: ", responseDiff);
+
+    handleKeepResponseDiff(
+      { dispatch },
+      payload: {
+        agentName: string;
+        responseType: EventType;
+        diff: Diff;
+      }
+    ) {
+      if (payload.responseType === EventType.Backup) {
+        const d = payload.diff as BackupDiff;
+        const time = d.time;
+        const ship = d.ship;
+        const agent = d.agent;
+
+        dispatch("addKeptBackup", { dif: d, agent });
+
+        const logMsg: LogMessage = {
+          msg: `Kept a backup of %${agent} for ${ship} at ${time}`,
+          time,
+          type: "info",
+        };
+        dispatch("message/addMessage", logMsg, { root: true });
+      }
     },
 
     handleAgentResponseState(
@@ -240,7 +279,8 @@ export default {
         responseState: payload.responseState,
       });
     },
-    // TODO
+
+    // For handling diffs
     handleAgentResponseType(
       { dispatch },
       payload: {
@@ -280,11 +320,14 @@ export default {
       }
 
       if (payload.responseType === EventType.Saved) {
-        const d = payload.diff as BackupDiff;
+        const d = payload.diff as SavedDiff;
         const time = d.time;
         const ship = d.ship;
 
-        dispatch("addSavedBackup", { dif: d, agent: payload.agentName });
+        dispatch("addSavedBackup", {
+          dif: d,
+          agent: payload.agentName,
+        });
 
         const logMsg: LogMessage = {
           msg: `Backed up %${payload.agentName} to ${ship} at ${time}`,
@@ -351,7 +394,10 @@ export default {
         if (active) {
           const time = Date.now() / 1000;
 
-          dispatch("addActive", { dif: active, agent: payload.agentName });
+          dispatch("addActive", {
+            dif: active,
+            agent: payload.agentName,
+          });
 
           const logMsg: LogMessage = {
             msg: `${agent} activated!`,
@@ -362,7 +408,10 @@ export default {
         } else {
           const time = Date.now() / 1000;
 
-          dispatch("removeActive", { dif: active, agent: payload.agentName });
+          dispatch("removeActive", {
+            dif: active,
+            agent: payload.agentName,
+          });
 
           const logMsg: LogMessage = {
             msg: `${agent} deactivated!`,
@@ -390,9 +439,10 @@ export default {
     },
 
     testMany({}, payload: ManyRequest) {
-      return keepApi.testMany(payload)
+      return keepApi
+        .testMany(payload)
         .then((r) => {
-          return r
+          return r;
         })
         .catch((e) => {
           throw e.response;
@@ -400,9 +450,10 @@ export default {
     },
 
     testUnsetMany({}, payload: UnsetManyRequest) {
-      return keepApi.testUnsetMany(payload)
+      return keepApi
+        .testUnsetMany(payload)
         .then((r) => {
-          return r
+          return r;
         })
         .catch((e) => {
           throw e.response;
@@ -410,9 +461,10 @@ export default {
     },
 
     testRestore({}, payload: RestoreRequest) {
-      return keepApi.testRestore(payload)
+      return keepApi
+        .testRestore(payload)
         .then((r) => {
-          return r
+          return r;
         })
         .catch((e) => {
           throw e.response;
@@ -420,9 +472,10 @@ export default {
     },
 
     mendFromShip({}, payload: RestoreRequest) {
-      return keepApi.mendFromShip(payload)
+      return keepApi
+        .mendFromShip(payload)
         .then((r) => {
-          return r
+          return r;
         })
         .catch((e) => {
           throw e.response;
@@ -444,39 +497,40 @@ export default {
       commit("addPending", payload);
     },
 
-    addSavedBackup(
+    addKeptBackup(
       { commit },
-      payload: { dif: BackupDiff, agent: string }
+      payload: { dif: BackupDiff; agent: string }
     ) {
-      commit("updateSaved", payload)
+      commit("updateBackup", payload);
     },
 
-    addAuto(
+    addSavedBackup(
       { commit },
-      payload: { dif: AutoOnDiff, agent: string }
+      payload: { dif: SavedDiff; agent: string }
     ) {
-      commit("updateAuto", payload)
+      commit("updateSaved", payload);
+    },
+
+    addAuto({ commit }, payload: { dif: AutoOnDiff; agent: string }) {
+      commit("updateAuto", payload);
     },
 
     removeAuto(
       { commit },
-      payload: { dif: AutoOffDiff, agent: string }
+      payload: { dif: AutoOffDiff; agent: string }
     ) {
-      commit("removeAuto", payload)
+      commit("removeAuto", payload);
     },
 
-    addActive(
-      { commit },
-      payload: { dif: ActiveDiff, agent: string }
-    ) {
+    addActive({ commit }, payload: { dif: ActiveDiff; agent: string }) {
       commit("addActive", payload);
     },
 
     removeActive(
       { commit },
-      payload: { dif: ActiveDiff, agent: string }
+      payload: { dif: ActiveDiff; agent: string }
     ) {
       commit("removeActive", payload);
-    }
+    },
   },
 };
