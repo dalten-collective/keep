@@ -2,7 +2,7 @@
   <div>
     <header class="tw-mb-4">
       <h3 class="tw-text-2xl">%{{ agentName }}</h3>
-      <v-btn @click="deactivateAgent">Deactivate</v-btn>
+      <!-- DEBUG TODO: <v-btn @click="deactivateAgent">Deactivate</v-btn> -->
     </header>
 
     <section v-if="!live" class="tw-flex tw-flex-col">

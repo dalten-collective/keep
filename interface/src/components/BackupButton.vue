@@ -131,7 +131,7 @@
                     v-model="freq"
                     :rules="[
                       (v) => !!v || 'Required',
-                      (v) => v > 1 || 'Must be greater than 120',
+                      (v) => v > 120 || 'Must be greater than 120',
                     ]"
                   />
                 </div>
