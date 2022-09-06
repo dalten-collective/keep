@@ -135,5 +135,6 @@ export interface RestoreRequest {
 
 export interface LogMessage {
   msg: string;
-  time: number;
+  time: number; // Seconds since epoch
+  type: string;
 }

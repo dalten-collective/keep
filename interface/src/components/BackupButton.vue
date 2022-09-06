@@ -134,9 +134,10 @@
                     v-model="freq"
                     :rules="[
                       (v) => !!v || 'Required',
-                      (v) => v > 120 || 'Must be greater than 120',
+                      (v) => v > 10 || 'Must be greater than 120',
                     ]"
                   />
+                  <!-- TODO!!! fix above 10 to 120 -->
                 </div>
                 <div class="tw-flex-grow"></div>
               </div>

@@ -2,11 +2,11 @@
   <div>
     <header class="tw-mb-4">
       <h3 class="tw-text-2xl">%{{ agentName }}</h3>
+      <!-- TODO: <v-btn @click="deactivateAgent">Deactivate</v-btn> -->
     </header>
 
     <section v-if="!live" class="tw-flex tw-flex-col">
       <v-btn color="success" v-if="!live" @click="activateAgent">Activate</v-btn>
-      <v-btn v-else @click="deactivateAgent">Deactivate</v-btn>
     </section>
 
     <section v-else class="tw-flex tw-flex-col">

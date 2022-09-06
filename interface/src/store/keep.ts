@@ -145,7 +145,7 @@ export default {
       { commit },
       payload: { agentName: string; responseState: KeepAgentSubscriptionStatus }
     ) {
-      console.log(`handle '${ payload.agentName }' agent response state: `, payload.responseState);
+      console.log(`handle '%${ payload.agentName }' agent response state: `, payload.responseState);
       commit("setAgentStatus", {
         agentName: payload.agentName,
         responseState: payload.responseState,
@@ -161,13 +161,14 @@ export default {
 
       if (payload.responseType === EventType.Pending) {
         const d = payload.diff as PendingDiff;
-        const time = Date.now();
+        const time = Date.now() / 1000;
         const ship = d.ship;
         const status = d.status;
         if (status === InviteStatus.Invite) {
           const logMsg: LogMessage = {
             msg: `Invite pending to ${ship}`,
             time,
+            type: 'pend',
           };
           dispatch("message/addMessage", logMsg, { root: true });
         }
@@ -175,6 +176,7 @@ export default {
           const logMsg: LogMessage = {
             msg: `${ship} accepted invite`,
             time,
+            type: 'succ',
           };
           dispatch("message/addMessage", logMsg, { root: true });
         }
@@ -185,8 +187,9 @@ export default {
         const time = d.time;
         const ship = d.ship;
         const logMsg: LogMessage = {
-          msg: `Backed up to ${ship} at ${time}`,
+          msg: `Backed up %${ payload.agentName } to ${ship} at ${time}`,
           time,
+          type: 'succ',
         };
         dispatch("message/addMessage", logMsg, { root: true });
       }
@@ -196,8 +199,9 @@ export default {
         const time = d.time;
         const ship = d.ship;
         const logMsg: LogMessage = {
-          msg: `Restored from ${ship} at ${time}`,
+          msg: `Restored %${ payload.agentName } from ${ship} at ${time}`,
           time,
+          type: 'succ',
         };
         dispatch("message/addMessage", logMsg, { root: true });
       }
@@ -210,19 +214,21 @@ export default {
           const d = payload.diff as AutoOnDiff;
           const freq = d.freq;
           const ship = d.ship;
-          const time = Date.now();
+          const time = Date.now() / 1000;
           const logMsg: LogMessage = {
-            msg: `Recurring backups to ${ship} activated every ${freq} seconds`,
+            msg: `Recurring backups for %${ payload.agentName } to ${ship} activated every ${freq} seconds`,
             time,
+            type: 'info',
           };
           dispatch("message/addMessage", logMsg, { root: true });
         } else {
           const d = payload.diff as AutoOffDiff;
-          const time = d.time;
+          const time = Date.now() / 1000;
           const ship = d.ship;
           const logMsg: LogMessage = {
-            msg: `Recurring backups to ${ship} stopped`,
+            msg: `Recurring backups for %${ payload.agentName } to ${ship} stopped`,
             time,
+            type: 'info',
           };
           dispatch("message/addMessage", logMsg, { root: true });
         }
@@ -232,17 +238,19 @@ export default {
         const active = payload.diff as ActiveDiff;
         const agent = payload.agentName;
         if (active) {
-          const time = Date.now();
+          const time = Date.now() / 1000;
           const logMsg: LogMessage = {
             msg: `${agent} activated!`,
             time,
+            type: 'succ',
           };
           dispatch("message/addMessage", logMsg, { root: true });
         } else {
-          const time = Date.now();
+          const time = Date.now() / 1000;
           const logMsg: LogMessage = {
             msg: `${agent} deactivated!`,
             time,
+            type: 'info',
           };
           dispatch("message/addMessage", logMsg, { root: true });
         }

@@ -39,7 +39,6 @@
 
     <v-main class="tw-container tw-mx-auto tw-my-8">
       <router-view></router-view>
-      <Message />
       <!--
       <button @click="startMainAirlock">Start Main airlock(s)</button>
       <button @click="closeMainAirlock">Close keep airlock</button>
@@ -52,6 +51,7 @@
       </div>
       -->
     </v-main>
+    <Message style="position: fixed; bottom: 0;" class="tw-fixed tw-bottom-0 tw-right-0 tw-w-full tw-p-2 tw-opacity-100 sm:tw-w-1/3"/>
   </v-app>
 </template>
 
