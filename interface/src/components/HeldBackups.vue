@@ -44,7 +44,7 @@
             :key="a[0]"
             class="tw-border tw-rounded-keep tw-p-4 tw-mb-4"
           >
-            <div class="keep-info-items" >
+            <div class="keep-info-items">
               <v-chip
                 label
                 color="surface"
@@ -56,10 +56,7 @@
               <div class="keep-info-data">%{{ a[0] }}</div>
             </div>
 
-            <div
-              class="keep-info-items"
-              style="max-width: 46rem"
-            >
+            <div class="keep-info-items" style="max-width: 46rem">
               <v-chip
                 label
                 color="surface"
@@ -101,11 +98,33 @@ export default defineComponent({
             .filter((b) => b.ship === ship)
             .map((b) => {
               return [b.agent, b.time];
-            }),
+            })
+            .sort((b, a) => {
+              return a[1] - b[1];
+            }), // sort by backups by time
         };
         ships.push([ship, shipBackups]);
       });
-      return ships;
+      // Sort by ship type, then alpha
+      return ships.sort((a, b) => {
+        // compare lengths (ship type)
+        if (a[0].length < b[0].length) {
+          return -1;
+        }
+        if (a[0].length > b[0].length) {
+          return 1;
+        }
+
+        // then alphabetize
+        if (a[0] < b[0]) {
+          return -1;
+        }
+        if (a[0] > b[0]) {
+          return 1;
+        }
+
+        return 0;
+      });
     },
   },
   data() {
