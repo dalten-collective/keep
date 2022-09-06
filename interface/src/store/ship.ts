@@ -84,11 +84,14 @@ export default {
           console.log("agentName ", agentName);
           console.log(`sub-agent response ('${ agentName }' agent)`, data);
 
-          dispatch(
-            "keep/handleAgentResponseState",
-            { agentName, responseState: data.state },
-            { root: true }
-          );
+          // Only set full state on initial. all else through diffs (below)
+          if (data.type == "initial") {
+            dispatch(
+              "keep/handleAgentResponseState",
+              { agentName, responseState: data.state },
+              { root: true }
+            );
+          }
 
           // TODO:
           dispatch(

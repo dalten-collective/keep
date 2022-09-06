@@ -1,4 +1,4 @@
-import keepApi from "../api/keep";
+import keepApi from "@/api";
 import { Scry } from "@urbit/http-api";
 import {
   PendingStatus,
@@ -65,7 +65,7 @@ export default {
 
   mutations: {
     setAgents(state, agents: Array<string>) {
-      console.log("setting agents ", agents)
+      console.log("setting agents ", agents);
       state.agents = agents;
     },
     removeAgent(state, agentName: string) {
@@ -74,19 +74,26 @@ export default {
 
     setAgentStatus(
       state,
-      payload: { agentName: string; responseState: KeepAgentSubscriptionStatus }
+      payload: {
+        agentName: string;
+        responseState: KeepAgentSubscriptionStatus;
+      }
     ) {
       // Update or set this agent's state:
       const agentIndex = state.wrappedAgents.findIndex(
         (a: KeepAgentStatus) => a.agentName === payload.agentName
       );
       if (agentIndex == -1) {
-        console.log("did not find ", payload.agentName, " in wrappedAgents")
-        console.log("all agents ", state.agents)
-        console.log("adding...")
+        console.log(
+          "did not find ",
+          payload.agentName,
+          " in wrappedAgents"
+        );
+        console.log("all agents ", state.agents);
+        console.log("adding...");
         state.wrappedAgents.push({
           agentName: payload.agentName,
-          status: payload.responseState
+          status: payload.responseState,
         });
       } else {
         state.wrappedAgents.splice(agentIndex, 1, {
@@ -99,6 +106,13 @@ export default {
     setBackups(state, backups: Array<Backup>) {
       state.backups = backups;
     },
+
+    addPending(state, payload: { dif: PendingDiff; agent: string }) {
+      const agent = state.wrappedAgents.find((a) => {
+        return a.agentName == payload.agent;
+      });
+      agent.status.pending.push(payload.dif);
+    },
   },
 
   actions: {
@@ -109,31 +123,37 @@ export default {
     },
 
     setAgents({ commit, dispatch }, agents: Array<string>) {
-      console.log('setting agents')
+      console.log("setting agents");
       commit("setAgents", agents);
       //agents.forEach((agentName: string) => {
-        //dispatch("ship/openAirlockToAgent", agentName, { root: true });
+      //dispatch("ship/openAirlockToAgent", agentName, { root: true });
       //});
     },
 
     openAgentAirlocks({ commit, dispatch }, agents: Array<string>) {
-      console.log('opening airlocks')
+      console.log("opening airlocks");
       agents.forEach((agentName: string) => {
         dispatch("ship/openAirlockToAgent", agentName, { root: true });
       });
     },
 
-    handleKeepResponseState({ commit }, responseState: KeepSubscriptionState) {
+    handleKeepResponseState(
+      { commit },
+      responseState: KeepSubscriptionState
+    ) {
       console.log("keep response state: ", responseState);
-      commit("setBackups", responseState.backups)
+      commit("setBackups", responseState.backups);
     },
 
     // TODO
-    handleKeepResponseType({}, payload: { diff: object, responseType: EventType }) {
+    handleKeepResponseType(
+      {},
+      payload: { diff: object; responseType: EventType }
+    ) {
       console.log("keep response type: ", payload.responseType);
       console.log("keep response diff: ", payload.diff);
       if (payload.responseType == EventType.NewAgent) {
-        console.log('new agent! ', payload.diff)
+        console.log("new agent! ", payload.diff);
       }
     },
     // TODO
@@ -143,9 +163,15 @@ export default {
 
     handleAgentResponseState(
       { commit },
-      payload: { agentName: string; responseState: KeepAgentSubscriptionStatus }
+      payload: {
+        agentName: string;
+        responseState: KeepAgentSubscriptionStatus;
+      }
     ) {
-      console.log(`handle '%${ payload.agentName }' agent response state: `, payload.responseState);
+      console.log(
+        `handle %${payload.agentName} agent response state: `,
+        payload.responseState
+      );
       commit("setAgentStatus", {
         agentName: payload.agentName,
         responseState: payload.responseState,
@@ -154,7 +180,11 @@ export default {
     // TODO
     handleAgentResponseType(
       { dispatch },
-      payload: { agentName: string; responseType: EventType; diff: Diff }
+      payload: {
+        agentName: string;
+        responseType: EventType;
+        diff: Diff;
+      }
     ) {
       console.log("agent response type: ", payload.responseType);
       console.log("agent response diff ", payload.diff);
@@ -164,19 +194,23 @@ export default {
         const time = Date.now() / 1000;
         const ship = d.ship;
         const status = d.status;
+
         if (status === InviteStatus.Invite) {
+          dispatch("addPending", { dif: d, agent: payload.agentName });
+
           const logMsg: LogMessage = {
             msg: `Invite pending to ${ship}`,
             time,
-            type: 'pend',
+            type: "pend",
           };
           dispatch("message/addMessage", logMsg, { root: true });
         }
         if (status === InviteStatus.Restore) {
+          // TODO: Handle this type of pending.
           const logMsg: LogMessage = {
-            msg: `${ship} accepted invite`,
+            msg: `Waiting for restore of %${payload.agentName} from ${ship}.`,
             time,
-            type: 'succ',
+            type: "pend",
           };
           dispatch("message/addMessage", logMsg, { root: true });
         }
@@ -187,9 +221,9 @@ export default {
         const time = d.time;
         const ship = d.ship;
         const logMsg: LogMessage = {
-          msg: `Backed up %${ payload.agentName } to ${ship} at ${time}`,
+          msg: `Backed up %${payload.agentName} to ${ship} at ${time}`,
           time,
-          type: 'succ',
+          type: "succ",
         };
         dispatch("message/addMessage", logMsg, { root: true });
       }
@@ -199,9 +233,9 @@ export default {
         const time = d.time;
         const ship = d.ship;
         const logMsg: LogMessage = {
-          msg: `Restored %${ payload.agentName } from ${ship} at ${time}`,
+          msg: `Restored %${payload.agentName} from ${ship} at ${time}`,
           time,
-          type: 'succ',
+          type: "succ",
         };
         dispatch("message/addMessage", logMsg, { root: true });
       }
@@ -216,9 +250,9 @@ export default {
           const ship = d.ship;
           const time = Date.now() / 1000;
           const logMsg: LogMessage = {
-            msg: `Recurring backups for %${ payload.agentName } to ${ship} activated every ${freq} seconds`,
+            msg: `Recurring backups for %${payload.agentName} to ${ship} activated every ${freq} seconds`,
             time,
-            type: 'info',
+            type: "info",
           };
           dispatch("message/addMessage", logMsg, { root: true });
         } else {
@@ -226,9 +260,9 @@ export default {
           const time = Date.now() / 1000;
           const ship = d.ship;
           const logMsg: LogMessage = {
-            msg: `Recurring backups for %${ payload.agentName } to ${ship} stopped`,
+            msg: `Recurring backups for %${payload.agentName} to ${ship} stopped`,
             time,
-            type: 'info',
+            type: "info",
           };
           dispatch("message/addMessage", logMsg, { root: true });
         }
@@ -242,7 +276,7 @@ export default {
           const logMsg: LogMessage = {
             msg: `${agent} activated!`,
             time,
-            type: 'succ',
+            type: "succ",
           };
           dispatch("message/addMessage", logMsg, { root: true });
         } else {
@@ -250,7 +284,7 @@ export default {
           const logMsg: LogMessage = {
             msg: `${agent} deactivated!`,
             time,
-            type: 'info',
+            type: "info",
           };
           dispatch("message/addMessage", logMsg, { root: true });
         }
@@ -262,12 +296,13 @@ export default {
     },
 
     testOnce({}, payload: OnceRequest) {
-      return keepApi.testOnce(payload)
+      return keepApi
+        .testOnce(payload)
         .then((r) => {
-          return r
+          return r;
         })
-        .catch(e => {
-          throw e.response
+        .catch((e) => {
+          throw e.response;
         });
     },
     testMany({}, payload: ManyRequest) {
@@ -287,6 +322,13 @@ export default {
     },
     deactivate({}, payload: { agentName: string }) {
       keepApi.deactivate(payload.agentName);
+    },
+
+    addPending(
+      { commit },
+      payload: { dif: PendingDiff; agent: string }
+    ) {
+      commit("addPending", payload);
     },
   },
 };

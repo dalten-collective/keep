@@ -134,7 +134,7 @@
                     v-model="freq"
                     :rules="[
                       (v) => !!v || 'Required',
-                      (v) => v > 120 || 'Must be greater than 120',
+                      (v) => v > 1 || 'Must be greater than 120',
                     ]"
                   />
                 </div>
@@ -295,7 +295,8 @@ export default defineComponent({
       };
       this.$store
         .dispatch("keep/testOnce", request)
-        .then((r) => {})
+        .then((r) => {
+          })
         .finally(() => {
           this.backupPending = false;
         });
