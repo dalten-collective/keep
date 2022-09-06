@@ -55,7 +55,7 @@ export default defineComponent({
   computed: {
     ...mapGetters("keep", ["agents", "activeAgents"]),
     orderedActiveAgents() {
-      return this.activeAgents.sort((a, b) => {
+      return this.activeAgents.slice().sort((a, b) => {
         if (a.agentName < b.agentName) {
           return -1;
         }
