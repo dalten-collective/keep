@@ -1,13 +1,13 @@
 <template>
   <div
-    class="bg-white tw-border tw-border-gray-200 tw-rounded-t-lg tw-shadow-xl tw-opacity-50 sm:tw-rounded-tl-lg"
+    class="bg-white tw-border tw-border-gray-200 tw-rounded-t-lg tw-shadow-xl tw-opacity-100 sm:tw-rounded-tl-lg"
   >
     <div v-if="messages && messages.length > 0">
       <div v-if="collapsed">
         <div
           class="tw-flex tw-justify-space-between tw-items-center tw-my-1 tw-text-gray-700 tw-bg-white tw-rounded-md"
         >
-          <div class="tw-absolute tw-flex tw-justify-end">
+          <div class="tw-absolute tw-flex tw-justify-end tw-cursor-pointer" @click="collapsed = false">
             <div>
               {{ messages.length }} message{{
                 messages.length == 1 ? "" : "s"
@@ -15,7 +15,7 @@
             </div>
             <div
               v-if="newMessages"
-              class="tw-relative tw-rounded-full tw-right-1 tw-bg-info tw-h-3 tw-w-3"
+              class="tw-relative tw-rounded-full tw-right-1 tw-bg-info tw-h-2 tw-w-2 tw-animate-pulse"
             ></div>
           </div>
           <v-spacer />
@@ -39,8 +39,7 @@
         <div
           class="tw-flex tw-justify-space-between tw-items-center tw-my-1 tw-text-gray-700 tw-bg-white tw-rounded-md"
         >
-          <div>
-            {{ newMessages ? `new!` : `` }}
+          <div class="tw-absolute tw-flex tw-justify-end tw-cursor-pointer" @click="collapsed = true">
             {{ messages.length }} message{{
               messages.length == 1 ? "" : "s"
             }}
@@ -64,7 +63,7 @@
           <li
             class="tw-p-2 tw-my-1 tw-font-bold tw-text-white tw-shadow-md tw-rounded-md"
             :class="typeClass(m.type)"
-            v-for="m in messages"
+            v-for="m in orderedMessages"
             :key="m.time"
           >
             <div class="tw-flex tw-justify-between">
@@ -106,6 +105,12 @@ export default defineComponent({
         return this.messages.length;
       }
       return 0;
+    },
+
+    orderedMessages() {
+      return this.messages.slice().sort(({ time: b }, {time: a}) => {
+        return a > b ? 1 : a < b ? -1 : 0
+      })
     },
   },
   data() {
@@ -167,11 +172,11 @@ export default defineComponent({
     typeClass(msgType) {
       switch (msgType) {
         case "succ":
-          return "tw-bg-green-400";
+          return "tw-bg-success";
         case "fail":
-          return "tw-bg-red-300";
-        case "newg":
-          return "tw-bg-yellow-300";
+          return "tw-bg-error";
+        case "pend":
+          return "tw-bg-warning";
         default:
           return "tw-bg-gray-400";
       }
