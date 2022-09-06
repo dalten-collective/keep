@@ -113,6 +113,69 @@ export default {
       });
       agent.status.pending.push(payload.dif);
     },
+
+    updateSaved(state, payload: { dif: BackupDiff; agent: string }) {
+      const agent = state.wrappedAgents.find((a) => {
+        return a.agentName == payload.agent;
+      });
+
+      // remove if existing
+      if (agent.status.saved.map((s) => s.ship).includes(payload.dif.ship)) {
+        agent.status.saved = agent.status.saved.filter((s) => {
+          return s.ship !== payload.dif.ship
+        })
+      }
+      // add new status to saved
+      agent.status.saved.push(payload.dif)
+    },
+
+    updateAuto(state, payload: { dif: AutoOnDiff; agent: string}) {
+      const agent: KeepAgentStatus = state.wrappedAgents.find((a) => {
+        return a.agentName == payload.agent;
+      });
+
+      // remove if existing
+      if (agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)) {
+        agent.status.auto = agent.status.auto.filter((s) => {
+          return s.ship !== payload.dif.ship
+        })
+      }
+      // add new status to auto
+      agent.status.auto.push(payload.dif)
+    },
+
+    removeAuto(state, payload: { dif: AutoOffDiff; agent: string}) {
+      const agent: KeepAgentStatus = state.wrappedAgents.find((a) => {
+        return a.agentName == payload.agent;
+      });
+
+      // remove if existing
+      if (agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)) {
+        agent.status.auto = agent.status.auto.filter((s) => {
+          return s.ship !== payload.dif.ship
+        })
+      }
+    },
+
+    addActive(state, payload: { dif: ActiveDiff; agent: string }) {
+      const agent: KeepAgentStatus = state.wrappedAgents.find((a) => {
+        return a.agentName == payload.agent;
+      });
+
+      if (!agent.status.live) {
+        agent.status.live = true
+      }
+    },
+
+    removeActive(state, payload: { dif: ActiveDiff; agent: string }) {
+      const agent: KeepAgentStatus = state.wrappedAgents.find((a) => {
+        return a.agentName == payload.agent;
+      });
+
+      if (agent.status.live) {
+        agent.status.live = false
+      }
+    },
   },
 
   actions: {
@@ -220,6 +283,9 @@ export default {
         const d = payload.diff as BackupDiff;
         const time = d.time;
         const ship = d.ship;
+
+        dispatch("addSavedBackup", { dif: d, agent: payload.agentName });
+
         const logMsg: LogMessage = {
           msg: `Backed up %${payload.agentName} to ${ship} at ${time}`,
           time,
@@ -232,6 +298,9 @@ export default {
         const d = payload.diff as RestoreDiff;
         const time = d.time;
         const ship = d.ship;
+
+        // TODO: handle as dif?
+
         const logMsg: LogMessage = {
           msg: `Restored %${payload.agentName} from ${ship} at ${time}`,
           time,
@@ -249,6 +318,9 @@ export default {
           const freq = d.freq;
           const ship = d.ship;
           const time = Date.now() / 1000;
+
+          dispatch("addAuto", { dif: d, agent: payload.agentName });
+
           const logMsg: LogMessage = {
             msg: `Recurring backups for %${payload.agentName} to ${ship} activated every ${freq} seconds`,
             time,
@@ -259,6 +331,9 @@ export default {
           const d = payload.diff as AutoOffDiff;
           const time = Date.now() / 1000;
           const ship = d.ship;
+
+          dispatch("removeAuto", { dif: d, agent: payload.agentName });
+
           const logMsg: LogMessage = {
             msg: `Recurring backups for %${payload.agentName} to ${ship} stopped`,
             time,
@@ -273,6 +348,9 @@ export default {
         const agent = payload.agentName;
         if (active) {
           const time = Date.now() / 1000;
+
+          dispatch("addActive", { dif: active, agent: payload.agentName });
+
           const logMsg: LogMessage = {
             msg: `${agent} activated!`,
             time,
@@ -281,10 +359,13 @@ export default {
           dispatch("message/addMessage", logMsg, { root: true });
         } else {
           const time = Date.now() / 1000;
+
+          dispatch("removeActive", { dif: active, agent: payload.agentName });
+
           const logMsg: LogMessage = {
             msg: `${agent} deactivated!`,
             time,
-            type: "info",
+            type: "fail",
           };
           dispatch("message/addMessage", logMsg, { root: true });
         }
@@ -330,5 +411,40 @@ export default {
     ) {
       commit("addPending", payload);
     },
+
+    addSavedBackup(
+      { commit },
+      payload: { dif: BackupDiff, agent: string }
+    ) {
+      commit("updateSaved", payload)
+    },
+
+    addAuto(
+      { commit },
+      payload: { dif: AutoOnDiff, agent: string }
+    ) {
+      commit("updateAuto", payload)
+    },
+
+    removeAuto(
+      { commit },
+      payload: { dif: AutoOffDiff, agent: string }
+    ) {
+      commit("removeAuto", payload)
+    },
+
+    addActive(
+      { commit },
+      payload: { dif: ActiveDiff, agent: string }
+    ) {
+      commit("addActive", payload);
+    },
+
+    removeActive(
+      { commit },
+      payload: { dif: ActiveDiff, agent: string }
+    ) {
+      commit("removeActive", payload);
+    }
   },
 };
