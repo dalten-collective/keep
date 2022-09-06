@@ -3,7 +3,7 @@
 ::  usage: %-(agent:keep your-agent)
 ::
 /-  *keep
-/+  default-agent, *sane, agentio, trans
+/+  default-agent, *sane, agentio, multipart, verb
 ::
 |%
 ::  This is the meat of the logic. The rest is bookkeeping and logistics.
@@ -11,30 +11,45 @@
 ::  bowl that the agent will see, i.e. it should be stripped of keep's subs.
 ::
 ++  restore
-  |=  [=agent:gall =bowl:gall backup=noun]
+  |=  [=agent:gall =bowl:gall]  |=  old=backup
   ^-  (quip card _agent)
   =.  agent  ~(. agent bowl)
-  =/  old  ~|(%bad-shape ;;([wex=boat:gall sup=bitt:gall state=*] backup))
   =^  cards0  agent  (on-load:agent [-:on-save:agent state.old])
+  ::
   =^  cards1=(list card)  agent
     %+  roll  (diff ~(tap by wex.old) ~(tap by wex.bowl))
     |:  *[[[=wire =ship *] *] caz=(list card) ag=_agent]
-    =+  (on-agent:ag(src.+< ship) wire %kick ~)
-    [(weld caz -.-) +.-]
+    =-  [(weld caz -.-) +.-]
+    ?-  res0=(mule |.((on-agent:ag(src.+< ship) wire %kick ~)))
+        [%& *]  p.res0
+        [%| *]
+      %+  fall  (mole |.((on-fail:ag %kick leaf/"closing subsciption" p.res0)))
+      `ag
+    ==
+  ::
   =^  cards2=(list card)  agent
     %+  roll  (diff ~(tap by sup.old) ~(tap by sup.bowl))
     |:  *[[* =ship =path] caz=(list card) ag=_agent]
-    =+  (on-leave:ag(src.+< ship) path)
-    [(weld caz -.-) +.-]
+    =-  [(weld caz -.-) +.-]
+    ?-  res0=(mule |.((on-leave:ag(src.+< ship) path)))
+        [%& *]  p.res0
+        [%| *]
+      %+  fall  (mole |.((on-fail:ag %leave p.res0)))
+      `ag
+    ==
+  ::
   =/  cards3=(list card)
     %+  turn  (diff ~(tap by sup.bowl) ~(tap by sup.old))
     |=  [* =ship =path]  [%give %kick ~[path] `ship]
+  ::
   =/  cards4=(list card)
     %+  turn  (diff ~(tap by wex.bowl) ~(tap by wex.old))
     |=  [[=wire =ship =dude] *]  [%pass wire %agent [ship dude] %leave ~]
+  ::
   :_  agent
   :(weld cards0 cards1 cards2 cards3 cards4)
 ::
++$  backup  [wex=boat:gall sup=bitt:gall state=*]
 +$  versioned-state
   $%  state-0
   ==
@@ -52,6 +67,7 @@
   ::
   =|  state-0
   =*  state  -
+  %+  verb  &
   ::
   ^-  agent:gall
   |_  bowl:gall
@@ -71,13 +87,32 @@
       wait  |=  u=(unit ship)
             ~(wait pass:io keep/wait/?~(u /put /ship/(scot %p u.u)))
       tell  (~(poke-our pass:io /keep/tell) %keep keep-agent+!>(tell+dap.bowl))
+      upload-path
+        /apps/keep/[dap.bowl]/upload
   ::
   ++  on-poke
     |=  [=mark =vase]
     ^-  (quip card agent:gall)
-    ?.  ?=(%keep mark)
+    =*  call-inner
       =^  cards  agent  (on-poke:ag mark vase)
       [cards this]
+    ::
+    ?.  ?=(?(%keep %handle-http-request) mark)  call-inner
+    ?:  ?=(%handle-http-request mark)
+      ?>  =(src.bowl our.bowl)
+      ?>  live
+      =/  req  !<([@ta inbound-request:eyre] vase)
+      ?.  =([~ 0] (find upload-path (rash url.request.+.req stap)))
+        call-inner
+      =/  [res=(unit agent:gall) cards=(list card)]
+        (handle-http-request req (restore agent dish))
+      ?~  res
+        :_  this
+        :_  cards
+        (~(malformed json state) ~ now.bowl)
+      :_  this(agent u.res)
+      :_  cards
+      (~(restored json state) ~ now.bowl)
     ::
     =/  cmd  !<(wrapper:poke vase)
     ?-  -.cmd
@@ -85,20 +120,15 @@
         %once
       ?>  live
       ?>  =(src.bowl our.bowl)
-      =*  backup  [wex.dish sup.dish +:on-save:ag]
-      ::  Back up to put dir or to a ship?
-      ?~  to.cmd
-        :_  this(last (~(put by last) to.cmd now.bowl))
-        :~  (drop our.bowl now.bowl dap.bowl backup) ::TODO set timer
-            (~(saved json state) to.cmd now.bowl)
-        ==
+      ::
       =/  paths
-        ::  Already backing up to there?
+        ?~  to.cmd  ~
         %+  murn  ~(val by sup.bowl)
         |=  [=ship =path]
-        ?.  =(ship to.cmd)  ~
+        ?.  =(ship u.to.cmd)  ~
         `path
-      ?~  paths
+      ::  Possible to back up now?
+      ?.  ?|(?=(~ to.cmd) ?=(~ paths))
         ::  No. Initiate new connection.
         =/  key  (scot %uv (sham eny.bowl))
         =.  pending  (~(put by pending) u.to.cmd %invite key)
@@ -107,16 +137,20 @@
             %+  ~(poke pass:io /keep/init/(scot %p u.to.cmd))  u.to.cmd^%keep
             keep-agent+!>([%init dap.bowl key])
         ==
-      ::  Yes. Just give the fact.
+      ::  Yes. Give the fact or write to put and set new timers.
+      =/  backup  [wex.dish sup.dish +:on-save:ag]
       =/  freq  (~(get by auto) to.cmd)
       =/  prev  (~(get by last) to.cmd)
       =.  last  (~(put by last) to.cmd now.bowl)
+      ::
       :_  this
       %-  catunits
-      :~  (bind (both `now.bowl freq) (cork add (wait to.cmd))) :: (behn wait+to.cmd))) :: set next
+      :~  (bind (both `now.bowl freq) (cork add (wait to.cmd))) :: set next
           (bind (both prev freq) (cork add (rest to.cmd))) :: unset old next
-          `(fact:io noun+!>(backup) paths) :: `[%give %fact paths noun+!>(backup)]
           `(~(saved json state) to.cmd now.bowl)
+          ?~  to.cmd
+            `(drop our.bowl now.bowl dap.bowl backup)
+          `(fact:io noun+!>(backup) paths)
       ==
     ::  Set/unset repeating backups
         %many
@@ -133,19 +167,10 @@
             new :: set next later
           (bind freq.cmd |=(* ((wait to.cmd) now.bowl))) :: set next now
       ==
-    ::  Start repairing your state
+    ::  Ask another ship for your state
         %mend
       ?>  live
       ?>  =(src.bowl our.bowl)
-      ::  Restoring from a jam file?
-      ?~  from.cmd
-        ::  Yes. Read from the path and restore.
-        ?~  file=(read from.cmd)  ~&  >>  no-file-at=from.cmd  `this ::TODO actually read a file
-        =^  cards  agent  (restore agent dish u.file)
-        :_  this
-        [(~(restored json state) ~ now.bowl) cards]
-      ::  No. Request the data from the host.
-      =>  .(from.cmd u.from.cmd)
       =/  key  (scot %uv (sham eny.bowl))
       :_  this(pending (~(put by pending) from.cmd %restore key))
       :~  (~(try-restore json state) from.cmd)
@@ -158,7 +183,10 @@
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
-      =^  cards  agent  (restore agent dish data.cmd)
+      ?~  res=(mole |.(((restore agent dish) ;;(backup data.cmd))))
+        :_  this
+        ~[(~(malformed json state) `src.bowl now.bowl)]
+      =^  cards  agent  u.res
       :_  this
       [(~(restored json state) `src.bowl now.bowl) cards]
     ::  Turn wrapper on or off
@@ -167,7 +195,10 @@
       ?:  =(live live.cmd)  `this
       =.  live  live.cmd
       :_  this
-      ~[~(live json state)]
+      :-  ~(live json state)
+      ?:  live
+        ~[(~(connect pass:io /keep/eyre) `upload-path dap.bowl)]
+      ~[(~(arvo pass:io /keep/eyre) %e %disconnect `upload-path)]
     ==
   ::
   ++  on-peek
@@ -207,11 +238,12 @@
   ++  on-watch
     |=  =path
     ^-  (quip card agent:gall)
-    ?.  ?=(%keep -.path)
+    ?.  ?=(?(%keep %http-response) -.path)
       =^  cards  agent  (on-watch:ag path)
       [cards this]
-    ?+  +.path  (on-watch:def path)
     ::
+    ?:  ?=([%http-response ^] path)  `this
+    ?+  +.path  (on-watch:def path)
         [%website ~]
       ?>  =(src.bowl our.bowl)
       :_  this
@@ -237,10 +269,24 @@
     ?.  ?=(%keep -.wire)
       =^  cards  agent  (on-arvo:ag wire sign-arvo)
       [cards this]
-    ?.  ?=([%timer %wait ?(%put %ship) *] +.wire)  (on-arvo:def wire sign-arvo)
-    ?.  ?=([%behn %wake *] sign-arvo)              (on-arvo:def wire sign-arvo)
-    ?^  error.sign-arvo                            (on-arvo:def wire sign-arvo)
-    (on-poke %keep !>(`wrapper:poke`once+`(slav %p &3.wire))) ::TODO change entry from &3
+    ?+  +.wire  (on-arvo:def wire sign-arvo)
+        [%eyre ~]
+      ?>  ?=([%eyre %bound *] sign-arvo)
+      %.  `this
+      ?:  accepted.sign-arvo  same
+      (slog leaf+"keep-wrapper-fail -binding-eyre-for-import" ~)
+    ::
+        [%wait ^]
+      ?>  ?=([%behn %wake *] sign-arvo)
+      ?^  error.sign-arvo  (on-arvo:def wire sign-arvo)
+      %+  on-poke  %keep
+      !>  ^-  wrapper:poke
+      :-  %once
+      ?+  +>.wire  (on-arvo:def wire sign-arvo)
+        [%put *]        ~
+        [%ship term *]  `(slav %p &4.wire)
+      ==
+    ==
   ::
   ++  on-fail
     |=  [=term =tang]
@@ -263,14 +309,82 @@
       ==
   ==
 ::
-++  read  ::TODO read from UI somehow??
-  |=  =path
-  ^-  (unit noun)
-  ~|  not-a-jam-file=path
-  ?>  =(%jam (rear path))
-  %+  bind  fil:.^(arch %cy path)
-  ~|  no-atom-at=path
-  |=(* (cue .^(@ %cx path)))
+++  handle-http-request
+  |=  $:  [eyre-id=@ta auth=? secure=? =address:eyre =request:http]
+          load=$-(backup (quip card agent:gall))
+      ==
+  |^  ^-  [(unit agent:gall) (list card)]
+      ?+  method.request  `(reply)
+          %'GET'  `(reply 200 "")
+      ::
+          %'POST'
+        ?~  parts=(de-request:multipart [header-list body]:request)
+          `(reply 400 "Missing data in POST. Complete the form!")
+        =/  jams=(list jam)
+          %+  murn  u.parts
+          |=  [n=@t =part:multipart]
+          ?.  =(n 'file')  ~
+          [~ `jam`body.part]
+        ?.  ?=([jam ~] jams)
+          `(reply 400 "Bad amount of jam. Need exactly one. Try again!")
+        ?~  res=(mole |.((load ;;(backup (cue i.jams)))))
+          `(reply 400 "Corrupted backup file!")
+        :-  `+.u.res
+        (weld (reply 200 "Upload completed successfully!") -.u.res)
+      ==
+  ++  reply
+    |=  [code=$~(405 @) err=tape]
+    ^-  (list card)
+    =/  paths  ~[/http-response/[eyre-id]]
+    =/  load=simple-payload:http  [code^~ `(make-upload-page err)]
+    =,  agentio
+    :~  (fact http-response-header+!>(response-header.load) paths)
+        (fact http-response-data+!>(data.load) paths)
+        (kick paths)
+    ==
+  --
+::
+++  make-upload-page  
+  |=  err=tape
+  ^-  octs
+  %-  as-octt:mimes:html
+  %-  en-xml:html
+  ^-  manx
+  ;html
+    ;head
+      ;title:"%keep importer"
+      ;meta(charset "utf-8");
+      ;style:'''
+             * { font-family: monospace; margin-top: 1em; }
+             '''
+    ==
+    ::
+    ;body
+      ;h2:"%keep importer"
+      ;+  ?^  err
+            ;p: {err}
+          ;p:"""
+             Please make sure that the file you upload is a backup
+             of the correct agent. We try our best to not load any
+             malformed backups, but we cannot make guarantees. It
+             is possible (but improbable) to make the agent unusable
+             by restoring from a malformed backup. But then again,
+             you were already restoring, so you probably didn't have
+             anything to lose, did you?
+             """
+      ;form(method "post", enctype "multipart/form-data")
+        ;label
+          ;+  :/"Import file: "
+          ;input
+            =type             "file"
+            =name             "file"
+            =required         "";
+        ==
+        ;br;
+        ;button(type "submit"):"Restore"
+      ==
+    ==
+  ==
 ::
 ++  json
   =,  enjs:format
@@ -293,6 +407,12 @@
     |=  new=[(unit @p) @da]  (website-card 'restored' (json-da new))
   ::
   ++  live  (website-card 'active' b+live.state)
+  ::
+  ++  malformed
+    |=  [(unit @p) @da]  (website-card 'fail-restore' (json-da +<))
+  ::
+  ++  no-store
+    |=  [(unit @p) @da]  (website-card 'fail-store' (json-da +<))
   ::
   ++  website-card
     |=  [event=@t diff=^json]

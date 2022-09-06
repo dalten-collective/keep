@@ -14,7 +14,7 @@
   +$  wrapper                                  ::
     $%  [%once to=(unit ship)]                 :: Backup to a ship or the put dir
         [%many to=(unit ship) freq=(unit @dr)] :: Repeat backup
-        [%mend from=(unit ship)]               :: Initiate recovery
+        [%mend from=ship]                      :: Initiate recovery
         [%data data=noun key=term]             :: Old state and secret (internal only)
         [%live live=?]                         :: (De)activate. Deact before uninstall!
     ==
