@@ -28,7 +28,7 @@
 
     <div v-else>
       <div v-if="activeAgents.length === 0">No active agents</div>
-      <div v-else v-for="agent in activeAgents" :key="agent" class="tw-my-2">
+      <div v-else v-for="agent in orderedActiveAgents" :key="agent" class="tw-my-2">
         <KeepAgent
           :agent-name="agent.agentName"
           class="tw-p-2 tw-my-4 tw-bg-white tw-border tw-rounded-keep"
@@ -54,6 +54,18 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters("keep", ["agents", "activeAgents"]),
+    orderedActiveAgents() {
+      return this.activeAgents.sort((a, b) => {
+        if (a.agentName < b.agentName) {
+          return -1;
+        }
+        if (a.agentName > b.agentName) {
+          return 1;
+        }
+
+        return 0;
+      });
+    },
   },
   data() {
     return {
