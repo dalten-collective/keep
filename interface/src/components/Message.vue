@@ -115,16 +115,13 @@ export default defineComponent({
   },
   data() {
     return {
-      collapsed: false, // TODO: change to true
+      collapsed: true,
       newMessages: false,
     };
   },
 
   watch: {
     messageCount(val, oldVal) {
-      // TODO: do we want to open this every time new messages appear?
-      // this.collapsed = false;
-
       // When there are new messages and we don't already have the tray open
       if (val > oldVal && this.collapsed) {
         this.newMessages = true;

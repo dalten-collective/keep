@@ -145,7 +145,7 @@ export default {
       { commit },
       payload: { agentName: string; responseState: KeepAgentSubscriptionStatus }
     ) {
-      console.log(`handle '${ payload.agentName }' agent response state: `, payload.responseState);
+      console.log(`handle '%${ payload.agentName }' agent response state: `, payload.responseState);
       commit("setAgentStatus", {
         agentName: payload.agentName,
         responseState: payload.responseState,
@@ -187,7 +187,7 @@ export default {
         const time = d.time;
         const ship = d.ship;
         const logMsg: LogMessage = {
-          msg: `Backed up ${ payload.agentName } to ${ship} at ${time}`,
+          msg: `Backed up %${ payload.agentName } to ${ship} at ${time}`,
           time,
           type: 'succ',
         };
@@ -199,7 +199,7 @@ export default {
         const time = d.time;
         const ship = d.ship;
         const logMsg: LogMessage = {
-          msg: `Restored ${ payload.agentName } from ${ship} at ${time}`,
+          msg: `Restored %${ payload.agentName } from ${ship} at ${time}`,
           time,
           type: 'succ',
         };
@@ -216,7 +216,7 @@ export default {
           const ship = d.ship;
           const time = Date.now() / 1000;
           const logMsg: LogMessage = {
-            msg: `Recurring backups for ${ payload.agentName } to ${ship} activated every ${freq} seconds`,
+            msg: `Recurring backups for %${ payload.agentName } to ${ship} activated every ${freq} seconds`,
             time,
             type: 'info',
           };
@@ -226,7 +226,7 @@ export default {
           const time = Date.now() / 1000;
           const ship = d.ship;
           const logMsg: LogMessage = {
-            msg: `Recurring backups for ${ payload.agentName } to ${ship} stopped`,
+            msg: `Recurring backups for %${ payload.agentName } to ${ship} stopped`,
             time,
             type: 'info',
           };
