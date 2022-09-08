@@ -51,12 +51,6 @@
     %+  ~(watch pass:io /backups/(scot %p src.bowl)/[dap.cmd])
       [src.bowl dap.cmd]
     /keep/data/[key.cmd]
-    
-   :: :~  :*
-   ::   %pass   /backups/(scot %p src.bowl)/[dap.cmd]
-   ::   %agent  [src.bowl dap.cmd]
-   ::   %watch  /keep/data/[key.cmd]
-   :: ==  ==
   ::
   ::  "Give me my stuff," said someone else's wrapper.
       %grab
@@ -68,15 +62,6 @@
     %+  ~(poke pass:io /recoveries/(scot %p src.bowl)/[dap.cmd])
       [src.bowl dap.cmd]
     keep+!>([%data data:(~(got by kept) [dap.cmd src.bowl]) key.cmd])
-
-   :: =/  data=noun
-   ::   data:(~(got by kept) [dap.cmd src.bowl])
-
-   :: :~  :*
-   ::   %pass   /recoveries/(scot %p src.bowl)/[dap.cmd]
-   ::   %agent  [src.bowl dap.cmd]
-   ::   %poke   keep+!>([%data data key.cmd])
-   :: ==  ==
   ::
   ::  "I exist," said a wrapper on our own ship.
       %tell
