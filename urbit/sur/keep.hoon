@@ -9,6 +9,8 @@
     $%  [%init dap=dude key=term]       :: Initiate agent as keeper
         [%grab dap=dude key=term]       :: Request old backup
         [%tell dap=dude]                :: Register wrapped agent
+        [%able (each ship ship)]
+        [%wyte on=?]
     ==
   ::                                    :: To the wrapper.
   +$  wrapper                           ::
