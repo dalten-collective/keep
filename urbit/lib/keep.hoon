@@ -128,7 +128,7 @@
         ?.  =(ship u.to.cmd)  ~
         `path
       ::  Possible to back up now?
-      ?.  ?|(?=(~ to.cmd) ?=(~ paths))
+      ?:  ?&(?=(^ to.cmd) ?=(~ paths))
         ::  No. Initiate new connection.
         =/  key  (scot %uv (sham eny.bowl))
         =.  pending  (~(put by pending) u.to.cmd %invite key)
