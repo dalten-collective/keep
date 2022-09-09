@@ -82,11 +82,9 @@
       dish  +<(sup their.sup)  ::TODO change eny too?
       ag    ~(. agent dish)
       io    ~(. agentio bowl)
-      rest  |=  u=(unit ship)
-            ~(rest pass:io keep/rest/?~(u /put /ship/(scot %p u.u)))
-      wait  |=  u=(unit ship)
-            ~(wait pass:io keep/wait/?~(u /put /ship/(scot %p u.u)))
-      tell  (~(poke-our pass:io /keep/tell) %keep keep-agent+!>(tell+dap.bowl))
+      pass  |=  =path  ~(. pass:io keep/path)
+      behn  |=  u=(unit ship)  behn/?~(u /put /ship/(scot %p u.u))
+      tell  (poke-our:(pass /tell) %keep keep-agent+!>(tell+dap.bowl))
       upload-path
         /apps/keep/[dap.bowl]/upload
   ::
@@ -134,7 +132,7 @@
         =.  pending  (~(put by pending) u.to.cmd %invite key)
         :_  this
         :~  (~(try-invite json state) u.to.cmd)
-            %+  ~(poke pass:io /keep/init/(scot %p u.to.cmd))  u.to.cmd^%keep
+            %+  poke:(pass /init/(scot %p u.to.cmd))  u.to.cmd^%keep
             keep-agent+!>([%init dap.bowl key])
         ==
       ::  Yes. Give the fact or write to put and set new timers.
@@ -145,8 +143,8 @@
       ::
       :_  this
       %-  catunits
-      :~  (bind (both `now.bowl freq) (cork add (wait to.cmd))) :: set next
-          (bind (both prev freq) (cork add (rest to.cmd))) :: unset old next
+      :~  (bind (both `now.bowl freq) (cork add wait:(pass (behn to.cmd)))) :: set next
+          (bind (both prev freq) (cork add rest:(pass (behn to.cmd)))) :: unset old next
           `(~(saved json state) to.cmd now.bowl)
           ?~  to.cmd
             `(drop our.bowl now.bowl dap.bowl backup)
@@ -161,11 +159,11 @@
       =.  auto  (putunit auto to.cmd freq.cmd)
       :_  this
       %-  catunits
-      :~  (bind (both prev freq) (cork add (rest to.cmd))) :: unset old next
+      :~  (bind (both prev freq) (cork add rest:(pass (behn to.cmd)))) :: unset old next
           `(~(auto json state) to.cmd freq.cmd)
-          ?^  new=(bind (both prev freq.cmd) (cork add (wait to.cmd)))
+          ?^  new=(bind (both prev freq.cmd) (cork add wait:(pass (behn to.cmd))))
             new :: set next later
-          (bind freq.cmd |=(* ((wait to.cmd) now.bowl))) :: set next now
+          (bind freq.cmd |=(* (wait:(pass (behn to.cmd)) now.bowl))) :: set next now
       ==
     ::  Ask another ship for your state
         %mend
@@ -174,7 +172,7 @@
       =/  key  (scot %uv (sham eny.bowl))
       :_  this(pending (~(put by pending) from.cmd %restore key))
       :~  (~(try-restore json state) from.cmd)
-          %+  ~(poke pass:io /keep/grab/(scot %p from.cmd))  [from.cmd %keep]
+          %+  poke:(pass /grab/(scot %p from.cmd))  [from.cmd %keep]
           keep-agent+!>(`agent:poke`grab+dap.bowl^key)
       ==
     ::  Load this back
@@ -197,8 +195,8 @@
       :_  this
       :-  ~(live json state)
       ?:  live
-        ~[(~(connect pass:io /keep/eyre) `upload-path dap.bowl)]
-      ~[(~(arvo pass:io /keep/eyre) %e %disconnect `upload-path)]
+        ~[(connect:(pass /eyre) `upload-path dap.bowl)]
+      ~[(arvo:(pass /eyre) %e %disconnect `upload-path)]
     ==
   ::
   ++  on-peek
@@ -269,16 +267,18 @@
     ?.  ?=(%keep -.wire)
       =^  cards  agent  (on-arvo:ag wire sign-arvo)
       [cards this]
-    ?+  +.wire  (on-arvo:def wire sign-arvo)
+    ::
+    ?+    +.wire  (on-arvo:def wire sign-arvo)
         [%eyre ~]
       ?>  ?=([%eyre %bound *] sign-arvo)
       %.  `this
       ?:  accepted.sign-arvo  same
       (slog leaf+"keep-wrapper-fail -binding-eyre-for-import" ~)
     ::
-        [%wait ^]
+        [%behn ^]
       ?>  ?=([%behn %wake *] sign-arvo)
-      ?^  error.sign-arvo  (on-arvo:def wire sign-arvo)
+      ?^  error.sign-arvo
+        ((slog u.error.sign-arvo) (on-arvo:def wire sign-arvo))
       %+  on-poke  %keep
       !>  ^-  wrapper:poke
       :-  %once
@@ -302,11 +302,7 @@
       %poke   %drum-put
       !>  ^-  [path jam]
       :_  (jam non)
-      ;:  welp
-        /(scot %tas dap)
-        /(scot %tas (crip "{(trip dap)}_bak_{(scow %da now)}"))
-        /jam
-      ==
+      /keep/[dap]/(scot %da now)/jam
   ==
 ::
 ++  handle-http-request
