@@ -121,7 +121,7 @@
 ++  website-card
   |=  [event=@t diff=json]
   ^-  card
-  %+  (fact-curry:agentio %json json)  ~[/website]
+  %-  fact:agentio  :_  ~[/website]
   =,  enjs:format
   %-  pairs
   :~  [%type s+event]
