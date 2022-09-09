@@ -54,6 +54,10 @@ These can also come in the form of JSON:
 
   When the wrapper is deactivated, the only available poke is to activate it again. However, subscribers will not be kicked, and new subscriptions will still be accepted.
 
+## Browser upload
+
+Whenever a wrapper has been activated with `%live`, it will serve a web page on `/apps/keep/[agent-name]/upload` through which it is possible to upload files which were backed up to the `put` directory.
+
 ## Subscriptions
 
 All JSON objects sent from both the agent and wrappers will be on the form:
