@@ -54,6 +54,43 @@ These can also come in the form of JSON:
 
   When the wrapper is deactivated, the only available poke is to activate it again. However, subscribers will not be kicked, and new subscriptions will still be accepted.
 
+## Whitelist [temporary]
+
+For now, Keep ...keeps.. its own whitelist, but this will move into a middlewear piece soon.
+
+In the meantime, these are the changes that the temporary whitelist makes to Keep's state and pokes:
+
+### Pokes
+
+
+```
+[%able (each ship ship)]  ::  Add or remove ship from whitelist
+[%wyte on=?]              ::  Enable or disable the whitelist
+```
+
+Or, in JSON:
+
+```
+{"able": {"able": true, "ship": "~sampel-palnet"}}
+{"wyte": true}
+```
+
+Both of these are available regardless of the other, but modifying the whitelist won't affect the agent's behavior if it's currently turned off. But if you first add ~sampel-palnet and then turn it on, then ~sampel-palnet will immediately be whitelisted.
+
+The whitelist is initialized to be on and empty.
+
+### State:
+
+Upon initial subscription to the /website path, the %keep agent will give you one additional entry in the JSON object it sends you, namely:
+
+```
+"whitelist": {
+  "on": true,
+  "in": ["~zod", "~sampel", "~palnet"]
+}
+```
+
+
 ## Browser upload
 
 Whenever a wrapper has been activated with `%live`, it will serve a web page on `/apps/keep/[agent-name]/upload` through which it is possible to upload files which were backed up to the `put` directory.
