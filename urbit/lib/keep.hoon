@@ -257,9 +257,12 @@
   ++  on-agent
     |=  [=wire =sign:agent:gall]
     ^-  (quip card agent:gall)
-    ?:  ?=(%keep -.wire)  `this
-    =^  cards  agent  (on-agent:ag wire sign)
-    [cards this]
+    ?.  ?=(%keep -.wire)
+      =^  cards  agent  (on-agent:ag wire sign)
+      [cards this]
+    ?.  ?=(%poke-ack -.sign)  `this
+    ?~  p.sign  `this
+    ((slog u.p.sign) `this)
   ::
   ++  on-arvo
     |=  [=wire =sign-arvo]

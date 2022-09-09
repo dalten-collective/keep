@@ -1,7 +1,7 @@
 ::  keep: backup manager
 ::
 /-  *keep
-/+  default-agent, dbug, *sane
+/+  default-agent, dbug, *sane, agentio
 ::
 |%
 +$  versioned-state
@@ -12,6 +12,7 @@
   $:  %0
       kept=(map [dude ship] [data=noun time=@da])
       live=(set dude)
+      able=(each (set ship) (set ship))
   ==
 --
 ::
@@ -24,6 +25,8 @@
 |_  =bowl:gall
 +*  this  .
     def   ~(. (default-agent this %|) bowl)
+    io    ~(. agentio bowl)
+    whitelisted  |(?=(%| -.able) (~(has in p.able) src.bowl))
 ::
 ++  on-save  !>(state)
 ::
@@ -38,25 +41,28 @@
   ?>  ?=(%keep-agent mark)
   =/  cmd  !<(agent:poke vase)
   ?-  -.cmd
+  ::
   ::  "Subscribe to my stuff," said someone else's wrapper.
       %init
+    ~|  %not-whitelisted
+    ?>  whitelisted
     :_  this
-    :~  :*
-      %pass   /backups/(scot %p src.bowl)/[dap.cmd]
-      %agent  [src.bowl dap.cmd]
-      %watch  /keep/data/[key.cmd]
-    ==  ==
+    :_  ~
+    %+  ~(watch pass:io /backups/(scot %p src.bowl)/[dap.cmd])
+      [src.bowl dap.cmd]
+    /keep/data/[key.cmd]
+  ::
   ::  "Give me my stuff," said someone else's wrapper.
       %grab
+    ~|  %not-whitelisted
+    ?>  whitelisted
     :_  this
+    :_  ~
     ~|  [%has-no dap.cmd from=src.bowl]
-    =/  data=noun
-      data:(~(got by kept) [dap.cmd src.bowl])
-    :~  :*
-      %pass   /recoveries/(scot %p src.bowl)/[dap.cmd]
-      %agent  [src.bowl dap.cmd]
-      %poke   keep+!>([%data data key.cmd])
-    ==  ==
+    %+  ~(poke pass:io /recoveries/(scot %p src.bowl)/[dap.cmd])
+      [src.bowl dap.cmd]
+    keep+!>([%data data:(~(got by kept) [dap.cmd src.bowl]) key.cmd])
+  ::
   ::  "I exist," said a wrapper on our own ship.
       %tell
     ?>  =(src.bowl our.bowl)
@@ -64,11 +70,27 @@
     =.  live  (~(put in live) dap.cmd)
     :_  this
     ~[(website-card 'agent' s+dap.cmd)]
+  ::
+  ::  "(De)whitelist this ship," said our operator.
+      %able
+    ?>  =(src.bowl our.bowl)
+    ?-  +<.cmd
+      %&  `this(p.able (~(put in p.able) p.cmd))
+      %|  `this(p.able (~(del in p.able) p.cmd))
+    ==
+  ::
+  ::  "(De)activate the whitelist," said our operator.
+      %wyte
+    ?>  =(src.bowl our.bowl)
+    =*  res  `this(able [on.cmd p.able])
+    ?:(on.cmd res res)
   ==
 ::
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
+  ~|  %not-whitelisted
+  ?>  whitelisted
   ?.  ?=([%backups term term ~] wire)  (on-agent:def wire sign)
   ?+  -.sign  (on-agent:def wire sign)
   ::
@@ -85,6 +107,7 @@
 ++  on-watch
   |=  =path
   ^-  (quip card _this)
+  ?>  =(src.bowl our.bowl)
   ?.  ?=([%website ~] path)  (on-watch:def path)
   :_  this
   ~[(website-card 'initial' ~)]
@@ -100,18 +123,22 @@
 ++  website-card
   |=  [event=@t diff=json]
   ^-  card
+  %-  fact:agentio  :_  ~[/website]
+  :-  %json  !>
   =,  enjs:format
-  :*  %give  %fact  ~[/website]  %json
-      !>  %-  pairs
-      :~  [%type s+event]
-          [%diff diff]
-          :-  %state
-          %-  pairs
-          :~
-            ['agents' a+(turn ~(tap in live) (lead %s))]
-            :-  'backups'
-            a+(turn ~(tap by kept) |=([to=[@ @p] [* =@da]] (json-backup da to)))
-  ==  ==  ==
+  %-  pairs
+  :~  [%type s+event]
+      [%diff diff]
+      :-  %state
+      %-  pairs
+      :~  ['agents' a/(turn ~(tap in live) (lead %s))]
+      ::
+          :-  'backups'
+          a/(turn ~(tap by kept) |=([to=[@ @p] [* =@da]] (json-backup da to)))
+      ::
+          :-  'whitelist'
+          (pairs ~[['on' b/-.able] ['in' a/(turn ~(tap in p.able) ship)]])
+  ==  ==
 ::
 ++  json-backup
   |=  [=@da =dude =@p]

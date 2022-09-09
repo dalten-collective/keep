@@ -50,6 +50,94 @@ export function deactivate(agentName: string) {
     });
 }
 
+export function wyteOn() {
+  return urbitAPI
+    .poke({
+      app: 'keep',
+      mark: "keep-agent",
+      json: {
+        wyte: true,
+      },
+    })
+    .then((r) => {
+      console.log("res ", r);
+      return r;
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      return e
+    });
+}
+
+export function wyteOff() {
+  return urbitAPI
+    .poke({
+      app: 'keep',
+      mark: "keep-agent",
+      json: {
+        wyte: false,
+      },
+    })
+    .then((r) => {
+      console.log("res ", r);
+      return r;
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      return e
+    });
+}
+
+export function wyteAble(ship: Ship) {
+  return urbitAPI
+    .poke({
+      app: 'keep',
+      mark: "keep-agent",
+      json: {
+        able: {
+          able: true,
+          ship: siggedShip(ship)
+        }
+      },
+    })
+    .then((r) => {
+      console.log("res ", r);
+      return r;
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      throw e
+      // return 'error'
+    });
+}
+export function wyteDisable(ship: Ship) {
+  return urbitAPI
+    .poke({
+      app: 'keep',
+      mark: "keep-agent",
+      json: {
+        able: {
+          able: false,
+          ship: siggedShip(ship)
+        }
+      },
+    })
+    .then((r) => {
+      console.log("res ", r);
+      return r;
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      throw e
+      // return 'error'
+    });
+}
+
+
 export function scry(scry: Scry) {
   return urbitAPI
     .scry(scry)
