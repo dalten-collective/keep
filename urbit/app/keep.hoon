@@ -73,7 +73,9 @@
   ?+  -.sign  (on-agent:def wire sign)
   ::
       %fact
-    ~&  >  [%store-backup of=,.&3.wire from=src.bowl]
+    ~&  >  :*  %store-backup  of=,.&3.wire  from=src.bowl
+           since-last=`@dr`(sub now.bowl +:(~(gut by kept) [&3.wire src.bowl] *[* @da]))
+        ==
     ?.  ?=(%noun p.cage.sign)  `this
     =.  kept  (~(put by kept) [&3.wire src.bowl] !<(noun q.cage.sign) now.bowl)
     :_  this
