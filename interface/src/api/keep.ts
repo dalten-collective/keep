@@ -5,6 +5,8 @@ import {
   ManyRequest,
   UnsetManyRequest,
   RestoreRequest,
+  LocalBackupRequest,
+  LocalManyRequest,
 } from "@/types";
 
 export function siggedShip(ship) {
@@ -149,6 +151,24 @@ export function scry(scry: Scry) {
     });
 }
 
+export function localBackup(payload: LocalBackupRequest): Promise<any> {
+  return urbitAPI
+    .poke({
+      app: payload.agentName,
+      mark: "keep",
+      json: { once: null },
+    })
+    .then((r) => {
+      console.log("res ", r);
+      return r;
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      throw e.response;
+    });
+}
+
 export function testOnce(payload: OnceRequest): Promise<any> {
   // gets data: { pending: { status: "invite", ship: "sum" } }
   return urbitAPI
@@ -165,6 +185,29 @@ export function testOnce(payload: OnceRequest): Promise<any> {
       // TODO: 'e' is undefined
       console.log("err ", e);
       throw e.response;
+    });
+}
+
+export function localMany(payload: LocalManyRequest) {
+  return urbitAPI
+    .poke({
+      app: payload.agentName,
+      mark: "keep",
+      json: {
+        many: {
+          to: null,
+          freq: payload.freq,
+        },
+      },
+    })
+    .then((r) => {
+      console.log("res ", r);
+      return r
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      return e
     });
 }
 

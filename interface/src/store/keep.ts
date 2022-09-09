@@ -26,6 +26,8 @@ import {
   LogMessage,
   SavedDiff,
   WhitelistSettings,
+  LocalBackupRequest,
+  LocalManyRequest,
 } from "@/types";
 import {siggedShip} from "@/api/keep";
 
@@ -404,8 +406,14 @@ export default {
           agent: payload.agentName,
         });
 
+        let targetShip;
+        if (ship) {
+          targetShip = ship
+        } else {
+          targetShip = 'local disk'
+        }
         const logMsg: LogMessage = {
-          msg: `Backed up %${payload.agentName} to ${ship} at ${time}`,
+          msg: `Backed up %${payload.agentName} to ${targetShip} at ${time}`,
           time,
           type: "succ",
         };
@@ -441,8 +449,14 @@ export default {
 
           dispatch("addAuto", { dif: d, agent: payload.agentName });
 
+          let targetShip;
+          if (ship) {
+            targetShip = ship
+          } else {
+            targetShip = 'local disk'
+          }
           const logMsg: LogMessage = {
-            msg: `Recurring backups for %${payload.agentName} to ${ship} activated every ${freq} seconds`,
+            msg: `Recurring backups for %${payload.agentName} to ${targetShip} activated every ${freq} seconds`,
             time,
             type: "info",
           };
@@ -454,8 +468,14 @@ export default {
 
           dispatch("removeAuto", { dif: d, agent: payload.agentName });
 
+          let targetShip;
+          if (ship) {
+            targetShip = ship
+          } else {
+            targetShip = 'local disk'
+          }
           const logMsg: LogMessage = {
-            msg: `Recurring backups for %${payload.agentName} to ${ship} stopped`,
+            msg: `Recurring backups for %${payload.agentName} to ${targetShip} stopped`,
             time,
             type: "info",
           };
@@ -505,6 +525,28 @@ export default {
     testOnce({}, payload: OnceRequest) {
       return keepApi
         .testOnce(payload)
+        .then((r) => {
+          return r;
+        })
+        .catch((e) => {
+          throw e.response;
+        });
+    },
+
+    backupLocal({}, payload: LocalBackupRequest) {
+      return keepApi
+        .localBackup(payload)
+        .then((r) => {
+          return r;
+        })
+        .catch((e) => {
+          throw e.response;
+        });
+    },
+
+    localMany({}, payload: LocalManyRequest) {
+      return keepApi
+        .localMany(payload)
         .then((r) => {
           return r;
         })

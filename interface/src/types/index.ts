@@ -130,6 +130,15 @@ export interface OnceRequest {
   agentName: string;
 }
 
+export interface LocalBackupRequest {
+  agentName: string;
+}
+
+export interface LocalManyRequest {
+  agentName: string;
+  freq: number;
+}
+
 export interface ManyRequest {
   ship: Ship;
   agentName: string;

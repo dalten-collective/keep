@@ -13,6 +13,10 @@ const app = createApp(App);
 app.config.globalProperties.ourShip = window.ship;
 app.config.globalProperties.$filters = {
   sigShip(ship) {
+    if (ship === null) {
+      return null
+    }
+
     if (ship[0] === "~") {
       return ship;
     }

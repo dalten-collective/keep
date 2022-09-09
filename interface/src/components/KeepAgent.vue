@@ -1,6 +1,6 @@
 <template>
   <div>
-    <header class="tw-mb-4">
+    <header class="tw-mb-4 tw-flex tw-justify-between">
       <h3 class="tw-text-2xl">%{{ agentName }}</h3>
       <!-- DEBUG TODO: <v-btn @click="deactivateAgent">Deactivate</v-btn> -->
     </header>
@@ -13,10 +13,60 @@
 
     <section v-else class="tw-flex tw-flex-col">
       <article>
-        <h4 class="tw-text-lg tw-mb-4">Live backup targets</h4>
 
-        <article v-if="backupsByShip.length == 0">
-          No backup targets configured
+        <article
+          class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
+        >
+          <div class="tw-flex-grow">
+            <v-tooltip location="top" v-if="diskBackup.auto.length > 0">
+              <template v-slot:activator="{ props }">
+                <v-chip
+                  v-bind="props"
+                  variant="outlined"
+                  label
+                  color="info"
+                  class="mr-2"
+                >
+                  <span class="mr-2 tw-font-mono">Local Disk</span>
+                  <v-icon color="info"> mdi-cached </v-icon>
+                </v-chip>
+              </template>
+              <span>Recurring backups enabled</span>
+            </v-tooltip>
+            <v-chip
+              v-else
+              v-bind="props"
+              variant="outlined"
+              label
+              color="info"
+              class="mr-2"
+            >
+              <span class="mr-2 tw-font-mono">Local Disk</span>
+            </v-chip>
+          </div>
+
+          <div class="tw-flex tw-flex-row tw-justify-end tw-flex-grow">
+            <div class="tw-mr-2">
+              <BackupButton
+                :ship="null"
+                :agent-name="agentName"
+                :status="diskBackup"
+              />
+            </div>
+            <RestoreButton
+              :ship="null"
+              :status="diskBackup"
+              :agent-name="agentName"
+            />
+          </div>
+        </article>
+
+        <h4 class="tw-text-xl tw-mb-4">Live backup targets</h4>
+
+        <article class="tw-mt-6" v-if="backupsByShip.length == 0">
+          <h3 class="tw-text-lg">
+            No on-network backup targets configured
+          </h3>
         </article>
 
         <article
@@ -74,12 +124,20 @@
         </article>
       </article>
 
+      <footer
+        class="tw-flex tw-flex-col tw-justify-end tw-text-right tw-align-middle md:tw-mb-0"
+      >
+        <div>
+          <AddBackupTargetButton :agent-name="agentName" />
+        </div>
+      </footer>
+
       <article v-if="pending.length > 0">
         <h4 class="my-2 tw-text-lg">Outstanding Invites</h4>
         <p class="my-2 tw-text-sm">
           You've initiated a backup to these ships, but they haven't yet
-          responded. Either they don't have %keep installed or they haven't
-          accepted your request yet.
+          responded. Either they don't have %keep installed or they
+          haven't accepted your request yet.
         </p>
         <ul class="my-2 tw-list-disc">
           <li v-for="p in pending" :key="p.ship" class="tw-ml-4">
@@ -90,14 +148,6 @@
           </li>
         </ul>
       </article>
-
-      <footer
-        class="tw-flex tw-flex-col tw-justify-end tw-text-right tw-align-middle md:tw-mb-0"
-      >
-        <div>
-          <AddBackupTargetButton :agent-name="agentName" />
-        </div>
-      </footer>
     </section>
   </div>
 </template>
@@ -151,6 +201,15 @@ export default defineComponent({
       }
       return !!this.ourStatus.live;
     },
+    diskBackup() {
+      const status = {
+        auto: this.ourStatus.auto.filter((s) => s.ship === null),
+        saved: this.ourStatus.saved.filter((s) => s.ship === null),
+        pending: this.ourStatus.pending.filter((s) => s.ship === null).map((s) => s),
+      };
+
+      return status;
+    },
     backupsByShip() {
       const shipList = new Set();
       // TODO: test structure:
@@ -166,10 +225,22 @@ export default defineComponent({
       // };
 
       this.ourStatus.saved.forEach((s) => {
-        shipList.add(s.ship);
+        let ship;
+        if (s.ship) {
+          ship = s.ship;
+        } else {
+          ship = this.ourShip;
+        }
+        shipList.add(ship);
       });
       this.ourStatus.auto.forEach((s) => {
-        shipList.add(s.ship);
+        let ship;
+        if (s.ship) {
+          ship = s.ship;
+        } else {
+          ship = this.ourShip;
+        }
+        shipList.add(ship);
       });
       const status = [];
 
@@ -223,12 +294,11 @@ export default defineComponent({
     },
   },
   methods: {
-    doOnce() {
-      const request: OnceRequest = {
-        agentName: "keep", // TODO: why this?
-        ship: this.newTarget,
+    doLocalBackup() {
+      const request: LocalBackupRequest = {
+        agentName: this.agentName,
       };
-      this.$store.dispatch("keep/testOnce", request);
+      this.$store.dispatch("keep/backupLocal", request);
     },
 
     activateAgent() {

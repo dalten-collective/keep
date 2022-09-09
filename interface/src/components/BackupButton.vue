@@ -10,7 +10,7 @@
     <v-card class="tw-w-96 tw-border-4 tw-border-primary tw-bg-white tw-p-4">
       <v-card-title>
         <div class="tw-flex tw-flex-row tw-justify-between">
-          <h2 class="tw-text-2xl">Backup</h2>
+          <h2 class="tw-text-2xl">Backup <span v-if="!ship">to disk</span></h2>
           <div>
             <span
               @click="backupOpen = !backupOpen"
@@ -24,9 +24,12 @@
       <v-card-text>
         <div class="tw-mt-2">
           <section class="tw-my-2 tw-mb-4 tw-text-sm">
-            <p class="tw-mb-2">
+            <p v-if="ship" class="tw-mb-2">
               Settings for %{{ agentName }}'s backups with
-              <span class="tw-font-mono">{{ $filters.sigShip(ship) }}</span>
+              <span v-if="ship" class="tw-font-mono">{{ $filters.sigShip(ship) }}</span>
+            </p>
+            <p v-else class="tw-mb-2">
+              Settings for %{{ agentName }}'s backups to local disk
             </p>
 
             <section v-if="isRecurringBackup || haveSaved" class="tw-my-2">
@@ -39,7 +42,8 @@
                     size="small"
                     >Last backup</v-chip
                   >
-                  <div class="keep-info-data">
+                  <!-- not sure why this guard is needed: -->
+                  <div class="keep-info-data" v-if="status.saved && status.saved[0]">
                     {{
                       $filters.sectToDate(status.saved[0].time).toLocaleString()
                     }}
@@ -69,7 +73,7 @@
             class="tw-mb-2 tw-bg-surface tw-rounded-keep tw-shadow-inner tw-p-4"
           >
             <h4 class="tw-text-lg tw-mb-2">One-time backup</h4>
-            <div class="tw-flex tw-flex-row">
+            <div v-if="ship" class="tw-flex tw-flex-row">
               <div class="mr-4">
                 <v-btn
                   color="success"
@@ -93,6 +97,28 @@
                 </p>
               </div>
             </div>
+            <div v-else class="tw-mt-2 tw-flex tw-flex-row">
+              <div class="mr-4">
+                <v-btn
+                  color="success"
+                  text="white"
+                  :loading="backupPending || autoSetPending"
+                  :disabled="backupPending || autoSetPending"
+                  @click="doLocalBackup"
+                >
+                  Backup to Disk
+                </v-btn>
+              </div>
+              <div class="tw-mb-2">
+                <p>
+                  Backup %{{ agentName }} to local disk one time, now.
+                </p>
+                <p v-if="isRecurringBackup">
+                  Since you already have recurring backups enabled, this will
+                  also re-start the frequency timer from right now.
+                </p>
+              </div>
+            </div>
 
             <hr class="tw-my-4" />
 
@@ -102,46 +128,92 @@
               v-model="recurringValid"
               class="tw-flex tw-flex-col"
             >
-              <div class="tw-my-2 tw-flex tw-flex-row">
-                <template v-if="isRecurringBackup">
-                  Currently backing up {{ autoBackupPrint }}.
-                </template>
-                <template v-else> Not backing up on a schedule yet. </template>
-              </div>
-              <div class="tw-flex tw-flex-row">
-                <div class="mr-4">
-                  <v-btn
-                    color="success"
-                    text="white"
-                    :loading="backupPending || autoSetPending"
-                    @click="testMany"
-                    :disabled="
-                      backupPending || autoSetPending || !recurringValid
-                    "
+              <div v-if="ship">
+                <div class="tw-my-2 tw-flex tw-flex-row">
+                  <template v-if="isRecurringBackup">
+                    Currently backing up {{ autoBackupPrint }}.
+                  </template>
+                  <template v-else> Not backing up on a schedule yet. </template>
+                </div>
+                <div class="tw-flex tw-flex-row">
+                  <div class="mr-4">
+                    <v-btn
+                      color="success"
+                      text="white"
+                      :loading="backupPending || autoSetPending"
+                      @click="testMany"
+                      :disabled="
+                        backupPending || autoSetPending || !recurringValid
+                      "
+                    >
+                      <template v-if="isRecurringBackup">
+                        Change Frequency
+                      </template>
+                      <template v-else> Set Recurring backup </template>
+                    </v-btn>
+                  </div>
+                  <div class="tw-flex-grow">
+                    <v-text-field
+                      label="Frequency (seconds)"
+                      v-model="freq"
+                      :rules="[
+                        (v) => !!v || 'Required',
+                        (v) => v >= 120 || 'Must be at least 120',
+                      ]"
+                    />
+                  </div>
+                  <div class="tw-flex-grow"></div>
+                </div>
+
+                <div v-if="isRecurringBackup">
+                  <v-btn color="success" @click="unsetMany"
+                    >Stop recurring backups</v-btn
                   >
-                    <template v-if="isRecurringBackup">
-                      Change Frequency
-                    </template>
-                    <template v-else> Set Recurring backup </template>
-                  </v-btn>
                 </div>
-                <div class="tw-flex-grow">
-                  <v-text-field
-                    label="Frequency (seconds)"
-                    v-model="freq"
-                    :rules="[
-                      (v) => !!v || 'Required',
-                      (v) => v > 120 || 'Must be greater than 120',
-                    ]"
-                  />
-                </div>
-                <div class="tw-flex-grow"></div>
               </div>
 
-              <div v-if="isRecurringBackup">
-                <v-btn color="success" @click="unsetMany"
-                  >Stop recurring backups</v-btn
-                >
+              <div v-else>
+                <div class="tw-my-2 tw-flex tw-flex-row">
+                  <template v-if="isRecurringBackup">
+                    Currently backing up {{ autoBackupPrint }}.
+                  </template>
+                  <template v-else> Not backing up to disk on a schedule yet. </template>
+                </div>
+                <div class="tw-flex tw-flex-row">
+                  <div class="mr-4">
+                    <v-btn
+                      color="success"
+                      text="white"
+                      :loading="backupPending || autoSetPending"
+                      @click="doLocalBackupMany"
+                      :disabled="
+                        backupPending || autoSetPending || !recurringValid
+                      "
+                    >
+                      <template v-if="isRecurringBackup">
+                        Change Frequency
+                      </template>
+                      <template v-else> Set Recurring disk backup</template>
+                    </v-btn>
+                  </div>
+                  <div class="tw-flex-grow">
+                    <v-text-field
+                      label="Frequency (seconds)"
+                      v-model="freq"
+                      :rules="[
+                        (v) => !!v || 'Required',
+                        (v) => v >= 120 || 'Must be at least 120',
+                      ]"
+                    />
+                  </div>
+                  <div class="tw-flex-grow"></div>
+                </div>
+
+                <div v-if="isRecurringBackup">
+                  <v-btn color="success" @click="unsetLocalMany"
+                    >Stop recurring backups</v-btn
+                  >
+                </div>
               </div>
             </v-form>
 
@@ -199,7 +271,9 @@ import {
   RestoreRequest,
   KeepAgentSubscriptionStatus,
   PendingStatus,
+  LocalManyRequest,
   SavedStatus,
+  LocalBackupRequest,
   Ship,
 } from "../types";
 
@@ -211,7 +285,7 @@ interface TargetStatus {
 export default defineComponent({
   props: {
     ship: {
-      type: String as PropType<Ship>,
+      type: String as PropType<Ship> | null,
       default: "",
     },
     agentName: {
@@ -299,6 +373,40 @@ export default defineComponent({
       this.$refs.recurringForm.validate();
     },
 
+    doLocalBackup() {
+      const request: LocalBackupRequest = {
+        agentName: this.agentName
+      };
+      this.$store.dispatch("keep/backupLocal", request)
+        .then((r) => {})
+        .finally(() => {
+          this.backupPending = false;
+          this.showDone = true;
+        });
+    },
+
+    doLocalBackupMany() {
+      this.validateRecurring();
+      if (!this.recurringValid) {
+        return;
+      }
+      this.autoSetPending = true;
+      this.showDone = false;
+      this.showAutoSetDone = false;
+
+      const request: LocalManyRequest = {
+        agentName: this.agentName,
+        freq: parseInt(this.freq),
+      };
+      this.$store
+        .dispatch("keep/localMany", request)
+        .then((r) => {})
+        .finally(() => {
+          this.autoSetPending = false;
+          this.showAutoSetDone = true;
+        });
+    },
+
     openBackup() {
       this.backupOpen = true;
     },
@@ -362,6 +470,25 @@ export default defineComponent({
         .finally(() => {
           this.autoOffPending = false;
           this.showAutoOffDone = true;
+        });
+    },
+
+    unsetLocalMany() {
+      this.autoOffPending = true;
+      this.showDone = false;
+      this.showAutoSetDone = false;
+      this.showAutoOffDone = false;
+
+      const request: LocalManyRequest = {
+        agentName: this.agentName,
+        freq: null,
+      };
+      this.$store
+        .dispatch("keep/localMany", request)
+        .then((r) => {})
+        .finally(() => {
+          this.autoSetPending = false;
+          this.showAutoSetDone = true;
         });
     },
 

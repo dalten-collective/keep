@@ -25,7 +25,7 @@
         <div class="tw-mt-2">
           <div class="tw-mb-2">
             <span class="tw-font-bold"
-              >Begin sending backups to another ship.</span
+              >Begin sending backups to another ship (or your own).</span
             >
           </div>
 
