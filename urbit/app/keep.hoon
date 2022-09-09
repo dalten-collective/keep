@@ -122,6 +122,7 @@
   |=  [event=@t diff=json]
   ^-  card
   %-  fact:agentio  :_  ~[/website]
+  :-  %json  !>
   =,  enjs:format
   %-  pairs
   :~  [%type s+event]
