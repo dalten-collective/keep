@@ -15,29 +15,30 @@ All actions are initiated by poking keep-enriched agents (i.e. **not** the `%kee
 All keep-enriched agents can be poked with the mark `%keep` and support the following pokes:
 
 ```hoon
-[%once to=ship]                 :: Backup
-[%many to=ship freq=(unit @dr)] :: Repeat backup
-[%mend from=(each path ship)]   :: Initiate recovery
-[%live live=?]                  :: (De)activate. Deact before uninstall!
+[%once to=(unit ship)]                 :: Backup
+[%many to=(unit ship) freq=(unit @dr)] :: Repeat backup
+[%mend from=ship]                      :: Initiate recovery
+[%live live=?]                         :: (De)activate. Deact before uninstall!
 ```
 
 These can also come in the form of JSON:
 
 ```json
 {"once": "~sampel-palnet"}
+{"once": null}
 {"many": {"to": "~sampel", "freq": 500}}
 {"many": {"to": "~palnet", "freq": null}}
-{"mend": {"ship": "~sampel-palnet"}}
-{"mend": {"path": "/path/to/jam"}}
+{"many": {"to": null, "freq": 500}}
+{"mend": "~sampel-palnet"}
 {"live": true}
 {"live": false}
 ```
 
 - `%once`
   Trigger a single backup to the specified ship.
-  If repeating backups are set for this ship, this resets the timer. If the ship is our own, the backup will be written to the directory `pier/.urb/put`.
+  If repeating backups are set for this ship, this resets the timer. If the ship is null, the backup will be written to the directory `pier/.urb/put/keep/[agent-name]`.
 - `%many`
-  Set or unset repeating backups to the specified ship.
+  Set or unset repeating backups to the specified ship (or to the `put` directory).
 
   The frequency is either null for unsetting, or the desired frequency in seconds for setting.
 
@@ -45,13 +46,17 @@ These can also come in the form of JSON:
 
   If setting repeating backups and this agent **has** been backed up to the specified ship at time `t`, this will trigger a backup immediately or at time `t+freq`, whichever comes last.
 - `%mend`
-  Load a backup from the specified ship or a path in Clay.
+  Load a backup from the specified ship.
 - `%live`
   Activate/deactivate the keep wrapper. Always initialized to false/deactivated.
 
   This *needs* to be set to false before the wrapper is removed from the source code of any keep-enriched agent. Otherwise the previously enriched agent will most likely crash, or worse exhibit unexpected behaviour, possibly corrupting its own state.
 
   When the wrapper is deactivated, the only available poke is to activate it again. However, subscribers will not be kicked, and new subscriptions will still be accepted.
+
+## Browser upload
+
+Whenever a wrapper has been activated with `%live`, it will serve a web page on `/apps/keep/[agent-name]/upload` through which it is possible to upload files which were backed up to the `put` directory.
 
 ## Subscriptions
 
@@ -140,7 +145,7 @@ A few examples:
 ```json
 {
   "type": "saved",
-  "diff": {"ship": "~sampel-palnet", "time": 555},
+  "diff": {"ship": null, "time": 555},
   "state": <...>
 }
 ```

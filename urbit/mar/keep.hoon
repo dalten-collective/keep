@@ -16,10 +16,11 @@
     =,  dejs:format
     %-  of
     :~
-      [%once (se %p)]
-      [%many (ot ~[['to' (se %p)] ['freq' (cu (lift (cury mul ~s1)) (mu ni))]])]
-      [%mend (cu |=(^ [=(%path +<-) +<+]) (of ~[ship+(se %p) path+pa]))]
+      [%once (mu (se %p))]
+      [%mend (se %p)]
       [%live bo]
+      :-  %many
+      (ot ~[[%to (mu (se %p))] [%freq (cu (lift (cury mul ~s1)) (mu ni))]])
     ==
   --
 --

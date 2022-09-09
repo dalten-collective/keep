@@ -12,13 +12,13 @@
         [%able (each ship ship)]
         [%wyte on=?]
     ==
-  ::                                    :: To the wrapper.
-  +$  wrapper                           ::
-    $%  [%once to=ship]                 :: Backup
-        [%many to=ship freq=(unit @dr)] :: Repeat backup
-        [%mend from=(each path ship)]   :: Initiate recovery
-        [%data data=noun key=term]      :: Old state and secret (internal only)
-        [%live live=?]                  :: (De)activate. Deact before uninstall!
+  ::                                           :: To the wrapper.
+  +$  wrapper                                  ::
+    $%  [%once to=(unit ship)]                 :: Backup to a ship or the put dir
+        [%many to=(unit ship) freq=(unit @dr)] :: Repeat backup
+        [%mend from=ship]                      :: Initiate recovery
+        [%data data=noun key=term]             :: Old state and secret (internal only)
+        [%live live=?]                         :: (De)activate. Deact before uninstall!
     ==
   --
 --
