@@ -5,6 +5,7 @@ import {
   SavedStatus,
   AutoStatus,
   RestoredStatus,
+  Ship,
   InviteStatus,
   AutoOnDiff,
   BackupDiff,
@@ -24,7 +25,9 @@ import {
   EventType,
   LogMessage,
   SavedDiff,
+  WhitelistSettings,
 } from "@/types";
+import {siggedShip} from "@/api/keep";
 
 export default {
   namespaced: true,
@@ -33,7 +36,8 @@ export default {
       agents: [] as Array<string>,
       wrappedAgents: [] as Array<KeepAgentStatus>,
       backups: [] as Array<Backup>,
-      pending: [] as Array,
+      pending: [] as Array, // TODO:
+      whitelist: {} as WhitelistSettings
     };
   },
 
@@ -65,6 +69,25 @@ export default {
   },
 
   mutations: {
+    localOnWyte(state) {
+      state.whitelist.on = true;
+    },
+    localOffWyte(state) {
+      state.whitelist.on = false;
+    },
+
+    addToWyte(state, ship) {
+      const list = new Set(state.whitelist.in)
+      list.add(ship)
+      state.whitelist.in = Array.from(list)
+      // state.whitelist.in.push(ship);
+    },
+    removeFromWyte(state, ship) {
+      state.whitelist.in = state.whitelist.in.filter((s) => {
+        return siggedShip(s) !== siggedShip(ship)
+      });
+    },
+
     setAgents(state, agents: Array<string>) {
       console.log("setting agents ", agents);
       state.agents = agents;
@@ -106,6 +129,9 @@ export default {
 
     setBackups(state, backups: Array<Backup>) {
       state.backups = backups;
+    },
+    setWhitelist(state, whitelist: WhitelistSettings) {
+      state.whitelist = whitelist;
     },
 
     updateBackup(state, payload: { dif: BackupDiff; agent: string }) {
@@ -203,6 +229,52 @@ export default {
       keepApi.scry(scry);
     },
 
+    wyteOn({ commit }) {
+      return keepApi
+        .wyteOn()
+        .then((r) => {
+          commit("localOnWyte")
+          return r;
+        })
+        .catch((e) => {
+          throw e.response;
+        });
+    },
+    wyteOff({ commit }) {
+      return keepApi
+        .wyteOff()
+        .then((r) => {
+          commit("localOffWyte")
+          return r;
+        })
+        .catch((e) => {
+          throw e.response;
+        });
+    },
+    wyteDisallow({ commit }, ship: Ship) {
+      return keepApi
+        .wyteDisable(ship)
+        .then((r) => {
+          commit('removeFromWyte', ship)
+          return r;
+        })
+        .catch((e) => {
+          throw e
+        });
+    },
+    wyteAllow({ commit }, ship: Ship) {
+      return keepApi
+        .wyteAble(ship)
+        .then((r) => {
+          commit('addToWyte', ship)
+          return r;
+        })
+        .catch((e) => {
+          throw e
+        });
+      // add to whitelist.in
+    },
+
     setAgents({ commit, dispatch }, agents: Array<string>) {
       console.log("setting agents");
       commit("setAgents", agents);
@@ -224,6 +296,7 @@ export default {
     ) {
       console.log("keep response state: ", responseState);
       commit("setBackups", responseState.backups);
+      commit("setWhitelist", responseState.whitelist);
     },
 
     // TODO
@@ -246,6 +319,8 @@ export default {
         diff: Diff;
       }
     ) {
+      // TODO: whitelist updates
+
       if (payload.responseType === EventType.Backup) {
         const d = payload.diff as BackupDiff;
         const time = d.time;

@@ -22,6 +22,11 @@ export interface Backup {
   time: number;
 }
 
+export interface WhitelistSettings {
+  on: boolean;
+  in: Array<Ship>;
+}
+
 export interface RestoreDiff {
   ship: Ship;
   time: number;
@@ -79,6 +84,7 @@ export interface KeepAgentSubscriptionResponse {
 export interface KeepSubscriptionState {
   agents: Array<Ship>;
   backups: Array<Backup>;
+  whitelist: WhitelistSettings;
 }
 
 export interface PendingStatus {

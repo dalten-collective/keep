@@ -121,21 +121,20 @@
 ++  website-card
   |=  [event=@t diff=json]
   ^-  card
-  %+  (fact-curry:agentio %json json)  ~[/website]
   =,  enjs:format
-  %-  pairs
-  :~  [%type s+event]
-      [%diff diff]
-      :-  %state
-      %-  pairs
-      :~  ['agents' a/(turn ~(tap in live) (lead %s))]
-      ::
-          :-  'backups'
-          a/(turn ~(tap by kept) |=([to=[@ @p] [* =@da]] (json-backup da to)))
-      ::
-          :-  'whitelist'
-          (pairs ~[['on' b/-.able] ['in' a/(turn ~(tap in p.able) ship)]])
-  ==  ==
+    :*  %give  %fact  ~[/website]  %json
+      !>  %-  pairs
+      :~  [%type s+event]
+          [%diff diff]
+          :-  %state
+          %-  pairs
+          :~
+            ['agents' a+(turn ~(tap in live) (lead %s))]
+            :-  'backups'
+            a+(turn ~(tap by kept) |=([to=[@ @p] [* =@da]] (json-backup da to)))
+            :-  'whitelist'
+            (pairs ~[['on' b/-.able] ['in' a/(turn ~(tap in p.able) ship)]])
+  ==  ==  ==
 ::
 ++  json-backup
   |=  [=@da =dude =@p]
