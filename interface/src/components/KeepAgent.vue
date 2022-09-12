@@ -13,7 +13,6 @@
 
     <section v-else class="tw-flex tw-flex-col">
       <article>
-
         <article
           class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
         >
@@ -53,11 +52,10 @@
                 :status="diskBackup"
               />
             </div>
-            <RestoreButton
-              :ship="null"
-              :status="diskBackup"
-              :agent-name="agentName"
-            />
+            <v-btn @click="redirectToUpload" color="success">
+              <v-icon start>mdi-content-duplicate</v-icon>
+              restore
+            </v-btn>
           </div>
         </article>
 
@@ -155,12 +153,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
-import {
-  OnceRequest,
-  ManyRequest,
-  UnsetManyRequest,
-  RestoreRequest,
-} from "../types";
+import { LocalBackupRequest, RestoreRequest } from "../types";
 
 import BackupButton from "@/components/BackupButton.vue";
 import RestoreButton from "@/components/RestoreButton.vue";
@@ -205,7 +198,9 @@ export default defineComponent({
       const status = {
         auto: this.ourStatus.auto.filter((s) => s.ship === null),
         saved: this.ourStatus.saved.filter((s) => s.ship === null),
-        pending: this.ourStatus.pending.filter((s) => s.ship === null).map((s) => s),
+        pending: this.ourStatus.pending
+          .filter((s) => s.ship === null)
+          .map((s) => s),
       };
 
       return status;
@@ -294,6 +289,15 @@ export default defineComponent({
     },
   },
   methods: {
+    redirectToUpload() {
+      const locationString = window.location.toString();
+      const baseURL = locationString.endsWith("/")
+        ? locationString.slice(0, -1)
+        : locationString;
+      const redirectLocation = `${baseURL}/${this.agentName}/upload`;
+      window.open(redirectLocation, "_blank");
+    },
+
     doLocalBackup() {
       const request: LocalBackupRequest = {
         agentName: this.agentName,

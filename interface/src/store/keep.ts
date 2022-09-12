@@ -429,8 +429,15 @@ export default {
 
         // TODO: also remove from pending.
 
+        let targetShip;
+        if (ship) {
+          targetShip = ship
+        } else {
+          targetShip = 'local disk'
+        }
+
         const logMsg: LogMessage = {
-          msg: `Restored %${payload.agentName} from ${ship} at ${time}`,
+          msg: `Restored %${payload.agentName} from ${targetShip} at ${time}`,
           time,
           type: "succ",
         };
