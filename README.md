@@ -63,14 +63,14 @@ In the meantime, these are the changes that the temporary whitelist makes to Kee
 ### Pokes
 
 
-```
+```hoon
 [%able (each ship ship)]  ::  Add or remove ship from whitelist
 [%wyte on=?]              ::  Enable or disable the whitelist
 ```
 
 Or, in JSON:
 
-```
+```json
 {"able": {"able": true, "ship": "~sampel-palnet"}}
 {"wyte": true}
 ```
@@ -83,7 +83,7 @@ The whitelist is initialized to be on and empty.
 
 Upon initial subscription to the /website path, the %keep agent will give you one additional entry in the JSON object it sends you, namely:
 
-```
+```json
 "whitelist": {
   "on": true,
   "in": ["~zod", "~sampel", "~palnet"]
