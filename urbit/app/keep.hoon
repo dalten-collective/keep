@@ -123,11 +123,11 @@
       [%backups term term ~]
     ~|  %not-whitelisted
     ?>  whitelisted
-    ?.  ?=(%fact -.sign)  (on-agent:def wire sign)
+    ?.  ?=(%fact -.sign)       (on-agent:def wire sign)
+    ?.  ?=(%noun p.cage.sign)  (on-agent:def wire sign)
     ~&  >  :*  %store-backup  of=,.&3.wire  from=src.bowl
            since-last=`@dr`(sub now.bowl +:(~(gut by kept) [&3.wire src.bowl] *[* @da]))
         ==
-    ?.  ?=(%noun p.cage.sign)  `this
     =.  kept  (~(put by kept) [&3.wire src.bowl] !<(noun q.cage.sign) now.bowl)
     :_  this
     ~[(website-card 'backup' (json-backup now.bowl &3.wire src.bowl))]
