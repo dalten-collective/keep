@@ -104,18 +104,12 @@
     =/  keep-now  /(scot %p src.bowl)/keep/(scot %da now.bowl)
     %-  ~(arvo pass:io /copy/[to.cmd])
     :*  %c  %info  to.cmd  %&
-        %+  weld
-          %+  turn
-            ~[/lib/skeleton/hoon /lib/default-agent/hoon] ::TODO add agentio
-          |=  =path
-          :*  keep/path  %ins  %txt  !>  :_  ~
-              .^(@t cx/(weld base-now path))
-          ==
+        :-  =/  =path  /lib/skeleton/hoon  ::  Dependency management lol
+            [keep/path %ins txt+!>(~[.^(@t cx/(weld base-now path))])]
         %+  turn  .^((list path) ct/(weld keep-now /keep))
         |=  =path
-        :*  path  %ins  %txt  !>  :_  ~
-            .^(@t cx/(weld keep-now path))
-    ==  ==
+        [path %ins txt+!>(~[.^(@t cx/(weld keep-now path))])]
+    ==
   ==
 ::
 ++  on-agent

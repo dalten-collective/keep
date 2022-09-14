@@ -1,11 +1,13 @@
 ::  keep: agent wrapper for backups
 ::
-::  usage: %-(agent:keep your-agent)
+::  usage:
+::  /=  keep  /keep/lib
+::  ...
+::  %-(agent:keep your-agent)
 ::
-::  /-  *keep
-::  /+  default-agent, *sane, agentio, multipart
+::
 /=  default-agent  /keep/lib/default-agent
-/=  agentio        /keep/lib/agentio  ::TODO Change this to /+
+/=  agentio        /keep/lib/agentio
 /=  multipart      /keep/lib/multipart
 /=  sane           /keep/lib/sane
 /=  keep-sur       /keep/sur/keep
