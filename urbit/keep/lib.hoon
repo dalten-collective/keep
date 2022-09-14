@@ -11,7 +11,8 @@
 /=  multipart      /keep/lib/multipart
 /=  sane           /keep/lib/sane
 /=  keep-sur       /keep/sur/keep
-=>  [,.keep-sur ,.sane +>..]  ::  Remove faces
+=,  sane
+=,  keep-sur
 ::
 |%
 ::  This is the meat of the logic. The rest is bookkeeping and logistics.

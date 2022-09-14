@@ -5,7 +5,8 @@
 /=  agentio   /keep/lib/agentio
 /=  sane      /keep/lib/sane
 /=  keep-sur  /keep/sur/keep
-=>  [,.keep-sur ,.sane +>..]  ::  Remove faces
+=,  keep-sur
+=,  sane
 ::
 =>
   |%
@@ -106,7 +107,7 @@
     :*  %c  %info  to.cmd  %&
         :-  =/  =path  /lib/skeleton/hoon  ::  Dependency management lol
             [keep/path %ins txt+!>(~[.^(@t cx/(weld base-now path))])]
-        %+  turn  .^((list path) ct/(weld keep-now /keep))
+        %+  turn  `duct`[/mar/keep/hoon .^((list path) ct/(weld keep-now /keep))]
         |=  =path
         [path %ins txt+!>(~[.^(@t cx/(weld keep-now path))])]
     ==

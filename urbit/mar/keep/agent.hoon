@@ -1,7 +1,9 @@
 ::
 ::  keep agent pokes
 ::
-/-  *keep
+/=  sur  /keep/sur/keep
+=>  [,.sur +..]
+::
 |_  =agent:poke
 ++  grad  %noun
 ++  grow
