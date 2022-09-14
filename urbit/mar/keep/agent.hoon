@@ -2,7 +2,7 @@
 ::  keep agent pokes
 ::
 /=  sur  /keep/sur/keep
-=>  [,.sur +..]
+=,  sur
 ::
 |_  =agent:poke
 ++  grad  %noun
