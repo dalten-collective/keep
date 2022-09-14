@@ -1,20 +1,26 @@
 ::  keep: backup manager
 ::
-/-  *keep
-/+  default-agent, dbug, *sane, agentio
+/+  dbug
+/=  default-agent  /keep/lib/default-agent
+/=  agentio   /keep/lib/agentio
+/=  sane      /keep/lib/sane
+/=  keep-sur  /keep/sur/keep
+=>  [,.keep-sur ,.sane +>..]  ::  Remove faces
 ::
-|%
-+$  versioned-state
-  $%  state-0
-  ==
-::
-+$  state-0
-  $:  %0
-      kept=(map [dude ship] [data=noun time=@da])
-      live=(set dude)
-      able=(each (set ship) (set ship))
-  ==
---
+=>
+  |%
+  +$  versioned-state
+    $%  state-0
+    ==
+  ::
+  +$  state-0
+    $:  %0
+        kept=(map [dude ship] [data=noun time=@da])
+        live=(set dude)
+        able=(each (set ship) (set ship))
+        into=(set desk)
+    ==
+  --
 ::
 %-  agent:dbug
 =|  state-0
@@ -33,7 +39,11 @@
 ++  on-load
   |=  old=vase
   ^-  (quip card _this)
-  `this(state !<(state-0 old))
+  =.  state  !<(state-0 old)
+  :_  this
+  %+  turn  ~(tap in into)
+  |=  =desk
+  (~(poke-self pass:io /trigger/[desk]) keep-agent/!>(`agent:poke`copy/desk))
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -61,7 +71,7 @@
     ~|  [%has-no dap.cmd from=src.bowl]
     %+  ~(poke pass:io /recoveries/(scot %p src.bowl)/[dap.cmd])
       [src.bowl dap.cmd]
-    keep+!>([%data data:(~(got by kept) [dap.cmd src.bowl]) key.cmd])
+    keep+!>(`wrap:poke`[%data data:(~(got by kept) [dap.cmd src.bowl]) key.cmd])
   ::
   ::  "I exist," said a wrapper on our own ship.
       %tell
@@ -84,17 +94,41 @@
     ?>  =(src.bowl our.bowl)
     =*  res  `this(able [on.cmd p.able])
     ?:(on.cmd res res)
+  ::
+  ::  "Copy the wrapper to a desk," said our operator.
+      %copy
+    ?>  =(src.bowl our.bowl)
+    :_  this(into (~(put in into) to.cmd))
+    :_  ~
+    =/  base-now  /(scot %p src.bowl)/base/(scot %da now.bowl)
+    =/  keep-now  /(scot %p src.bowl)/keep/(scot %da now.bowl)
+    %-  ~(arvo pass:io /copy/[to.cmd])
+    :*  %c  %info  to.cmd  %&
+        %+  weld
+          %+  turn
+            ~[/lib/skeleton/hoon /lib/default-agent/hoon] ::TODO add agentio
+          |=  =path
+          :*  keep/path  %ins  %txt  !>  :_  ~
+              .^(@t cx/(weld base-now path))
+          ==
+        %+  turn  .^((list path) ct/(weld keep-now /keep))
+        |=  =path
+        :*  path  %ins  %txt  !>  :_  ~
+            .^(@t cx/(weld keep-now path))
+    ==  ==
   ==
 ::
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
-  ~|  %not-whitelisted
-  ?>  whitelisted
-  ?.  ?=([%backups term term ~] wire)  (on-agent:def wire sign)
-  ?+  -.sign  (on-agent:def wire sign)
+  ?+    wire  (on-agent:def wire sign)
+      [?(%copy %trigger) *]
+    `this
   ::
-      %fact
+      [%backups term term ~]
+    ~|  %not-whitelisted
+    ?>  whitelisted
+    ?.  ?=(%fact -.sign)  (on-agent:def wire sign)
     ~&  >  :*  %store-backup  of=,.&3.wire  from=src.bowl
            since-last=`@dr`(sub now.bowl +:(~(gut by kept) [&3.wire src.bowl] *[* @da]))
         ==
