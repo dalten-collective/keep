@@ -420,7 +420,7 @@
     |=  [(unit @p) @da]  (website-card 'fail-restore' (json-da +<))
   ::
   ++  success
-    |=  [=@p sent=@da kept=@da] ::  (website-card 'success' (json-da +<))
+    |=  [=@p sent=@da kept=@da]
     %+  website-card  'success'
     (pairs ~[ship/(ship p) sent/(sect sent) kept/(sect kept)])
   ::
