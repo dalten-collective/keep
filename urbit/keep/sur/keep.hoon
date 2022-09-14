@@ -20,6 +20,7 @@
         [%mend from=ship]                      :: Initiate recovery
         [%data data=noun key=term]             :: Old state and secret (internal only)
         [%live live=?]                         :: (De)activate. Deact before uninstall!
+        [%okay time=@da]
     ==
   --
 --
