@@ -99,18 +99,23 @@
   ::  "Copy the wrapper to a desk," said our operator.
       %copy
     ?>  =(src.bowl our.bowl)
-    :_  this(into (~(put in into) to.cmd))
-    :_  ~
-    =/  base-now  /(scot %p src.bowl)/base/(scot %da now.bowl)
-    =/  keep-now  /(scot %p src.bowl)/keep/(scot %da now.bowl)
-    %-  ~(arvo pass:io /copy/[to.cmd])
-    :*  %c  %info  to.cmd  %&
-        :-  =/  =path  /lib/skeleton/hoon  ::  Dependency management lol
-            [keep/path %ins txt+!>(~[.^(@t cx/(weld base-now path))])]
-        %+  turn  `duct`[/mar/keep/hoon .^((list path) ct/(weld keep-now /keep))]
-        |=  =path
-        [path %ins txt+!>(~[.^(@t cx/(weld keep-now path))])]
-    ==
+    =.  into  (~(put in into) to.cmd)
+    :_  this
+    :~  (website-card 'copied-deps' s/to.cmd)
+    ::
+        =/  base-now  /(scot %p src.bowl)/base/(scot %da now.bowl)
+        =/  keep-now  /(scot %p src.bowl)/keep/(scot %da now.bowl)
+        %-  ~(arvo pass:io /copy/[to.cmd])
+        :*  %c  %info  to.cmd  %&
+            :-  =/  =path  /lib/skeleton/hoon  ::  Dependency management lol
+                [keep/path %ins txt+!>(~[.^(@t cx/(weld base-now path))])]
+            %+  turn
+              ^-  (list path)
+              :+  /mar/keep/hoon  /mar/json/hoon
+              .^((list path) ct/(weld keep-now /keep))
+            |=  =path
+            [path %ins txt+!>(~[.^(@t cx/(weld keep-now path))])]
+    ==  ==
   ==
 ::
 ++  on-agent
@@ -161,6 +166,7 @@
       :-  %state
       %-  pairs
       :~  ['agents' a/(turn ~(tap in live) (lead %s))]
+          ['desks' a/(turn ~(tap in into) (lead %s))]
       ::
           :-  'backups'
           a/(turn ~(tap by kept) |=([to=[@ @p] [* =@da]] (json-backup da to)))
