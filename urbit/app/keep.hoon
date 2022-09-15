@@ -146,8 +146,17 @@
   :_  this
   ~[(website-card 'initial' ~)]
 ::
+++  on-peek
+  |=  =path
+  ^-  (unit (unit cage))
+  ?.  ?=([%x %desks *] path)  ~
+  :-  ~  :-  ~  :-  %json  !>  ^-  json
+  :-  %a
+  %+  turn
+    ~(tap in .^((set desk) cd+/(scot %p our.bowl)/base/(scot %da now.bowl)))
+  (lead %s)
+::
 ++  on-init   on-init:def
-++  on-peek   on-peek:def
 ++  on-arvo   on-arvo:def
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def
