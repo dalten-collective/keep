@@ -37,6 +37,8 @@ export default {
     return {
       agents: [] as Array<string>,
       wrappedAgents: [] as Array<KeepAgentStatus>,
+      copyingDepsAgents: ['world'] as Array<string>,
+      desks: [],
       backups: [] as Array<Backup>,
       pending: [] as Array, // TODO:
       whitelist: {} as WhitelistSettings
@@ -71,6 +73,10 @@ export default {
   },
 
   mutations: {
+    setDesks(state, desks) {
+      state.desks = desks;
+    },
+
     localOnWyte(state) {
       state.whitelist.on = true;
     },
@@ -228,7 +234,21 @@ export default {
     scry({}, scry: Scry) {
       // TODO: need to insure that path is prefixed with /
       console.log(scry);
-      keepApi.scry(scry);
+      return keepApi.scry(scry)
+        .then((r) => { return r })
+        .catch((e) => { throw e })
+    },
+
+    copyDeps({}, deskName: string) {
+      return keepApi
+        .copyDeps(deskName)
+        .then((r) => {
+          // commit("localOnWyte")
+          return r;
+        })
+        .catch((e) => {
+          throw e.response;
+        });
     },
 
     wyteOn({ commit }) {
@@ -299,6 +319,7 @@ export default {
       console.log("keep response state: ", responseState);
       commit("setBackups", responseState.backups);
       commit("setWhitelist", responseState.whitelist);
+      commit("setDesks", responseState.desks);
     },
 
     // TODO
@@ -656,5 +677,6 @@ export default {
     ) {
       commit("removeActive", payload);
     },
+
   },
 };

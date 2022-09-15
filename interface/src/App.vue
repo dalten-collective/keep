@@ -82,6 +82,7 @@ export default defineComponent({
   },
   mounted() {
     this.startMainAirlock();
+    this.getDesks();
   },
   unmounted() {
     this.closeMainAirlock();
@@ -92,6 +93,14 @@ export default defineComponent({
   methods: {
     startMainAirlock() {
       this.$store.dispatch("ship/openKeepAirlock");
+    },
+    getDesks() {
+      const scry: Scry = { app: 'keep', path: '/desks' };
+      this.$store.dispatch("keep/scry", scry)
+        .then((r) => {
+          console.log('scried ', r)
+          this.$store.dispatch("ship/setDesks", r)
+        })
     },
 
     closeMainAirlock() {

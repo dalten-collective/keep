@@ -26,6 +26,27 @@
       </div>
     </div>
 
+    <div class="tw-my-4">
+      <h3 class="tw-text-lg">Installed Desks</h3>
+      <div class="tw-grid xs:tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-1">
+        <div v-for="d in installedDesks" class="tw-grid-col-span-1 tw-border tw-rounded-keep tw-p-4">
+          <div class="tw-flex tw-justify-between">
+            <div>
+              %{{ d }}
+            </div>
+            <div>
+              <div v-if="deskCopying(d)">
+                <v-btn v-bind="props" color="success" size="x-small" disabled icon="mdi-thumb-up" />
+              </div>
+              <div v-else>
+                <v-btn color="success" size="x-small" @click="copyDepsFor(d)">Prepare</v-btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div v-if="!agents || agents.length === 0">
       No keep agents on this ship
       <hr />
@@ -59,7 +80,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { Scry } from "@urbit/http-api";
 
 import KeepAgent from "@/components/KeepAgent.vue";
@@ -71,6 +92,15 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters("keep", ["agents", "inactiveAgents"]),
+    ...mapState("ship", ["installedDesks"]),
+    ...mapState("keep", ["desks"]),
+    installedButNotCopying() {
+      // TODO: return installedDesks minus copying-to
+      return this.installedDesks
+    },
+    copyingDepsAgents() {
+      return this.desks;
+    },
   },
   data() {
     return {
@@ -80,6 +110,18 @@ export default defineComponent({
     };
   },
   methods: {
+    deskCopying(deskName) {
+      if (this.copyingDepsAgents.includes(deskName)) {
+        return true
+      }
+      return false
+    },
+
+    copyDepsFor(deskName) {
+      console.log('copying deps for ', deskName)
+      this.$store.dispatch('keep/copyDeps', deskName);
+    },
+
     testScry() {
       console.log("scrying ", this.scryApp, this.scryPath);
       const scry: Scry = { app: this.scryApp, path: this.scryPath };
