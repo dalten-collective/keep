@@ -11,9 +11,10 @@
         [%tell dap=dude]                :: Register wrapped agent
         [%able (each ship ship)]
         [%wyte on=?]
+        [%copy to=desk]
     ==
   ::                                           :: To the wrapper.
-  +$  wrapper                                  ::
+  +$  wrap                                     ::
     $%  [%once to=(unit ship)]                 :: Backup to a ship or the put dir
         [%many to=(unit ship) freq=(unit @dr)] :: Repeat backup
         [%mend from=ship]                      :: Initiate recovery

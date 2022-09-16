@@ -1,9 +1,18 @@
 ::  keep: agent wrapper for backups
 ::
-::  usage: %-(agent:keep your-agent)
+::  usage:
+::  /=  keep  /keep/lib
+::  ...
+::  %-(agent:keep your-agent)
 ::
-/-  *keep
-/+  default-agent, *sane, agentio, multipart, verb
+::
+/=  default-agent  /keep/lib/default-agent
+/=  agentio        /keep/lib/agentio
+/=  multipart      /keep/lib/multipart
+/=  sane           /keep/lib/sane
+/=  keep-sur       /keep/sur/keep
+=,  sane
+=,  keep-sur
 ::
 |%
 ::  This is the meat of the logic. The rest is bookkeeping and logistics.
@@ -67,7 +76,6 @@
   ::
   =|  state-0
   =*  state  -
-  %+  verb  &
   ::
   ^-  agent:gall
   |_  bowl:gall
@@ -84,7 +92,8 @@
       io    ~(. agentio bowl)
       pass  |=  =path  ~(. pass:io keep/path)
       behn  |=  u=(unit ship)  behn/?~(u /put /ship/(scot %p u.u))
-      tell  (poke-our:(pass /tell) %keep keep-agent+!>(tell+dap.bowl))
+      tell
+        (poke-our:(pass /tell) %keep keep-agent+!>(`agent:poke`tell+dap.bowl))
       upload-path
         /apps/keep/[dap.bowl]/upload
   ::
@@ -112,7 +121,7 @@
       :_  cards
       (~(restored json state) ~ now.bowl)
     ::
-    =/  cmd  !<(wrapper:poke vase)
+    =/  cmd  !<(wrap:poke vase)
     ?-  -.cmd
     ::  Back up your state once
         %once
@@ -133,7 +142,7 @@
         :_  this
         :~  (~(try-invite json state) u.to.cmd)
             %+  poke:(pass /init/(scot %p u.to.cmd))  u.to.cmd^%keep
-            keep-agent+!>([%init dap.bowl key])
+            keep-agent+!>(`agent:poke`[%init dap.bowl key])
         ==
       ::  Yes. Give the fact or write to put and set new timers.
       =/  backup  [wex.dish sup.dish +:on-save:ag]
@@ -251,7 +260,7 @@
       ~|  %didnt-ask
       ?>  =([%invite &3.path] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
-      (on-poke(src.+< our.bowl) %keep !>(`wrapper:poke`once+`src.bowl))
+      (on-poke(src.+< our.bowl) %keep !>(`wrap:poke`once+`src.bowl))
     ==
   ::
   ++  on-agent
@@ -280,14 +289,10 @@
     ::
         [%behn ^]
       ?>  ?=([%behn %wake *] sign-arvo)
-      ?^  error.sign-arvo
-        ((slog u.error.sign-arvo) (on-arvo:def wire sign-arvo))
-      %+  on-poke  %keep
-      !>  ^-  wrapper:poke
-      :-  %once
-      ?+  +>.wire  (on-arvo:def wire sign-arvo)
-        [%put *]        ~
-        [%ship term *]  `(slav %p &4.wire)
+      ?^  error.sign-arvo  ((slog u.error.sign-arvo) `this)
+      ?+  +>.wire  ((slog keep/on-arvo/invalid-wire=wire) `this)
+        [%put *]        (on-poke keep/!>(`wrap:poke`once/~))
+        [%ship term *]  (on-poke keep/!>(`wrap:poke`once/`(slav %p &4.wire)))
       ==
     ==
   ::
