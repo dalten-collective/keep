@@ -37,7 +37,7 @@ export default {
     return {
       agents: [] as Array<string>,
       wrappedAgents: [] as Array<KeepAgentStatus>,
-      copyingDepsAgents: ['world'] as Array<string>,
+      copyingDepsAgents: [] as Array<string>, // TODO: remove
       desks: [],
       backups: [] as Array<Backup>,
       pending: [] as Array, // TODO:

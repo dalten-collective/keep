@@ -4,12 +4,14 @@
     <div class="tw-flex tw-space-between tw-mb-4">
       <div class="tw-grow">
         <h3 class="tw-text-3xl tw-font-silom">Inactive Agents</h3>
+        <!--
         <p class="tw-my-2">
           These agents are properly wrapped and ready for %keep, but are not yet <span class="tw-font-bold">live</span>. Activate them here to begin backing up.
         </p>
         <p class="tw-my-2">
           <router-link class="tw-underline" :to="{ name: 'learn' }">Learn more</router-link> about wrapping.
         </p>
+        -->
       </div>
       <div>
         <v-btn
@@ -27,7 +29,10 @@
     </div>
 
     <div class="tw-my-4">
-      <h3 class="tw-text-lg">Installed Desks</h3>
+      <h3 class="tw-text-lg tw-mb-4">Installed Desks</h3>
+      <p class="tw-my-2">
+        These are the desks you have installed on your ship. Keep needs to prepare these desks before it can back up their agents.
+      </p>
       <div class="tw-grid xs:tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-1">
         <div v-for="d in installedDesks" class="tw-grid-col-span-1 tw-border tw-rounded-keep tw-p-4">
           <div class="tw-flex tw-justify-between">

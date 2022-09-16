@@ -12,7 +12,7 @@ export default {
   state() {
     return {
       subscriptions: [] as Array<AgentSubscription>,
-      installedDesks: ['hi', 'world'] as Array<string>,
+      installedDesks: [] as Array<string>,
     };
   },
 

@@ -92,7 +92,7 @@ export default defineComponent({
       scryApp: "",
       scryPath: "",
       activePending: false,
-      tab: "inactive",
+      tab: "active",
     };
   },
   methods: {
