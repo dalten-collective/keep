@@ -70,8 +70,6 @@ export default {
               }
             );
           }
-          // TODO: handle "active" when a new wrapper comes online
-          // TODO: what other types are there for the main Keep subscription?
 
           dispatch("keep/handleKeepResponseState", data.state, {
             root: true,
@@ -81,7 +79,7 @@ export default {
           // TODO:
           dispatch(
             "keep/handleKeepResponseDiff",
-            { diff: data.diff, responseType: data.type },
+            { diff: data.diff, responseType: data.type, state: data.state },
             { root: true }
           );
         },
