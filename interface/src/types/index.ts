@@ -1,5 +1,6 @@
 export enum EventType {
   Initial = "initial", // first response on subscrtiption start
+  Agent = "agent",   // the main keep agent has done something (like wrapping)
   Backup = "backup", // WE did a backup for someone else
   Saved = "saved", // OUR backup landed with someone else
   Auto = "auto", // auto-backup configured
@@ -35,6 +36,10 @@ export interface RestoreDiff {
 export interface SavedDiff {
   ship: Ship;
   time: number;
+}
+
+export interface AgentDiff {
+  agent: string;
 }
 
 export interface BackupDiff {

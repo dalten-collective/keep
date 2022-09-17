@@ -7,6 +7,7 @@ import {
   RestoredStatus,
   Ship,
   InviteStatus,
+  AgentDiff,
   AutoOnDiff,
   BackupDiff,
   AutoOffDiff,
@@ -340,6 +341,7 @@ export default {
         agentName: string;
         responseType: EventType;
         diff: Diff;
+        state: { agents: Array<string> };
       }
     ) {
       // TODO: whitelist updates
@@ -359,6 +361,15 @@ export default {
         };
         dispatch("message/addMessage", logMsg, { root: true });
       }
+
+      // TODO: this does add to state: { agents }, but I think we're not getting
+      //       the agentStatus, so it doesn't immediately show up as Activateable.
+      // if (payload.responseType === EventType.Agent) {
+      //   const agentName = payload.diff as AgentDiff;
+      //   console.log('got wrap diff' , payload);
+      //   const agents = payload.state.agents;
+      //   dispatch("setAgents", agents);
+      // }
     },
 
     handleAgentResponseState(
