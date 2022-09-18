@@ -5,6 +5,7 @@
       <div class="tw-grow">
         <h3 class="tw-text-3xl tw-font-silom">Active Agents</h3>
       </div>
+      <!--
       <div>
         <v-btn
           :loading="activePending"
@@ -18,6 +19,7 @@
           refresh
         </v-btn>
       </div>
+      -->
     </div>
 
     <div v-if="!agents || agents.length === 0">

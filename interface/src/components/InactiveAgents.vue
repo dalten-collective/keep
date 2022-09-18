@@ -4,7 +4,7 @@
       <div class="tw-grow">
         <h3 class="tw-text-3xl tw-font-silom">Inactive Agents</h3>
         <p class="tw-my-2">
-          Agents/Apps on your ship need to be prepared for usage with %keep and
+          Agents/Apps on your ship need to be prepared for use with %keep and
           then <span class="tw-font-mono">ACTIVATED</span> before you can back
           them up.
         </p>
@@ -15,6 +15,7 @@
           about how %keep wraps agents for backup.
         </p>
       </div>
+      <!--
       <div>
         <v-btn
           :loading="activePending"
@@ -28,6 +29,7 @@
           refresh
         </v-btn>
       </div>
+      -->
     </div>
 
     <div class="tw-my-4">
