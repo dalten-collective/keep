@@ -65,6 +65,19 @@
                     <span v-else> Not performing automatic backups </span>
                   </div>
                 </div>
+
+                <div v-if="!ship" class="keep-info-items" style="max-width: 46rem">
+                  <v-chip
+                    label
+                    color="surface"
+                    class="keep-info-label"
+                    size="small"
+                    >Destination</v-chip
+                  >
+                  <div class="keep-info-data">
+                    <span class="tw-font-mono">.urb/put/keep/{{ agentName }}</span>
+                  </div>
+                </div>
               </article>
             </section>
           </section>
@@ -226,7 +239,7 @@
               </div>
               <div v-if="showDone">
                 <v-alert type="success" variant="tonal">
-                  Backup complete!
+                  Backup complete! Check <span class="tw-font-mono">.urb/put/keep/{{ agentName }}</span>
                 </v-alert>
               </div>
               <div v-if="autoSetPending">
@@ -244,6 +257,9 @@
               <div v-if="showAutoSetDone">
                 <v-alert type="success" variant="tonal">
                   Recurring backups set!
+                  <span v-if="!ship">
+                    Check <span class="tw-font-mono">.urb/put/keep/{{ agentName }}</span>
+                  </span>
                 </v-alert>
               </div>
               <div v-if="showAutoOffDone">
