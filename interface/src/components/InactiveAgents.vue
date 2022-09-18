@@ -1,14 +1,18 @@
 <template>
   <div class="tw-w-screen">
-
     <div class="tw-flex tw-space-between tw-mb-4">
       <div class="tw-grow">
         <h3 class="tw-text-3xl tw-font-silom">Inactive Agents</h3>
         <p class="tw-my-2">
-          Agents/Apps on your ship need to be prepared for usage with %keep and then <span class="tw-font-mono">ACTIVATED</span> before you can back them up.
+          Agents/Apps on your ship need to be prepared for usage with %keep and
+          then <span class="tw-font-mono">ACTIVATED</span> before you can back
+          them up.
         </p>
         <p class="tw-my-2">
-          <router-link class="tw-underline" :to="{ name: 'learn' }">Learn more</router-link> about how %keep wraps agents for backup.
+          <router-link class="tw-underline" :to="{ name: 'learn' }"
+            >Learn more</router-link
+          >
+          about how %keep wraps agents for backup.
         </p>
       </div>
       <div>
@@ -27,23 +31,38 @@
     </div>
 
     <div class="tw-my-4">
-      <div v-if="installedDesks && installedDesks.length > 0">
+      <div v-if="safeInstalledDesks && safeInstalledDesks.length > 0">
         <h3 class="tw-text-lg tw-mb-4">Installed Desks</h3>
         <p class="tw-my-2">
-          These are the desks you have installed on your ship. <span class="tw-font-mono">PREPARE</span> the desk to make it ready for activation.
+          These are the desks you have installed on your ship.
+          <span class="tw-font-mono">PREPARE</span> the desk to make it ready
+          for activation.
         </p>
         <div class="tw-grid xs:tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-1">
-          <div v-for="d in installedDesks" class="tw-grid-col-span-1 tw-border tw-rounded-keep tw-p-4">
+          <div
+            v-for="d in safeInstalledDesks"
+            class="tw-grid-col-span-1 tw-border tw-rounded-keep tw-p-4"
+          >
             <div class="tw-flex tw-justify-between">
-              <div>
-                %{{ d }}
-              </div>
+              <div>%{{ d }}</div>
               <div>
                 <div v-if="deskCopying(d)">
-                  <v-btn v-bind="props" color="success" size="x-small" disabled icon="mdi-thumb-up" />
+                  <v-btn
+                    v-bind="props"
+                    color="success"
+                    size="x-small"
+                    disabled
+                    icon="mdi-thumb-up"
+                  />
                 </div>
                 <div v-else>
-                  <v-btn color="success" size="x-small" @click="copyDepsFor(d)" :loading="preparePending" >Prepare</v-btn>
+                  <v-btn
+                    color="success"
+                    size="x-small"
+                    @click="copyDepsFor(d)"
+                    :loading="preparePending"
+                    >Prepare</v-btn
+                  >
                 </div>
               </div>
             </div>
@@ -53,18 +72,20 @@
 
       <div v-else>
         <h3 class="tw-text-lg tw-mb-4">Installed Desks</h3>
-        <p class="tw-my-2">
-          You don't have any desks installed on this ship
-        </p>
+        <p class="tw-my-2">You don't have any desks installed on this ship</p>
       </div>
     </div>
 
-    <v-divider class="tw-my-4"/>
+    <v-divider class="tw-my-4" />
 
-    <div v-if="installedDesks && installedDesks.length > 0">
+    <div v-if="safeInstalledDesks && safeInstalledDesks.length > 0">
       <h3 class="tw-text-lg tw-mb-4">Agents to Activate</h3>
       <div v-if="!agents || agents.length === 0">
-        No %keep-wrapped agents on this ship. Are you sure you've <router-link class="tw-underline" :to="{ name: 'learn' }">wrapped</router-link> some prepared agents?
+        No %keep-wrapped agents on this ship. Are you sure you've
+        <router-link class="tw-underline" :to="{ name: 'learn' }"
+          >wrapped</router-link
+        >
+        some prepared agents?
       </div>
 
       <div v-else>
@@ -111,10 +132,24 @@ export default defineComponent({
     ...mapState("keep", ["desks"]),
     installedButNotCopying() {
       // TODO: return installedDesks minus copying-to
-      return this.installedDesks
+      return this.installedDesks;
     },
     copyingDepsAgents() {
       return this.desks;
+    },
+    safeInstalledDesks(): Array<string> {
+      const badBoys = [
+        "keep",
+        "garden",
+        "kids",
+        "webterm",
+        "base",
+        "landscape",
+        "bitcoin",
+      ];
+      return this.installedDesks.filter((d) => {
+        return !badBoys.includes(d);
+      });
     },
   },
   data() {
@@ -128,17 +163,16 @@ export default defineComponent({
   methods: {
     deskCopying(deskName) {
       if (this.copyingDepsAgents.includes(deskName)) {
-        return true
+        return true;
       }
-      return false
+      return false;
     },
 
     copyDepsFor(deskName) {
       this.preparePending = true;
-      this.$store.dispatch('keep/copyDeps', deskName)
-        .finally(() => {
-          this.preparePending = false;
-        })
+      this.$store.dispatch("keep/copyDeps", deskName).finally(() => {
+        this.preparePending = false;
+      });
     },
 
     testScry() {
