@@ -226,7 +226,12 @@
               </div>
               <div v-if="showDone">
                 <v-alert type="success" variant="tonal">
-                  Backup complete!
+                  <span v-if="ship">
+                    Backup request sent!
+                  </span>
+                  <span v-else>
+                    Backup to disk complete!
+                  </span>
                 </v-alert>
               </div>
               <div v-if="autoSetPending">

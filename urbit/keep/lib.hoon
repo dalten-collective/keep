@@ -206,6 +206,10 @@
       ?:  live
         ~[(connect:(pass /eyre) `upload-path dap.bowl)]
       ~[(arvo:(pass /eyre) %e %disconnect `upload-path)]
+    ::  Successful backup
+        %okay
+      :_  this
+      ~[(~(success json state) src.bowl (~(got by last) `src.bowl) time.cmd)]
     ==
   ::
   ++  on-peek
@@ -415,8 +419,10 @@
   ++  malformed
     |=  [(unit @p) @da]  (website-card 'fail-restore' (json-da +<))
   ::
-  ++  no-store
-    |=  [(unit @p) @da]  (website-card 'fail-store' (json-da +<))
+  ++  success
+    |=  [=@p sent=@da kept=@da]
+    %+  website-card  'success'
+    (pairs ~[ship/(ship p) sent/(sect sent) kept/(sect kept)])
   ::
   ++  website-card
     |=  [event=@t diff=^json]

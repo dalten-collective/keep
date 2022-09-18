@@ -29,6 +29,7 @@ import {
   WhitelistSettings,
   LocalBackupRequest,
   LocalManyRequest,
+  SuccessDiff,
 } from "@/types";
 import {siggedShip} from "@/api/keep";
 
@@ -439,14 +440,35 @@ export default {
         });
 
         let targetShip;
+        let logMsg: LogMessage;
         if (ship) {
           targetShip = ship
+          logMsg = {
+            msg: `Requested backup of %${payload.agentName} to ${targetShip} at ${time}`,
+            time,
+            type: "pend",
+          };
         } else {
           targetShip = 'local disk'
+          logMsg = {
+            msg: `Backed up %${payload.agentName} to ${targetShip} at ${time}`,
+            time,
+            type: "succ",
+          };
         }
+        dispatch("message/addMessage", logMsg, { root: true });
+      }
+
+      if (payload.responseType === EventType.Success) {
+        console.log('backup done')
+        const d = payload.diff as SuccessDiff
+        const sent = d.sent;
+        const kept = d.kept;
+        const ship = d.ship;
+
         const logMsg: LogMessage = {
-          msg: `Backed up %${payload.agentName} to ${targetShip} at ${time}`,
-          time,
+          msg: `Backup of %${payload.agentName} saved to ${ship} at ${kept} (took ${kept - sent} seconds).`,
+          time: kept,
           type: "succ",
         };
         dispatch("message/addMessage", logMsg, { root: true });

@@ -133,9 +133,13 @@
     ~&  >  :*  %store-backup  of=,.&3.wire  from=src.bowl
            since-last=`@dr`(sub now.bowl +:(~(gut by kept) [&3.wire src.bowl] *[* @da]))
         ==
-    =.  kept  (~(put by kept) [&3.wire src.bowl] !<(noun q.cage.sign) now.bowl)
+    =*  dap  &3.wire
+    =.  kept  (~(put by kept) [dap src.bowl] !<(noun q.cage.sign) now.bowl)
     :_  this
-    ~[(website-card 'backup' (json-backup now.bowl &3.wire src.bowl))]
+    :~  (website-card 'backup' (json-backup now.bowl dap src.bowl))
+        %+  ~(poke pass:io /okay/(scot %p src.bowl)/[dap])  [src.bowl dap]
+        keep/!>(`wrap:poke`okay/now.bowl)
+    ==
   ==
 ::
 ++  on-watch
