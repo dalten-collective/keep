@@ -7,6 +7,7 @@ import {
   RestoredStatus,
   Ship,
   InviteStatus,
+  AgentDiff,
   AutoOnDiff,
   BackupDiff,
   AutoOffDiff,
@@ -38,6 +39,8 @@ export default {
     return {
       agents: [] as Array<string>,
       wrappedAgents: [] as Array<KeepAgentStatus>,
+      copyingDepsAgents: [] as Array<string>, // TODO: remove
+      desks: [],
       backups: [] as Array<Backup>,
       pending: [] as Array, // TODO:
       whitelist: {} as WhitelistSettings
@@ -72,6 +75,10 @@ export default {
   },
 
   mutations: {
+    setDesks(state, desks) {
+      state.desks = desks;
+    },
+
     localOnWyte(state) {
       state.whitelist.on = true;
     },
@@ -229,7 +236,21 @@ export default {
     scry({}, scry: Scry) {
       // TODO: need to insure that path is prefixed with /
       console.log(scry);
-      keepApi.scry(scry);
+      return keepApi.scry(scry)
+        .then((r) => { return r })
+        .catch((e) => { throw e })
+    },
+
+    copyDeps({}, deskName: string) {
+      return keepApi
+        .copyDeps(deskName)
+        .then((r) => {
+          // commit("localOnWyte")
+          return r;
+        })
+        .catch((e) => {
+          throw e.response;
+        });
     },
 
     wyteOn({ commit }) {
@@ -300,6 +321,7 @@ export default {
       console.log("keep response state: ", responseState);
       commit("setBackups", responseState.backups);
       commit("setWhitelist", responseState.whitelist);
+      commit("setDesks", responseState.desks);
     },
 
     // TODO
@@ -320,6 +342,7 @@ export default {
         agentName: string;
         responseType: EventType;
         diff: Diff;
+        state: { agents: Array<string> };
       }
     ) {
       // TODO: whitelist updates
@@ -339,6 +362,15 @@ export default {
         };
         dispatch("message/addMessage", logMsg, { root: true });
       }
+
+      // TODO: this does add to state: { agents }, but I think we're not getting
+      //       the agentStatus, so it doesn't immediately show up as Activateable.
+      // if (payload.responseType === EventType.Agent) {
+      //   const agentName = payload.diff as AgentDiff;
+      //   console.log('got wrap diff' , payload);
+      //   const agents = payload.state.agents;
+      //   dispatch("setAgents", agents);
+      // }
     },
 
     handleAgentResponseState(
@@ -678,5 +710,6 @@ export default {
     ) {
       commit("removeActive", payload);
     },
+
   },
 };

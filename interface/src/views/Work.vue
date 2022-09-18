@@ -96,11 +96,6 @@ export default defineComponent({
     };
   },
   methods: {
-    testScry() {
-      console.log("scrying ", this.scryApp, this.scryPath);
-      const scry: Scry = { app: this.scryApp, path: this.scryPath };
-      this.$store.dispatch("keep/scry", scry);
-    },
     closeAgentAirlock() {
       this.$store.dispatch("ship/closeKeepAirlock");
     },

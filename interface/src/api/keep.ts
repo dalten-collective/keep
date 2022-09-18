@@ -72,6 +72,26 @@ export function wyteOn() {
     });
 }
 
+export function copyDeps(agentName: string) {
+  return urbitAPI
+    .poke({
+      app: 'keep',
+      mark: "keep-agent",
+      json: {
+        copy: agentName,
+      },
+    })
+    .then((r) => {
+      console.log("res ", r);
+      return r;
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      return e
+    });
+}
+
 export function wyteOff() {
   return urbitAPI
     .poke({
@@ -145,9 +165,11 @@ export function scry(scry: Scry) {
     .scry(scry)
     .then((r) => {
       console.log(r);
+      return r
     })
     .catch((e) => {
       console.log(e);
+      throw e
     });
 }
 

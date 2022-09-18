@@ -12,6 +12,7 @@ export default {
   state() {
     return {
       subscriptions: [] as Array<AgentSubscription>,
+      installedDesks: [] as Array<string>,
     };
   },
 
@@ -38,6 +39,10 @@ export default {
       state.subscriptions.push(payload);
     },
 
+    setDesks(state, desks: Array<string>) {
+      state.installedDesks = desks;
+    },
+
     unsetSubscription(state, subscription: AgentSubscription) {
       const sub = state.subscriptions.find((s) => s === subscription);
       state.subscriptions = state.subscriptions.filter((s) => s != sub);
@@ -45,6 +50,10 @@ export default {
   },
 
   actions: {
+    setDesks({ commit }, desks: Array<string>) {
+      commit('setDesks', desks)
+    },
+
     openKeepAirlock({ dispatch }) {
       console.log("opening to keep...");
       airlock.openKeepAirlock(
@@ -61,8 +70,6 @@ export default {
               }
             );
           }
-          // TODO: handle "active" when a new wrapper comes online
-          // TODO: what other types are there for the main Keep subscription?
 
           dispatch("keep/handleKeepResponseState", data.state, {
             root: true,
@@ -72,7 +79,7 @@ export default {
           // TODO:
           dispatch(
             "keep/handleKeepResponseDiff",
-            { diff: data.diff, responseType: data.type },
+            { diff: data.diff, responseType: data.type, state: data.state },
             { root: true }
           );
         },
