@@ -104,7 +104,7 @@
     :~  (website-card 'copied-deps' s/to.cmd)
     ::
         =/  base-now  /(scot %p src.bowl)/base/(scot %da now.bowl)
-        =/  keep-now  /(scot %p src.bowl)/keep/(scot %da now.bowl)
+        =/  keep-now  /(scot %p src.bowl)/[q.byk.bowl]/(scot %da now.bowl)
         %-  ~(arvo pass:io /copy/[to.cmd])
         :*  %c  %info  to.cmd  %&
             :-  =/  =path  /lib/skeleton/hoon  ::  Dependency management lol
