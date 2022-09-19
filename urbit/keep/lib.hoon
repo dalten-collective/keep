@@ -106,11 +106,10 @@
     ::
     ?.  ?=(?(%keep %handle-http-request) mark)  call-inner
     ?:  ?=(%handle-http-request mark)
-      ?>  =(src.bowl our.bowl)
-      ?>  live
       =/  req  !<([@ta inbound-request:eyre] vase)
       ?.  =([~ 0] (find upload-path (rash url.request.+.req stap)))
         call-inner
+      ?>  =(src.bowl our.bowl)
       =/  [res=(unit agent:gall) cards=(list card)]
         (handle-http-request req (restore agent dish))
       ?~  res
@@ -125,7 +124,6 @@
     ?-  -.cmd
     ::  Back up your state once
         %once
-      ?>  live
       ?>  =(src.bowl our.bowl)
       ::
       =/  paths
@@ -176,7 +174,6 @@
       ==
     ::  Ask another ship for your state
         %mend
-      ?>  live
       ?>  =(src.bowl our.bowl)
       =/  key  (scot %uv (sham eny.bowl))
       :_  this(pending (~(put by pending) from.cmd %restore key))
@@ -186,7 +183,6 @@
       ==
     ::  Load this back
         %data
-      ?>  live
       ~|  %do-not-want
       ?>  =([%restore key.cmd] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
@@ -201,6 +197,8 @@
       ?>  =(our.bowl src.bowl)
       ?:  =(live live.cmd)  `this
       =.  live  live.cmd
+      =?  auto  !live.cmd  ~
+      =?  last  !live.cmd  ~
       :_  this
       :-  ~(live json state)
       ?:  live
