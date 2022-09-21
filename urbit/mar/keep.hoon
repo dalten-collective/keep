@@ -14,15 +14,9 @@
   |%
   ++  noun  wrap:poke
   ++  json
-    %+  corl  $<(%data wrap:poke)
+    %+  corl  wrap:poke
     =,  dejs:format
-    %-  of
-    :~
-      [%once (mu (se %p))]
-      [%mend (se %p)]
-      [%live bo]
-      :-  %many
-      (ot ~[[%to (mu (se %p))] [%freq (cu (lift (cury mul ~s1)) (mu ni))]])
+    (ot mend/(se %p))
     ==
   --
 --

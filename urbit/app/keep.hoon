@@ -194,8 +194,10 @@
   ::
       [%send term ^]
     ?.  ?=(%poke-ack -.sign)  (on-agent:def wire sign)
-    ?^  p.sign                (on-agent:def wire sign)
-    `this(last (~(put bi last) &2.wire (of-wire |2.wire) now.bowl))
+    ?~  p.sign
+      `this(last (~(put bi last) &2.wire (of-wire |2.wire) now.bowl))
+    :_  this
+    ~[(emit no-save/(da:event:json &2.wire (of-wire |2.wire) now.bowl))]  
   ::
       [%backups term term ~]
     ~|  %not-whitelisted
@@ -252,7 +254,6 @@
     ^-  card
     %-  fact:agentio  :_  ~[/website]
     :-  %json  !>  ^-  ^json
-    =-  ~&  >  emit/-  -
     %-  pairs 
     :~  [%type s+type]
         [%diff diff]
@@ -281,9 +282,9 @@
   ++  event
     |%
     ++  da
-      |=  [dap=dude place=(unit @p) prev=@da]
+      |=  [dap=dude place=(unit @p) time=@da]
       ^-  ^json
-      (pairs ~[agent/s/dap ship/(bindcast place ship) time/(sect prev)])
+      (pairs ~[agent/s/dap ship/(bindcast place ship) time/(sect time)])
     ::
     ++  dr
       |=  [dap=dude place=(unit @p) freq=(unit @dr)]

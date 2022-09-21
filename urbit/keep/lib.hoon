@@ -362,7 +362,6 @@
     ^-  card
     %-  fact:agentio  :_  ~[/keep/website]
     :-  %json  !>  ^-  ^json
-    =-  ~&  >>  emit/-  -
     %-  pairs
     :~  [%type s+event]
         [%diff diff]
