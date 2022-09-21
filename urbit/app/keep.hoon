@@ -290,9 +290,9 @@
       |=  [dap=dude place=(unit @p) freq=(unit @dr)]
       ^-  ^json
       %-  pairs
-      :~  ['app' s/dap]
-          ['ship' (bindcast place ship)]
-          ['freq' (bindcast freq (corl numb (curr div ~s1)))]
+      :~  [%agent s/dap]
+          [%ship (bindcast place ship)]
+          [%freq (bindcast freq (corl numb (curr div ~s1)))]
       ==
     ::
     ++  ok
