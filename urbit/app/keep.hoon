@@ -131,7 +131,6 @@
     =/  behn  ~(. pass:io behn/dap.cmd^(path-of to.cmd))
     :~  (bind (both prev freq) (cork add rest:behn))  :: unset old next
         `(emit auto/(dr:event:json dap.cmd to.cmd freq.cmd))
-        ::TODO emit json  `(~(auto json state) dap.cmd to.cmd freq.cmd)
         ?^  new=(bind (both prev freq.cmd) (cork add wait:behn))
           new  ::  set next later
         (bind freq.cmd |=(* (wait:behn now.bowl)))  :: set next now
@@ -194,10 +193,11 @@
   ::
       [%send term ^]
     ?.  ?=(%poke-ack -.sign)  (on-agent:def wire sign)
-    ?~  p.sign
-      `this(last (~(put bi last) &2.wire (of-wire |2.wire) now.bowl))
-    :_  this
-    ~[(emit no-save/(da:event:json &2.wire (of-wire |2.wire) now.bowl))]  
+    ?^  p.sign
+      :_  this
+      ~[(emit no-save/(da:event:json &2.wire (of-wire |2.wire) now.bowl))]  
+    :_  this(last (~(put bi last) &2.wire (of-wire |2.wire) now.bowl))
+    ~[(emit last/(da:event:json &2.wire (of-wire |2.wire) now.bowl))]
   ::
       [%backups term term ~]
     ~|  %not-whitelisted
