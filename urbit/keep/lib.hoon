@@ -93,8 +93,9 @@
       upload-path
         /apps/keep/[dap.bowl]/upload
       start
-        :~  (poke-our:(pass /tell) %keep keep-agent+!>(`agent:poke`tell+dap.bowl))
-            (connect:(pass /eyre) `upload-path dap.bowl)
+        :~  (connect:(pass /eyre) `upload-path dap.bowl)
+            %+  poke-our:(pass /tell)  %keep
+            keep-agent+!>(`agent:poke`tell+dap.bowl)
         ==
   ::
   ++  on-poke
@@ -153,7 +154,8 @@
         %mend
       ?>  =(src.bowl our.bowl)
       =/  key  (scot %uv (sham eny.bowl))
-      :_  this(pending (~(put by pending) from.cmd %restore key))
+      =.  pending  (~(put by pending) from.cmd %restore key)
+      :_  this
       :~  (~(try-restore json state) from.cmd)
           %+  poke:(pass /grab/(scot %p from.cmd))  [from.cmd %keep]
           keep-agent+!>(`agent:poke`grab+dap.bowl^key)
@@ -343,9 +345,6 @@
   ++  saved
     |=  new=[(unit @p) @da]  (website-card 'saved' (json-da new))
   ::
-  ++  auto
-    |=  new=[(unit @p) (unit @dr)]  (website-card 'auto' (json-dr new))
-  ::
   ++  try-invite
     |=  =@p  (website-card 'pending' (json-pending [p %invite]))
   ::
@@ -358,25 +357,23 @@
   ++  malformed
     |=  [(unit @p) @da]  (website-card 'fail-restore' (json-da +<))
   ::
-  ++  success
-    |=  [=@p sent=@da kept=@da]
-    %+  website-card  'success'
-    (pairs ~[ship/(ship p) sent/(sect sent) kept/(sect kept)])
-  ::
   ++  website-card
     |=  [event=@t diff=^json]
     ^-  card
-    =;  json-state=^json
-      :*  %give  %fact  ~[/keep/website]  %json
-          !>((pairs ~[[%type s+event] [%diff diff] [%state json-state]]))
-      ==
+    %-  fact:agentio  :_  ~[/keep/website]
+    :-  %json  !>  ^-  ^json
+    =-  ~&  >>  emit/-  -
     %-  pairs
-    :~  :+  %pending
-          %a
-        %+  turn  ~(tap by pending.state)
-        |=  [=@p status=?(%invite %restore) *]
-        (json-pending p status)
-    ==
+    :~  [%type s+event]
+        [%diff diff]
+        :-  %state
+        %-  pairs
+        :~  :+  %pending
+              %a
+            %+  turn  ~(tap by pending.state)
+            |=  [=@p status=?(%invite %restore) *]
+            (json-pending p status)
+    ==  ==
   ::
   ++  json-da
     |=  [place=(unit @p) prev=@da]

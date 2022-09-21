@@ -39,16 +39,18 @@
 ::
 %-  agent:dbug
 %+  verb  &
+::
+=<
 =|  state-0
 =*  state  -
 ^-  agent:gall
 ::
-=<
 |_  =bowl:gall
 +*  this  .
     def   ~(. (default-agent this %|) bowl)
     io    ~(. agentio bowl)
     whitelisted  |(?=(%| -.able) (~(has in p.able) src.bowl))
+    emit  ~(website json state)
     send
       |=  [dap=dude to=(unit ship)]
       %.  [dap keep/!>(`wrap:poke`send/to)]
@@ -100,7 +102,7 @@
     ?:  (~(has in live) dap.cmd)  `this
     =.  live  (~(put in live) dap.cmd)
     :_  this
-    ~[(website-card 'agent' s+dap.cmd)]
+    ~[(emit agent/s+dap.cmd)]
   ::
   ::  Back up once
       %once
@@ -128,6 +130,7 @@
     %-  catunits
     =/  behn  ~(. pass:io behn/dap.cmd^(path-of to.cmd))
     :~  (bind (both prev freq) (cork add rest:behn))  :: unset old next
+        `(emit auto/(dr:event:json dap.cmd to.cmd freq.cmd))
         ::TODO emit json  `(~(auto json state) dap.cmd to.cmd freq.cmd)
         ?^  new=(bind (both prev freq.cmd) (cork add wait:behn))
           new  ::  set next later
@@ -136,7 +139,15 @@
   ::
   ::  Successful backup
       %okay
-    `this  ::TODO emit JSON (~(success json state) src.bowl (~(got bi last) dap.cmd `src.bowl time.cmd))
+    :_  this
+    :_  ~
+    %+  emit  %success
+    %:  ok:event:json
+      dap.cmd
+      src.bowl
+      (~(got bi last) dap.cmd `src.bowl)
+      time.cmd
+    ==
   ::
   ::  "(De)whitelist this ship," said our operator.
       %able
@@ -157,7 +168,7 @@
     ?>  =(src.bowl our.bowl)
     =.  into  (~(put in into) to.cmd)
     :_  this
-    :~  (website-card 'copied-deps' s/to.cmd)
+    :~  (emit copied-deps/s/to.cmd)
     ::
         =/  base-now  /(scot %p src.bowl)/base/(scot %da now.bowl)
         =/  keep-now  /(scot %p src.bowl)/[q.byk.bowl]/(scot %da now.bowl)
@@ -197,7 +208,7 @@
     =*  dap  &3.wire
     =.  kept  (~(put by kept) [dap src.bowl] !<(noun q.cage.sign) now.bowl)
     :_  this
-    :~  (website-card 'backup' (json-backup now.bowl dap src.bowl))
+    :~  (emit backup/(da:event:json dap `src.bowl now.bowl))
         %+  ~(poke pass:io /okay/(scot %p src.bowl)/[dap])  [src.bowl %keep]
         keep-agent/!>(`agent:poke`[%okay dap now.bowl])
     ==
@@ -209,7 +220,7 @@
   ?>  =(src.bowl our.bowl)
   ?.  ?=([%website ~] path)  (on-watch:def path)
   :_  this
-  ~[(website-card 'initial' ~)]
+  ~[(emit initial/~)]
 ::
 ++  on-peek
   |=  =path
@@ -233,83 +244,60 @@
 --
 ::
 |%
-++  website-card
-  |=  [event=@t diff=^json]
-  ^-  card
-  %-  fact:agentio  :_  ~[/website]
-  :-  %json  !>  ^-  ^json
-  =,  enjs:format
-  %-  pairs
-  :~  [%type s+event]
-      [%diff diff]
-      :-  %state
-      %-  pairs
-      :~  ['agents' a/(turn ~(tap in live) (lead %s))]
-          ['desks' a/(turn ~(tap in into) (lead %s))]
-      ::
-          :-  'backups'
-          a/(turn ~(tap by kept) |=([to=[@ @p] [* =@da]] (json-backup da to)))
-      ::
-          :-  'whitelist'
-          (pairs ~[['on' b/-.able] ['in' a/(turn ~(tap in p.able) ship)]])
-  ==  ==
-::
-++  json-backup
-  |=  [=@da =dude =@p]
-  ^-  ^json
-  =,  enjs:format
-  (pairs ~[ship+(ship p) agent+s+dude time+(sect da)])
-::
 ++  json
   =,  enjs:format
   |_  state=state-0
-  ++  initial  (website-card 'initial' ~)
-  ::
-  ++  saved
-    |=  new=[dude (unit @p) @da]  (website-card 'saved' (json-da new))
-  ::
-  ++  auto
-    |=  new=[dude (unit @p) (unit @dr)]  (website-card 'auto' (json-dr new))
-  ::
-  ++  restored
-    |=  new=[dude (unit @p) @da]  (website-card 'restored' (json-da new))
-  ::
-  ++  malformed
-    |=  [dude (unit @p) @da]  (website-card 'fail-restore' (json-da +<))
-  ::
-  ++  success
-    |=  [=@p sent=@da kept=@da]
-    %+  website-card  'success'
-    (pairs ~[ship/(ship p) sent/(sect sent) kept/(sect kept)])
-  ::
-  ++  website-card
-    |=  [event=@t diff=^json]
+  ++  website
+    |=  [type=cord diff=^json]
     ^-  card
-    =;  json-state=^json
-      :*  %give  %fact  ~[/keep/website]  %json
-          !>((pairs ~[[%type s+event] [%diff diff] [%state json-state]]))
-      ==
-    %-  pairs
-    :~  [%saved a+(turn ~(tap bi last.state) json-da)]
+    %-  fact:agentio  :_  ~[/website]
+    :-  %json  !>  ^-  ^json
+    =-  ~&  >  emit/-  -
+    %-  pairs 
+    :~  [%type s+type]
+        [%diff diff]
+        :-  %state
+        %-  pairs
+        :~  [%saved a/(turn ~(tap bi last.state) da:event)]
+            [%agents a/(turn ~(tap in live.state) (lead %s))]
+            [%desks a/(turn ~(tap in into.state) (lead %s))]
+        ::
+            :+  %auto
+              %a
+            %+  turn  ~(tap bi auto.state)
+            |=([=dude =(unit @p) =@dr] (dr:event dude unit `dr))
+        ::
+            :+  %backups
+              %a
+            %+  turn  ~(tap by kept.state)
+            |=([[=dude =@p] [* =@da]] (da:event dude `p da))
+        ::
+            :-  %whitelist
+            %-  pairs
+            :~  [%on b/-.able.state]
+                [%in a/(turn ~(tap in p.able.state) ship)]
+    ==  ==  ==
+  ::
+  ++  event
+    |%
+    ++  da
+      |=  [dap=dude place=(unit @p) prev=@da]
+      ^-  ^json
+      (pairs ~[agent/s/dap ship/(bindcast place ship) time/(sect prev)])
     ::
-        :+  %auto
-          %a
-        %+  turn  ~(tap bi auto.state)
-        |=([=dude =(unit @p) =@dr] (json-dr dude unit `dr))
-    ==
-  ::
-  ++  json-da
-    |=  [dap=dude place=(unit @p) prev=@da]
-    ^-  ^json
-    (pairs ~[['app' s/dap] ['ship' (bindcast place ship)] ['time' (sect prev)]])
-  ::
-  ++  json-dr
-    |=  [dap=dude place=(unit @p) freq=(unit @dr)]
-    ^-  ^json
-    %-  pairs
-    :~  ['app' s/dap]
-        ['ship' (bindcast place ship)]
-        ['freq' (bindcast freq (corl numb (curr div ~s1)))]
-    ==
+    ++  dr
+      |=  [dap=dude place=(unit @p) freq=(unit @dr)]
+      ^-  ^json
+      %-  pairs
+      :~  ['app' s/dap]
+          ['ship' (bindcast place ship)]
+          ['freq' (bindcast freq (corl numb (curr div ~s1)))]
+      ==
+    ::
+    ++  ok
+      |=  [dap=dude =@p sent=@da kept=@da]
+      ^-  ^json
+      (pairs ~[agent/s/dap ship/(ship p) sent/(sect sent) kept/(sect kept)])
+    --
   --
 --
