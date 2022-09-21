@@ -6,6 +6,7 @@
 ::  %-(agent:keep your-agent)
 ::
 ::
+/+  verb
 /=  default-agent  /keep/lib/default-agent
 /=  agentio        /keep/lib/agentio
 /=  multipart      /keep/lib/multipart
@@ -29,10 +30,10 @@
     %+  roll  (diff ~(tap by wex.old) ~(tap by wex.bowl))
     |:  *[[[=wire =ship *] *] caz=(list card) ag=_agent]
     =-  [(weld caz -.-) +.-]
-    ?-  res0=(mule |.((on-agent:ag(src.+< ship) wire %kick ~)))
-        [%& *]  p.res0
+    ?-  res=(mule |.((on-agent:ag(src.+< ship) wire %kick ~)))
+        [%& *]  p.res
         [%| *]
-      %+  fall  (mole |.((on-fail:ag %kick leaf/"closing subsciption" p.res0)))
+      %+  fall  (mole |.((on-fail:ag %kick leaf/"closing subsciption" p.res)))
       `ag
     ==
   ::
@@ -40,10 +41,10 @@
     %+  roll  (diff ~(tap by sup.old) ~(tap by sup.bowl))
     |:  *[[* =ship =path] caz=(list card) ag=_agent]
     =-  [(weld caz -.-) +.-]
-    ?-  res0=(mule |.((on-leave:ag(src.+< ship) path)))
-        [%& *]  p.res0
+    ?-  res=(mule |.((on-leave:ag(src.+< ship) path)))
+        [%& *]  p.res
         [%| *]
-      %+  fall  (mole |.((on-fail:ag %leave p.res0)))
+      %+  fall  (mole |.((on-fail:ag %leave p.res)))
       `ag
     ==
   ::
@@ -65,9 +66,6 @@
 ::
 +$  state-0
   $:  %0
-      live=_|
-      last=(map (unit ship) @da)
-      auto=(map (unit ship) @dr)
       pending=(map ship [?(%invite %restore) term])
   ==
 ::
@@ -77,6 +75,7 @@
   =|  state-0
   =*  state  -
   ::
+  %+  verb  &
   ^-  agent:gall
   |_  bowl:gall
   +*  this  .
@@ -91,11 +90,12 @@
       ag    ~(. agent dish)
       io    ~(. agentio bowl)
       pass  |=  =path  ~(. pass:io keep/path)
-      behn  |=  u=(unit ship)  behn/?~(u /put /ship/(scot %p u.u))
-      tell
-        (poke-our:(pass /tell) %keep keep-agent+!>(`agent:poke`tell+dap.bowl))
       upload-path
         /apps/keep/[dap.bowl]/upload
+      start
+        :~  (poke-our:(pass /tell) %keep keep-agent+!>(`agent:poke`tell+dap.bowl))
+            (connect:(pass /eyre) `upload-path dap.bowl)
+        ==
   ::
   ++  on-poke
     |=  [=mark =vase]
@@ -123,17 +123,17 @@
     =/  cmd  !<(wrap:poke vase)
     ?-  -.cmd
     ::  Back up your state once
-        %once
+        %send
       ?>  =(src.bowl our.bowl)
-      ::
       =/  paths
         ?~  to.cmd  ~
         %+  murn  ~(val by sup.bowl)
         |=  [=ship =path]
-        ?.  =(ship u.to.cmd)  ~
+        ?.  &(=(ship u.to.cmd) ?=([%keep %data *] path))
+          ~
         `path
       ::  Possible to back up now?
-      ?:  ?&(?=(^ to.cmd) ?=(~ paths))
+      ?:  &(?=(^ to.cmd) ?=(~ paths))
         ::  No. Initiate new connection.
         =/  key  (scot %uv (sham eny.bowl))
         =.  pending  (~(put by pending) u.to.cmd %invite key)
@@ -144,34 +144,11 @@
         ==
       ::  Yes. Give the fact or write to put and set new timers.
       =/  backup  [wex.dish sup.dish +:on-save:ag]
-      =/  freq  (~(get by auto) to.cmd)
-      =/  prev  (~(get by last) to.cmd)
-      =.  last  (~(put by last) to.cmd now.bowl)
-      ::
       :_  this
-      %-  catunits
-      :~  (bind (both `now.bowl freq) (cork add wait:(pass (behn to.cmd)))) :: set next
-          (bind (both prev freq) (cork add rest:(pass (behn to.cmd)))) :: unset old next
-          `(~(saved json state) to.cmd now.bowl)
-          ?~  to.cmd
-            `(drop our.bowl now.bowl dap.bowl backup)
-          `(fact:io noun+!>(backup) paths)
-      ==
-    ::  Set/unset repeating backups
-        %many
-      ?>  live
-      ?>  =(src.bowl our.bowl)
-      =/  freq  (~(get by auto) to.cmd)
-      =/  prev  (~(get by last) to.cmd)
-      =.  auto  (putunit auto to.cmd freq.cmd)
-      :_  this
-      %-  catunits
-      :~  (bind (both prev freq) (cork add rest:(pass (behn to.cmd)))) :: unset old next
-          `(~(auto json state) to.cmd freq.cmd)
-          ?^  new=(bind (both prev freq.cmd) (cork add wait:(pass (behn to.cmd))))
-            new :: set next later
-          (bind freq.cmd |=(* (wait:(pass (behn to.cmd)) now.bowl))) :: set next now
-      ==
+      :_  ~[(~(saved json state) to.cmd now.bowl)]
+      ?~  to.cmd
+        (drop our.bowl now.bowl dap.bowl backup)
+      (fact:io noun+!>(backup) paths)
     ::  Ask another ship for your state
         %mend
       ?>  =(src.bowl our.bowl)
@@ -192,50 +169,23 @@
       =^  cards  agent  u.res
       :_  this
       [(~(restored json state) `src.bowl now.bowl) cards]
-    ::  Turn wrapper on or off
-        %live
-      ?>  =(our.bowl src.bowl)
-      ?:  =(live live.cmd)  `this
-      =.  live  live.cmd
-      =?  auto  !live.cmd  ~
-      =?  last  !live.cmd  ~
-      :_  this
-      :-  ~(live json state)
-      ?:  live
-        ~[(connect:(pass /eyre) `upload-path dap.bowl)]
-      ~[(arvo:(pass /eyre) %e %disconnect `upload-path)]
-    ::  Successful backup
-        %okay
-      :_  this
-      ~[(~(success json state) src.bowl (~(got by last) `src.bowl) time.cmd)]
     ==
   ::
-  ++  on-peek
-    |=  =path
-    ^-  (unit (unit cage))
-    ~&  [%keep peek=path]
-    ?.  ?=([%x %keep %live ~] path)  (on-peek:ag path)
-    ``loob+!>(live)
+  ++  on-peek  on-peek:ag
   ::
   ++  on-init
     ^-  (quip card agent:gall)
     =^  cards  agent  on-init:ag
     :_  this
-    [tell cards]
+    (weld start cards)
   ::
-  ++  on-save
-    ?.  live  on-save:ag
-    !>([on-save:ag state])
+  ++  on-save  on-save:ag
   ::
   ++  on-load
     |=  old=vase
     ^-  (quip card agent:gall)
-    ?^  our=(mole |.(!<([vase _state] old)))
-      =^  their  state  u.our
-      =^  cards  agent  (on-load:ag their)
-      [[tell cards] this]
     =^  cards  agent  (on-load:ag old)
-    [[tell cards] this]
+    [(weld start cards) this]
   ::
   ++  on-leave
     |=  =path
@@ -262,7 +212,8 @@
       ~|  %didnt-ask
       ?>  =([%invite &3.path] (~(got by pending) src.bowl))
       =.  pending  (~(del by pending) src.bowl)
-      (on-poke(src.+< our.bowl) %keep !>(`wrap:poke`once+`src.bowl))
+      :_  this
+      ~[(poke-self:(pass /poke) keep/!>(`wrap:poke`send+`src.bowl))]
     ==
   ::
   ++  on-agent
@@ -282,20 +233,12 @@
       =^  cards  agent  (on-arvo:ag wire sign-arvo)
       [cards this]
     ::
-    ?+    +.wire  (on-arvo:def wire sign-arvo)
+    ?+    +.wire  (on-arvo:def wire sign-arvo)  ::TODO use ?.
         [%eyre ~]
       ?>  ?=([%eyre %bound *] sign-arvo)
       %.  `this
       ?:  accepted.sign-arvo  same
       (slog leaf+"keep-wrapper-fail -binding-eyre-for-import" ~)
-    ::
-        [%behn ^]
-      ?>  ?=([%behn %wake *] sign-arvo)
-      ?^  error.sign-arvo  ((slog u.error.sign-arvo) `this)
-      ?+  +>.wire  ((slog keep/on-arvo/invalid-wire=wire) `this)
-        [%put *]        (on-poke keep/!>(`wrap:poke`once/~))
-        [%ship term *]  (on-poke keep/!>(`wrap:poke`once/`(slav %p &4.wire)))
-      ==
     ==
   ::
   ++  on-fail
@@ -412,8 +355,6 @@
   ++  restored
     |=  new=[(unit @p) @da]  (website-card 'restored' (json-da new))
   ::
-  ++  live  (website-card 'active' b+live.state)
-  ::
   ++  malformed
     |=  [(unit @p) @da]  (website-card 'fail-restore' (json-da +<))
   ::
@@ -430,13 +371,7 @@
           !>((pairs ~[[%type s+event] [%diff diff] [%state json-state]]))
       ==
     %-  pairs
-    :~  [%live b+live.state]
-        [%saved a+(turn ~(tap by last.state) json-da)]
-    ::
-        :-  %auto
-        a+(turn ~(tap by auto.state) |=([=(unit @p) =@dr] (json-dr unit `dr)))
-    ::
-        :+  %pending
+    :~  :+  %pending
           %a
         %+  turn  ~(tap by pending.state)
         |=  [=@p status=?(%invite %restore) *]
