@@ -197,7 +197,7 @@
       :_  this
       ~[(emit no-save/(da:event:json &2.wire (of-wire |2.wire) now.bowl))]  
     :_  this(last (~(put bi last) &2.wire (of-wire |2.wire) now.bowl))
-    ~[(emit last/(da:event:json &2.wire (of-wire |2.wire) now.bowl))]
+    ~[(emit saved/(da:event:json &2.wire (of-wire |2.wire) now.bowl))]
   ::
       [%backups term term ~]
     ~|  %not-whitelisted
