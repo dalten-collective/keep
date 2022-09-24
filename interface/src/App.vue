@@ -3,7 +3,10 @@
     <div class="tw-flex tw-flex-row tw-justify-center tw-p-8">
       <div>
         <h1 class="tw-text-2xl">
-        Coming soon. Check back in a few days
+        Coming soon. Check back in a few days.
+        </h1>
+        <h1 class="tw-text-2xl">
+        Learn more at <span class="tw-font-mono">~mister-hilper-dozzod-dalten/quartus</span>
         </h1>
       </div>
     </div>
