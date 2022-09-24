@@ -11,15 +11,15 @@
         >
           <v-tab value="active">
             <v-icon start>mdi-flare</v-icon>
-            Active Agents
-          </v-tab>
-          <v-tab value="inactive">
-            <v-icon start>mdi-folder</v-icon>
-            Inactive Agents
+            Agents
           </v-tab>
           <v-tab value="holdingBackups">
             <v-icon start>mdi-folder</v-icon>
-            Holding Backups
+            Backups
+          </v-tab>
+          <v-tab value="inactive">
+            <v-icon start>mdi-folder</v-icon>
+            Configuration
           </v-tab>
         </v-tabs>
       </div>

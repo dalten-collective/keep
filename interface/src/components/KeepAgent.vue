@@ -5,19 +5,24 @@
       <!-- DEBUG TODO: <v-btn @click="deactivateAgent">Deactivate</v-btn> -->
     </header>
 
+    <!-- Deprecated
     <section v-if="!live" class="tw-flex tw-flex-col">
       <v-btn color="success" v-if="!live" @click="activateAgent"
         >Activate</v-btn
       >
     </section>
+    -->
 
-    <section v-else class="tw-flex tw-flex-col">
+    <section class="tw-flex tw-flex-col">
       <article>
         <article
           class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
         >
           <div class="tw-flex-grow">
-            <v-tooltip location="top" v-if="diskBackup.auto.length > 0">
+            <v-tooltip
+              location="top"
+              v-if="diskBackup.auto && diskBackup.auto.length > 0"
+            >
               <template v-slot:activator="{ props }">
                 <v-chip
                   v-bind="props"
@@ -74,7 +79,10 @@
           class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
         >
           <div class="tw-flex-grow">
-            <v-tooltip location="top" v-if="target[1].auto.length > 0">
+            <v-tooltip
+              location="top"
+              v-if="target[1].auto && target[1].auto.length > 0"
+            >
               <template v-slot:activator="{ props }">
                 <v-chip
                   v-bind="props"
@@ -196,11 +204,16 @@ export default defineComponent({
     },
     diskBackup() {
       const status = {
-        auto: this.ourStatus.auto.filter((s) => s.ship === null),
-        saved: this.ourStatus.saved.filter((s) => s.ship === null),
-        pending: this.ourStatus.pending
-          .filter((s) => s.ship === null)
-          .map((s) => s),
+        auto: this.ourStatus
+          ? this.ourStatus.auto?.filter((s) => s.ship === null)
+          : [],
+        saved: this.ourStatus
+          ? this.ourStatus.saved?.filter((s) => s.ship === null)
+          : [],
+        pending: this.ourStatus
+          ? this.ourStatus.pending?.filter((s) => s.ship === null)
+              .map((s) => s)
+          : [],
       };
 
       return status;
@@ -219,7 +232,7 @@ export default defineComponent({
       //   ],
       // };
 
-      this.ourStatus.saved.forEach((s) => {
+      this.ourStatus?.saved?.forEach((s) => {
         let ship;
         if (s.ship) {
           ship = s.ship;
@@ -228,25 +241,27 @@ export default defineComponent({
         }
         shipList.add(ship);
       });
-      this.ourStatus.auto.forEach((s) => {
-        let ship;
-        if (s.ship) {
-          ship = s.ship;
-        } else {
-          ship = this.ourShip;
-        }
-        shipList.add(ship);
-      });
+      if (this.ourStatus?.auto) {
+        this.ourStatus?.auto.forEach((s) => {
+          let ship;
+          if (s.ship) {
+            ship = s.ship;
+          } else {
+            ship = this.ourShip;
+          }
+          shipList.add(ship);
+        });
+      }
       const status = [];
 
       shipList.forEach((ship) => {
         const shipStatus = {
-          auto: this.ourStatus.auto
-            .filter((a) => a.ship === ship)
-            .map((a) => {
-              return { freq: a.freq };
-            }),
-          saved: this.ourStatus.saved
+          // auto: this.ourStatus.auto
+          //   .filter((a) => a.ship === ship)
+          //   .map((a) => {
+          //     return { freq: a.freq };
+          //   }),
+          saved: this.ourStatus?.saved
             .filter((s) => s.ship === ship)
             .map((s) => {
               return { time: s.time };
@@ -265,12 +280,12 @@ export default defineComponent({
         }
 
         // Then order recurring to the top
-        if (a[1].auto.length > 0) {
-          return -1;
-        }
-        if (a[1].auto.length === 0) {
-          return 1;
-        }
+        // if (a[1].auto.length > 0) {
+        //   return -1;
+        // }
+        // if (a[1].auto.length === 0) {
+        //   return 1;
+        // }
 
         // then alphabetize
         if (a[0] < b[0]) {
@@ -285,7 +300,10 @@ export default defineComponent({
     },
 
     pending() {
-      return this.ourStatus.pending;
+      if (this.ourStatus?.pending) {
+        return this.ourStatus.pending;
+      }
+      return [];
     },
   },
   methods: {

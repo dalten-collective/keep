@@ -43,7 +43,10 @@ export default {
       desks: [],
       backups: [] as Array<Backup>,
       pending: [] as Array, // TODO:
-      whitelist: {} as WhitelistSettings
+      whitelist: {} as WhitelistSettings,
+
+      auto: [],
+      saved: [],
     };
   },
 
@@ -51,11 +54,14 @@ export default {
     agents(state): Array<string> {
       return state.agents;
     },
+
+    // TODO: Deprecated
     activeAgents(state): Array<KeepAgentStatus> {
       return state.wrappedAgents.filter((a) => {
         return a.status.live === true;
       });
     },
+    // TODO: Deprecated
     inactiveAgents(state): Array<KeepAgentStatus> {
       return state.wrappedAgents.filter((a) => {
         return a.status.live === false;
@@ -163,27 +169,65 @@ export default {
     },
 
     updateSaved(state, payload: { dif: SavedDiff; agent: string }) {
-      const agent = state.wrappedAgents.find((a) => {
-        return a.agentName == payload.agent;
-      });
+      //const agent = state.auto.find((a) => {
+        //return a.agentName == payload.agent;
+      //});
 
       // remove if existing
-      if (
-        agent.status.saved.map((s) => s.ship).includes(payload.dif.ship)
-      ) {
-        agent.status.saved = agent.status.saved.filter((s) => {
-          return s.ship !== payload.dif.ship;
-        });
+      // TODO: fix new diffs state
+      console.log('payload ', payload)
+      const s = {
+        ship: payload.dif.ship,
+        time: payload.dif.time,
+        agent: payload.agent,
       }
-      // add new status to saved
-      agent.status.saved.push(payload.dif);
+      const agentStatus = state.saved.find((exis) => {
+        console.log('exis ', exis)
+        console.log('s ', s)
+        return (exis.agent === s.agent && exis.ship === s.ship)
+      })
+      // remove if existing
+      console.log('removing ', agentStatus)
+      state.saved.filter((ex) => ex !== agentStatus)
+      console.log('adding ', s)
+      state.saved.push(s)
+
+      // return
+      // if (
+      //   agent.status.saved.map((s) => s.ship).includes(payload.dif.ship)
+      // ) {
+      //   agent.status.saved = agent.status.saved.filter((s) => {
+      //     return s.ship !== payload.dif.ship;
+      //   });
+      // }
+      // // add new status to saved
+      // agent.status.saved.push(payload.dif);
     },
 
     updateAuto(state, payload: { dif: AutoOnDiff; agent: string }) {
       const agent: KeepAgentStatus = state.wrappedAgents.find((a) => {
         return a.agentName == payload.agent;
       });
+      console.log('TODO auto update ', agent)
 
+      const s = {
+        ship: payload.dif.ship,
+        time: payload.dif.time,
+        agent: payload.agent,
+      }
+      const agentStatus = state.saved.find((exis) => {
+        console.log('exis ', exis)
+        console.log('s ', s)
+        return (exis.agent === s.agent && exis.ship === s.ship)
+      })
+      // remove if existing
+      console.log('removing ', agentStatus)
+      state.saved.filter((ex) => ex !== agentStatus)
+      console.log('adding ', s)
+      state.saved.push(s)
+
+      return
+      // TODO remove below
       // remove if existing
       if (
         agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)

@@ -3,7 +3,7 @@
 
     <div class="tw-flex tw-space-between tw-mb-4">
       <div class="tw-grow">
-        <h3 class="tw-text-3xl tw-font-silom">Active Agents</h3>
+        <h3 class="tw-text-3xl tw-font-silom">Agents</h3>
       </div>
       <!--
       <div>
@@ -29,10 +29,10 @@
     </div>
 
     <div v-else>
-      <div v-if="activeAgents.length === 0">No active agents</div>
-      <div v-else v-for="agent in orderedActiveAgents" :key="agent" class="tw-my-2">
+      <div v-if="agents.length === 0">No active agents</div>
+      <div v-else v-for="agent in orderedAgents" :key="agent" class="tw-my-2">
         <KeepAgent
-          :agent-name="agent.agentName"
+          :agent-name="agent"
           class="tw-p-2 tw-my-4 tw-bg-white tw-border tw-rounded-keep"
         />
       </div>
@@ -55,9 +55,9 @@ export default defineComponent({
     KeepAgent,
   },
   computed: {
-    ...mapGetters("keep", ["agents", "activeAgents"]),
-    orderedActiveAgents() {
-      return this.activeAgents.slice().sort((a, b) => {
+    ...mapGetters("keep", ["agents", "activeAgents", "agentStatus"]),
+    orderedAgents() {
+      return this.agents.slice().sort((a, b) => {
         if (a.agentName < b.agentName) {
           return -1;
         }

@@ -3,6 +3,7 @@
     <template v-slot:activator="{ props }">
       <v-btn v-bind="props" color="success" text="white" @click="openBackup">
         <v-icon start>mdi-content-save</v-icon>
+        {{ ship }}
         Backup
       </v-btn>
     </template>
@@ -158,7 +159,7 @@
                       v-model="freq"
                       :rules="[
                         (v) => !!v || 'Required',
-                        (v) => v >= 120 || 'Must be at least 120',
+                        (v) => v >= 13 || 'Must be at least 120',
                       ]"
                     />
                   </div>
@@ -202,7 +203,7 @@
                       v-model="freq"
                       :rules="[
                         (v) => !!v || 'Required',
-                        (v) => v >= 120 || 'Must be at least 120',
+                        (v) => v >= 13 || 'Must be at least 120',
                       ]"
                     />
                   </div>
@@ -266,7 +267,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import type { PropType } from "vue";
 
 import {
@@ -321,7 +322,7 @@ export default defineComponent({
   },
 
   mounted() {
-    if (this.isRecurringSaved) {
+    if (this.isRecurringSaved && this.haveAuto) {
       this.freq = this.status.auto[0].freq;
     }
   },
@@ -345,21 +346,34 @@ export default defineComponent({
   },
 
   computed: {
+    ...mapState("keep", ["saved"]),
     // ...mapGetters("peat", ["isRecurringSaved"]),
+    autoStatus() {
+      if (this.status.auto && this.status.length > 0) {
+        return this.status.auto[0]
+      } else {
+        return {}
+      }
+    },
+    haveAuto(): boolean {
+      return this.autoStatus.hasOwnProperty('freq')
+    },
+
     haveFreq() {
-      if (this.isRecurringBackup) {
+      if (this.isRecurringBackup && this.haveAuto) {
         return this.status.auto[0].freq;
       }
       return 240;
     },
     isRecurringBackup() {
-      if ("auto" in this.status && this.status.auto.length > 0) {
+      if (this.haveAuto && this.status.auto.length > 0) {
         return true;
       }
       return false;
     },
+
     haveSaved() {
-      if ("saved" in this.status && this.status.saved.length > 0) {
+      if (this.status.saved && this.status.saved.length > 0) {
         return true;
       }
       return false;

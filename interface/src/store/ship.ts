@@ -98,9 +98,8 @@ export default {
       airlock.openAirlockTo(
         agentName,
         (data: KeepAgentSubscriptionResponse) => {
-          console.log("agentName ", agentName);
           console.log(
-            `sub-agent response ('${agentName}' agent)`,
+            `keep-wrapper response ('${agentName}' agent)`,
             data
           );
 

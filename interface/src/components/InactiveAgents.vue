@@ -1,6 +1,7 @@
 <template>
   <div class="tw-w-screen">
     <div class="tw-flex tw-space-between tw-mb-4">
+
       <div class="tw-grow">
         <h3 class="tw-text-3xl tw-font-silom">Inactive Agents</h3>
         <p class="tw-my-2">

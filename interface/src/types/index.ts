@@ -4,10 +4,11 @@ export enum EventType {
   Agent = "agent",   // the main keep agent has done something (like wrapping)
   Backup = "backup", // WE did a backup for someone else
   Saved = "saved", // OUR backup was requested with someone else
+  NoSave = "no-save", // agent can't poke wrapper
   Auto = "auto", // auto-backup configured
   Pending = "pending", // backup-to ship invited
   Restored = "restored", // backup has been restored
-  Active = "active", // wrapper 'live' has changed
+  // Active = "active", // wrapper 'live' has changed
   NewAgent = "agent", // new agent has been wrapped
 }
 
@@ -54,12 +55,14 @@ export interface AutoOnDiff {
   freq: number;
 }
 
+// Emitted from wrapper
 export interface PendingDiff {
   ship: Ship;
   status: InviteStatus;
 }
 
-export type ActiveDiff = boolean;
+// Deprecated
+// export type ActiveDiff = boolean;
 
 export interface AutoOffDiff {
   ship: Ship;
@@ -73,15 +76,15 @@ export interface SuccessDiff {
 }
 
 export type Diff =
-  | RestoreDiff
-  | BackupDiff
-  | SavedDiff
-  | ActiveDiff
-  | SuccessDiff
-  | AutoOnDiff
-  | AutoOffDiff
-  | ActiveDiff
-  | PendingDiff;
+  | RestoreDiff  // wrapper
+  | BackupDiff   // wrapper
+  | SuccessDiff  // wrapper
+  | PendingDiff  // wrapper
+  | AutoOnDiff   // agent
+  | AutoOffDiff  // agent
+  | SavedDiff;   // agent
+  // | ActiveDiff
+  // | ActiveDiff
 
 export interface KeepSubscriptionResponse {
   state: KeepSubscriptionState;
@@ -126,7 +129,7 @@ export interface KeepAgentSubscriptionStatus {
   auto: Array<AutoStatus>;
   saved: Array<SavedStatus>;
   restored: Array<RestoredStatus>;
-  live: boolean;
+  // live: boolean; Deprecated
 }
 
 export interface KeepAgentStatus {
@@ -137,6 +140,19 @@ export interface KeepAgentStatus {
 export interface AgentSubscription {
   agentName: string;
   subscriptionNumber: number;
+}
+
+// To keep-agent
+export interface OncePoke {
+  once: {
+    from: string;
+    to: Ship;
+  };
+}
+export interface LocalOncePoke {
+  once: {
+    from: string;
+  };
 }
 
 export interface OnceRequest {
@@ -151,6 +167,15 @@ export interface LocalBackupRequest {
 export interface LocalManyRequest {
   agentName: string;
   freq: number;
+}
+
+// To keep-agent
+export interface ManyPoke {
+  many: {
+    from: string;
+    to: Ship;
+    freq: number;
+  };
 }
 
 export interface ManyRequest {
