@@ -20,8 +20,8 @@
     :~  [%able (ot ~[able/bo ship/(se %p)])]
         [%wyte bo]
         [%copy so]
-        [%once (ot ~[from/so to/(mu (se %p))]]
-        %-  %many
+        [%once (ot ~[from/so to/(mu (se %p))])]
+        :-  %many
         (ot ~[from/so to/(mu (se %p)) freq/(cu (lift (cury mul ~s1)) (mu ni))])
     ==
   --
