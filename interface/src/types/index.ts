@@ -11,12 +11,79 @@ export enum EventType {
   NewAgent = "agent", // new agent has been wrapped
 }
 
+export interface OnceLocalPoke {
+  
+}
+
+export interface WytePokePayload {
+  wyte: boolean
+}
+export interface WytePoke {
+  app: 'keep';
+  mark: 'keep-agent';
+  json: WytePokePayload;
+}
+
+export interface WyteAblePayload {
+  able: {
+    able: boolean;
+    ship: string;
+  }
+}
+export interface WyteAblePoke {
+  app: 'keep';
+  mark: 'keep-agent';
+  json: WyteAblePayload;
+}
+
+export interface CopyDepsPayload {
+  copy: string;
+}
+export interface CopyDepsPoke {
+  app: 'keep';
+  mark: 'keep-agent';
+  json: CopyDepsPayload;
+}
+
+export interface BackupPayload {
+  once: {
+    from: AgentName;
+    to: Ship | null;
+  }
+}
+export interface BackupPoke {
+  app: 'keep';
+  mark: 'keep-agent';
+  json: BackupPayload;
+}
+
+export interface ManyPayload {
+  many: {
+    from: AgentName;
+    to: Ship | null;
+    freq: number | null;
+  }
+}
+export interface ManyPoke {
+  app: 'keep';
+  mark: 'keep-agent';
+  json: ManyPayload;
+}
+
+// mend go to wrapper
+
+
+
+////
+
+
 export enum InviteStatus {
   Invite = "invite",
   Restore = "restore",
 }
 
 export type Ship = string;
+export type AgentName = string;
 
 export interface Backup {
   ship: Ship;
@@ -168,6 +235,15 @@ export interface UnsetManyRequest {
 export interface RestoreRequest {
   ship: Ship;
   agentName: string;
+}
+
+export interface MendPayload {
+  ship: Ship;
+}
+export interface MendPoke {
+  app: AgentName;
+  mark: 'keep';
+  json: MendPayload;
 }
 
 export interface LogMessage {

@@ -30,6 +30,7 @@ import {
   LocalBackupRequest,
   LocalManyRequest,
   SuccessDiff,
+  CopyDepsPayload
 } from "@/types";
 import {siggedShip} from "@/api/keep";
 
@@ -241,9 +242,9 @@ export default {
         .catch((e) => { throw e })
     },
 
-    copyDeps({}, deskName: string) {
+    copyDeps({}, payload: CopyDepsPayload) {
       return keepApi
-        .copyDeps(deskName)
+        .pokeCopyDeps(payload)
         .then((r) => {
           // commit("localOnWyte")
           return r;
