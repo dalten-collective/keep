@@ -6,7 +6,6 @@
 ::  %-(agent:keep your-agent)
 ::
 ::
-/+  verb
 /=  default-agent  /keep/lib/default-agent
 /=  agentio        /keep/lib/agentio
 /=  multipart      /keep/lib/multipart
@@ -75,7 +74,6 @@
   =|  state-0
   =*  state  -
   ::
-  %+  verb  &
   ^-  agent:gall
   |_  bowl:gall
   +*  this  .
