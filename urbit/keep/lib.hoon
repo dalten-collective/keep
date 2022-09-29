@@ -108,7 +108,7 @@
     ?.  ?=(?(%keep %handle-http-request) mark)  call-inner
     ?:  ?=(%handle-http-request mark)
       =/  req  !<([@ta inbound-request:eyre] vase)
-      ?.  =([~ 0] (find upload-path (rash url.request.+.req stap)))
+      ?.  =([~ 0] (biff (rush url.request.+.req stap) (cury find upload-path)))
         call-inner
       ?>  =(src.bowl our.bowl)
       =/  [res=(unit agent:gall) cards=(list card)]
