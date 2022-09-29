@@ -1,7 +1,7 @@
 :~  title+'Keep'
     info+'Back up your Urbit.'
     color+0x81.88c9
-    glob-http+['https://freedom-club.sfo2.digitaloceanspaces.com/glob-0vn2v8b.4fd2a.sk6t2.rpjs9.uhffv.glob' 0vn2v8b.4fd2a.sk6t2.rpjs9.uhffv]
+    glob-http+['https://freedom-club.sfo2.digitaloceanspaces.com/glob-0v6.9e37d.7gsfl.vi477.35scp.n6mml.glob' 0v6.9e37d.7gsfl.vi477.35scp.n6mml]
     base+'keep'
     version+[0 0 2]
     website+'https://dalten.org/'
