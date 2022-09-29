@@ -1,6 +1,6 @@
 <template>
   <v-app class="tw-font-silom">
-    <div class="tw-flex tw-flex-row tw-justify-center tw-p-8">
+    <div v-if="false" class="tw-flex tw-flex-row tw-justify-center tw-p-8">
       <div>
         <h1 class="tw-text-2xl">
         Coming soon. Check back in a few days.
@@ -10,7 +10,7 @@
         </h1>
       </div>
     </div>
-    <div v-if="false">
+    <div v-if="true">
       <v-app-bar extend color="primary">
         <template v-slot:prepend>
           <v-app-bar-nav-icon

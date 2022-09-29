@@ -1,7 +1,7 @@
 export enum EventType {
   Success = "success", // Backup saved successfull
   Initial = "initial", // first response on subscrtiption start
-  Agent = "agent",   // the main keep agent has done something (like wrapping)
+  Agent = "agent", // the main keep agent has done something (like wrapping)
   Backup = "backup", // WE did a backup for someone else
   Saved = "saved", // OUR backup was requested with someone else
   Auto = "auto", // auto-backup configured
@@ -9,18 +9,15 @@ export enum EventType {
   Restored = "restored", // backup has been restored
   Active = "active", // wrapper 'live' has changed
   NewAgent = "agent", // new agent has been wrapped
-}
-
-export interface OnceLocalPoke {
-  
+  CopiedDeps = "copied-deps", // Begun copying deps for agent
 }
 
 export interface WytePokePayload {
-  wyte: boolean
+  wyte: boolean;
 }
 export interface WytePoke {
-  app: 'keep';
-  mark: 'keep-agent';
+  app: "keep";
+  mark: "keep-agent";
   json: WytePokePayload;
 }
 
@@ -28,20 +25,21 @@ export interface WyteAblePayload {
   able: {
     able: boolean;
     ship: string;
-  }
+  };
 }
 export interface WyteAblePoke {
-  app: 'keep';
-  mark: 'keep-agent';
+  app: "keep";
+  mark: "keep-agent";
   json: WyteAblePayload;
 }
 
 export interface CopyDepsPayload {
   copy: string;
+  // TODO: soon to include a boolean for disabling
 }
 export interface CopyDepsPoke {
-  app: 'keep';
-  mark: 'keep-agent';
+  app: "keep";
+  mark: "keep-agent";
   json: CopyDepsPayload;
 }
 
@@ -49,11 +47,11 @@ export interface BackupPayload {
   once: {
     from: AgentName;
     to: Ship | null;
-  }
+  };
 }
 export interface BackupPoke {
-  app: 'keep';
-  mark: 'keep-agent';
+  app: "keep";
+  mark: "keep-agent";
   json: BackupPayload;
 }
 
@@ -62,21 +60,79 @@ export interface ManyPayload {
     from: AgentName;
     to: Ship | null;
     freq: number | null;
-  }
+  };
 }
 export interface ManyPoke {
-  app: 'keep';
-  mark: 'keep-agent';
+  app: "keep";
+  mark: "keep-agent";
   json: ManyPayload;
 }
 
-// mend go to wrapper
-
-
+export interface MendPayload {
+  ship: Ship;
+}
+export interface MendPoke {
+  app: AgentName;
+  mark: "keep";
+  json: MendPayload;
+}
 
 ////
+//
+//
+//
+//
+//
 
+export interface KeepAgentInitialResponse {
+  type: EventType.Initial;
+  diff: null;
+  state: KeepAgentState;
+}
+export interface KeepAgentAgentEnrichedResponse {
+  type: EventType.Agent;
+  diff: AgentName;
+  state: KeepAgentState;
+}
+export interface KeepAgentDepsCopiedResponse {
+  type: EventType.CopiedDeps;
+  diff: AgentName;
+  state: KeepAgentState;
+}
 
+export interface KeepWrapperInitialResponse {
+  type: EventType.Initial;
+  diff: null;
+  state: KeepWrapperState;
+}
+export interface KeepWrapperPendingResponse {
+  type: EventType.Pending;
+  diff: null;
+  state: KeepWrapperState;
+}
+export interface KeepWrapperSavedResponse {
+  type: EventType.Saved;
+  diff: SavedStatus;
+  state: KeepWrapperState;
+}
+export interface KeepWrapperBackupResponse {
+  type: EventType.Backup;
+  diff: null;
+  state: KeepWrapperState;
+}
+export interface KeepWrapperRestoredResponse {
+  type: EventType.Restored;
+  diff: null;
+  state: KeepWrapperState;
+}
+
+////
+//
+//
+//
+//
+//
+//
 export enum InviteStatus {
   Invite = "invite",
   Restore = "restore",
@@ -84,6 +140,7 @@ export enum InviteStatus {
 
 export type Ship = string;
 export type AgentName = string;
+export type DeskName = string;
 
 export interface Backup {
   ship: Ship;
@@ -150,35 +207,44 @@ export type Diff =
   | ActiveDiff
   | PendingDiff;
 
-export interface KeepSubscriptionResponse {
-  state: KeepSubscriptionState;
+export interface KeepAgentSubscriptionResponse {
+  state: KeepAgentState;
   diff: Diff;
   type: EventType;
 }
 
-export interface KeepAgentSubscriptionResponse {
-  state: KeepAgentSubscriptionStatus;
-  diff: object; // TODO: define types of diffs
+export interface KeepWrapperSubscriptionResponse {
+  state: KeepWrapperState;
+  diff: Diff;
   type: EventType;
 }
 
-export interface KeepSubscriptionState {
-  agents: Array<Ship>;
+export interface KeepAgentState {
+  agents: Array<AgentName>;
+  auto: Array<AutoStatus>;
   backups: Array<Backup>;
+  desks: Array<DeskName>;
+  saved: Array<SavedStatus>;
   whitelist: WhitelistSettings;
 }
 
+export interface KeepWrapperState {
+  pending: Array<PendingStatus>;
+}
+
 export interface PendingStatus {
-  status: string;
+  status: "invite" | "restore";
   ship: Ship;
 }
 
 export interface SavedStatus {
+  agent: AgentName;
   ship: Ship;
   time: number;
 }
 
 export interface AutoStatus {
+  agent: AgentName;
   ship: Ship;
   freq: number;
 }
@@ -235,15 +301,6 @@ export interface UnsetManyRequest {
 export interface RestoreRequest {
   ship: Ship;
   agentName: string;
-}
-
-export interface MendPayload {
-  ship: Ship;
-}
-export interface MendPoke {
-  app: AgentName;
-  mark: 'keep';
-  json: MendPayload;
 }
 
 export interface LogMessage {

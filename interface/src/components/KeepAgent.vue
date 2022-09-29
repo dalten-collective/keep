@@ -3,15 +3,11 @@
     <header class="tw-mb-4 tw-flex tw-justify-between">
       <h3 class="tw-text-2xl">%{{ agentName }}</h3>
       <!-- DEBUG TODO: <v-btn @click="deactivateAgent">Deactivate</v-btn> -->
+      <pre>wrapper {{ ourWrapperStatus }}</pre>
+      <pre>agent {{ ourAgentStatus }}</pre>
     </header>
 
-    <section v-if="!live" class="tw-flex tw-flex-col">
-      <v-btn color="success" v-if="!live" @click="activateAgent"
-        >Activate</v-btn
-      >
-    </section>
-
-    <section v-else class="tw-flex tw-flex-col">
+    <section class="tw-flex tw-flex-col">
       <article>
         <article
           class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
@@ -153,7 +149,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
-import { LocalBackupRequest, RestoreRequest } from "../types";
+import { BackupPayload, RestoreRequest } from "../types";
 
 import BackupButton from "@/components/BackupButton.vue";
 import RestoreButton from "@/components/RestoreButton.vue";
@@ -168,10 +164,6 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    inactive: {
-      type: Boolean,
-      default: false,
-    },
   },
   components: { BackupButton, RestoreButton, AddBackupTargetButton },
   data() {
@@ -180,32 +172,41 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapGetters("keep", ["agents", "agentStatus"]),
-    ourStatus() {
-      const status = this.agentStatus(this.agentName);
+    ...mapGetters("keep", ["agents", "wrapperStatus", "agentStatus"]),
+    ourWrapperStatus() {
+      console.log('ourstatus ', this.wrapperStatus('gora'))
+      const status = this.wrapperStatus(this.agentName);
       if (status) {
         return status;
       }
       return null;
     },
-    live() {
-      if (!this.ourStatus) {
-        return false;
-      }
-      return !!this.ourStatus.live;
-    },
-    diskBackup() {
-      const status = {
-        auto: this.ourStatus.auto.filter((s) => s.ship === null),
-        saved: this.ourStatus.saved.filter((s) => s.ship === null),
-        pending: this.ourStatus.pending
-          .filter((s) => s.ship === null)
-          .map((s) => s),
-      };
 
-      return status;
+    ourAgentStatus() {
+      return this.agentStatus('gora')
+    },
+
+    diskBackup() {
+      return {
+          auto: [],
+          saved: [],
+          pending: [],
+        }
+      // TODO
+      
+      // const status = {
+      //   auto: this.ourStatus.auto.filter((s) => s.ship === null),
+      //   saved: this.ourStatus.saved.filter((s) => s.ship === null),
+      //   pending: this.ourStatus.pending
+      //     .filter((s) => s.ship === null)
+      //     .map((s) => s),
+      // };
+
+      // return status;
     },
     backupsByShip() {
+      return []
+      // return AgentStatus items for this agent
       const shipList = new Set();
       // TODO: test structure:
       // const ourStatus = {
@@ -285,7 +286,9 @@ export default defineComponent({
     },
 
     pending() {
-      return this.ourStatus.pending;
+      return false
+      // TODO: how pending?
+      // return this.ourStatus.pending;
     },
   },
   methods: {
@@ -296,13 +299,6 @@ export default defineComponent({
         : locationString;
       const redirectLocation = `${baseURL}/${this.agentName}/upload`;
       window.open(redirectLocation, "_blank");
-    },
-
-    doLocalBackup() {
-      const request: LocalBackupRequest = {
-        agentName: this.agentName,
-      };
-      this.$store.dispatch("keep/backupLocal", request);
     },
 
     activateAgent() {

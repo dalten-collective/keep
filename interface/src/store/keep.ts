@@ -21,8 +21,8 @@ import {
   ManyRequest,
   UnsetManyRequest,
   RestoreRequest,
-  KeepAgentSubscriptionStatus,
-  KeepSubscriptionState,
+  KeepAgentState,
+  KeepWrapperState,
   EventType,
   LogMessage,
   SavedDiff,
@@ -30,21 +30,26 @@ import {
   LocalBackupRequest,
   LocalManyRequest,
   SuccessDiff,
-  CopyDepsPayload
+  CopyDepsPayload,
+  AgentName,
+  DeskName,
+  KeepWrapperSubscriptionResponse,
 } from "@/types";
-import {siggedShip} from "@/api/keep";
+import { siggedShip } from "@/api/keep";
 
 export default {
   namespaced: true,
   state() {
     return {
-      agents: [] as Array<string>,
-      wrappedAgents: [] as Array<KeepAgentStatus>,
-      copyingDepsAgents: [] as Array<string>, // TODO: remove
-      desks: [],
+      agents: [] as Array<AgentName>,
+      auto: [] as Array<AutoStatus>,
       backups: [] as Array<Backup>,
-      pending: [] as Array, // TODO:
-      whitelist: {} as WhitelistSettings
+      desks: [] as Array<DeskName>,
+      saved: [] as Array<SavedStatus>,
+      whitelist: {} as WhitelistSettings,
+      wrappedAgents: [] as Array<KeepAgentStatus>, // TODO: remove
+      copyingDepsAgents: [] as Array<string>, // TODO: remove
+      pending: [] as Array<PendingStatus>, // TODO: remove
     };
   },
 
@@ -62,16 +67,28 @@ export default {
         return a.status.live === false;
       });
     },
-    agentStatus: (state) => (
-      agentName: string
-    ): KeepAgentSubscriptionStatus | null => {
-      const s = state.wrappedAgents.find((sub: KeepAgentStatus) => {
-        return sub.agentName == agentName;
-      });
-      if (s) {
-        return s.status;
-      }
-      return null;
+
+    wrapperStatus: (state) => ( soughtAgentName: AgentName): KeepWrapperState | null => {
+      const pending: Array<PendingStatus> | [] = []
+      return {
+        pending
+      };
+    },
+
+    agentStatus: (state: KeepAgentState) => (soughtAgentName: AgentName) => {
+      console.log(state)
+      const auto: Array<AutoStatus> | [] = state.auto.filter((a: AutoStatus) => {
+        return a.agent === soughtAgentName
+      })
+      const backup: Array<Backup> | [] = state.backups.filter((b: Backup) => {
+        return b.agent === soughtAgentName
+      })
+      const saved: Array<SavedStatus> | [] = state.saved.filter((s: SavedStatus) => {
+        return s.agent === soughtAgentName
+      })
+      return {
+        auto, backup, saved
+      };
     },
   },
 
@@ -88,14 +105,14 @@ export default {
     },
 
     addToWyte(state, ship) {
-      const list = new Set(state.whitelist.in)
-      list.add(ship)
-      state.whitelist.in = Array.from(list)
+      const list = new Set(state.whitelist.in);
+      list.add(ship);
+      state.whitelist.in = Array.from(list);
       // state.whitelist.in.push(ship);
     },
     removeFromWyte(state, ship) {
       state.whitelist.in = state.whitelist.in.filter((s) => {
-        return siggedShip(s) !== siggedShip(ship)
+        return siggedShip(s) !== siggedShip(ship);
       });
     },
 
@@ -107,11 +124,11 @@ export default {
       state.agents = state.agents.filter((a: string) => a != agentName);
     },
 
-    setAgentStatus(
+    setWrapperStatus(
       state,
       payload: {
         agentName: string;
-        responseState: KeepAgentSubscriptionStatus;
+        responseState: KeepWrapperState;
       }
     ) {
       // Update or set this agent's state:
@@ -119,11 +136,7 @@ export default {
         (a: KeepAgentStatus) => a.agentName === payload.agentName
       );
       if (agentIndex == -1) {
-        console.log(
-          "did not find ",
-          payload.agentName,
-          " in wrappedAgents"
-        );
+        console.log("did not find ", payload.agentName, " in wrappedAgents");
         console.log("all agents ", state.agents);
         console.log("adding...");
         state.wrappedAgents.push({
@@ -134,13 +147,20 @@ export default {
         state.wrappedAgents.splice(agentIndex, 1, {
           agentName: payload.agentName,
           status: payload.responseState,
-        } as KeepAgentStatus);
+        });
       }
     },
 
+    setAuto(state, auto: Array<AutoStatus>) {
+      state.auto = auto;
+    },
     setBackups(state, backups: Array<Backup>) {
       state.backups = backups;
     },
+    setSaved(state, saved: Array<SavedStatus>) {
+      state.saved = saved;
+    },
+
     setWhitelist(state, whitelist: WhitelistSettings) {
       state.whitelist = whitelist;
     },
@@ -149,9 +169,9 @@ export default {
       // remove if existing (by agent AND ship)
       state.backups = state.backups.filter((b) => {
         if (b.ship != payload.dif.ship || b.agent != payload.agent) {
-          return b
+          return b;
         }
-      })
+      });
       // add
       state.backups.push(payload.dif);
     },
@@ -169,9 +189,7 @@ export default {
       });
 
       // remove if existing
-      if (
-        agent.status.saved.map((s) => s.ship).includes(payload.dif.ship)
-      ) {
+      if (agent.status.saved.map((s) => s.ship).includes(payload.dif.ship)) {
         agent.status.saved = agent.status.saved.filter((s) => {
           return s.ship !== payload.dif.ship;
         });
@@ -186,9 +204,7 @@ export default {
       });
 
       // remove if existing
-      if (
-        agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)
-      ) {
+      if (agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)) {
         agent.status.auto = agent.status.auto.filter((s) => {
           return s.ship !== payload.dif.ship;
         });
@@ -203,9 +219,7 @@ export default {
       });
 
       // remove if existing
-      if (
-        agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)
-      ) {
+      if (agent.status.auto.map((s) => s.ship).includes(payload.dif.ship)) {
         agent.status.auto = agent.status.auto.filter((s) => {
           return s.ship !== payload.dif.ship;
         });
@@ -237,9 +251,14 @@ export default {
     scry({}, scry: Scry) {
       // TODO: need to insure that path is prefixed with /
       console.log(scry);
-      return keepApi.scry(scry)
-        .then((r) => { return r })
-        .catch((e) => { throw e })
+      return keepApi
+        .scry(scry)
+        .then((r) => {
+          return r;
+        })
+        .catch((e) => {
+          throw e;
+        });
     },
 
     copyDeps({}, payload: CopyDepsPayload) {
@@ -258,7 +277,7 @@ export default {
       return keepApi
         .wyteOn()
         .then((r) => {
-          commit("localOnWyte")
+          commit("localOnWyte");
           return r;
         })
         .catch((e) => {
@@ -269,7 +288,7 @@ export default {
       return keepApi
         .wyteOff()
         .then((r) => {
-          commit("localOffWyte")
+          commit("localOffWyte");
           return r;
         })
         .catch((e) => {
@@ -280,22 +299,22 @@ export default {
       return keepApi
         .wyteDisable(ship)
         .then((r) => {
-          commit('removeFromWyte', ship)
+          commit("removeFromWyte", ship);
           return r;
         })
         .catch((e) => {
-          throw e
+          throw e;
         });
     },
     wyteAllow({ commit }, ship: Ship) {
       return keepApi
         .wyteAble(ship)
         .then((r) => {
-          commit('addToWyte', ship)
+          commit("addToWyte", ship);
           return r;
         })
         .catch((e) => {
-          throw e
+          throw e;
         });
       // add to whitelist.in
     },
@@ -315,14 +334,14 @@ export default {
       });
     },
 
-    handleKeepResponseState(
-      { commit },
-      responseState: KeepSubscriptionState
-    ) {
+    handleKeepResponseState({ commit }, responseState: KeepAgentState) {
       console.log("keep response state: ", responseState);
+      commit("setAuto", responseState.auto);
       commit("setBackups", responseState.backups);
+      commit("setSaved", responseState.saved);
       commit("setWhitelist", responseState.whitelist);
       commit("setDesks", responseState.desks);
+      commit("setAgents", responseState.agents);
     },
 
     // TODO
@@ -374,18 +393,18 @@ export default {
       // }
     },
 
-    handleAgentResponseState(
+    handleWrapperResponseState(
       { commit },
       payload: {
         agentName: string;
-        responseState: KeepAgentSubscriptionStatus;
+        responseState: KeepWrapperSubscriptionResponse;
       }
     ) {
       console.log(
         `handle %${payload.agentName} agent response state: `,
         payload.responseState
       );
-      commit("setAgentStatus", {
+      commit("setWrapperStatus", {
         agentName: payload.agentName,
         responseState: payload.responseState,
       });
@@ -443,14 +462,14 @@ export default {
         let targetShip;
         let logMsg: LogMessage;
         if (ship) {
-          targetShip = ship
+          targetShip = ship;
           logMsg = {
             msg: `Requested backup of %${payload.agentName} to ${targetShip} at ${time}`,
             time,
             type: "pend",
           };
         } else {
-          targetShip = 'local disk'
+          targetShip = "local disk";
           logMsg = {
             msg: `Backed up %${payload.agentName} to ${targetShip} at ${time}`,
             time,
@@ -461,14 +480,16 @@ export default {
       }
 
       if (payload.responseType === EventType.Success) {
-        console.log('backup done')
-        const d = payload.diff as SuccessDiff
+        console.log("backup done");
+        const d = payload.diff as SuccessDiff;
         const sent = d.sent;
         const kept = d.kept;
         const ship = d.ship;
 
         const logMsg: LogMessage = {
-          msg: `Backup of %${payload.agentName} saved to ${ship} at ${kept} (took ${kept - sent} seconds).`,
+          msg: `Backup of %${
+            payload.agentName
+          } saved to ${ship} at ${kept} (took ${kept - sent} seconds).`,
           time: kept,
           type: "succ",
         };
@@ -486,9 +507,9 @@ export default {
 
         let targetShip;
         if (ship) {
-          targetShip = ship
+          targetShip = ship;
         } else {
-          targetShip = 'local disk'
+          targetShip = "local disk";
         }
 
         const logMsg: LogMessage = {
@@ -513,9 +534,9 @@ export default {
 
           let targetShip;
           if (ship) {
-            targetShip = ship
+            targetShip = ship;
           } else {
-            targetShip = 'local disk'
+            targetShip = "local disk";
           }
           const logMsg: LogMessage = {
             msg: `Recurring backups for %${payload.agentName} to ${targetShip} activated every ${freq} seconds`,
@@ -532,9 +553,9 @@ export default {
 
           let targetShip;
           if (ship) {
-            targetShip = ship
+            targetShip = ship;
           } else {
-            targetShip = 'local disk'
+            targetShip = "local disk";
           }
           const logMsg: LogMessage = {
             msg: `Recurring backups for %${payload.agentName} to ${targetShip} stopped`,
@@ -595,9 +616,9 @@ export default {
         });
     },
 
-    backupLocal({}, payload: LocalBackupRequest) {
+    backupLocal(ctx, payload: BackupPayload) {
       return keepApi
-        .localBackup(payload)
+        .pokeOnce(payload)
         .then((r) => {
           return r;
         })
@@ -606,9 +627,9 @@ export default {
         });
     },
 
-    localMany({}, payload: LocalManyRequest) {
+    localMany(ctx, payload: ManyPayload) {
       return keepApi
-        .localMany(payload)
+        .pokeMany(payload)
         .then((r) => {
           return r;
         })
@@ -669,24 +690,15 @@ export default {
       keepApi.deactivate(payload.agentName);
     },
 
-    addPending(
-      { commit },
-      payload: { dif: PendingDiff; agent: string }
-    ) {
+    addPending({ commit }, payload: { dif: PendingDiff; agent: string }) {
       commit("addPending", payload);
     },
 
-    addKeptBackup(
-      { commit },
-      payload: { dif: BackupDiff; agent: string }
-    ) {
+    addKeptBackup({ commit }, payload: { dif: BackupDiff; agent: string }) {
       commit("updateBackup", payload);
     },
 
-    addSavedBackup(
-      { commit },
-      payload: { dif: SavedDiff; agent: string }
-    ) {
+    addSavedBackup({ commit }, payload: { dif: SavedDiff; agent: string }) {
       commit("updateSaved", payload);
     },
 
@@ -694,10 +706,7 @@ export default {
       commit("updateAuto", payload);
     },
 
-    removeAuto(
-      { commit },
-      payload: { dif: AutoOffDiff; agent: string }
-    ) {
+    removeAuto({ commit }, payload: { dif: AutoOffDiff; agent: string }) {
       commit("removeAuto", payload);
     },
 
@@ -705,12 +714,8 @@ export default {
       commit("addActive", payload);
     },
 
-    removeActive(
-      { commit },
-      payload: { dif: ActiveDiff; agent: string }
-    ) {
+    removeActive({ commit }, payload: { dif: ActiveDiff; agent: string }) {
       commit("removeActive", payload);
     },
-
   },
 };

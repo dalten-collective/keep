@@ -309,9 +309,9 @@ import {
   RestoreRequest,
   KeepAgentSubscriptionStatus,
   PendingStatus,
-  LocalManyRequest,
   SavedStatus,
-  LocalBackupRequest,
+  ManyPayload,
+  BackupPayload,
   Ship,
 } from "../types";
 
@@ -412,11 +412,13 @@ export default defineComponent({
     },
 
     doLocalBackup() {
-      const request: LocalBackupRequest = {
-        agentName: this.agentName,
+      const payload: BackupPayload = {
+        once: {
+          from: this.agentName,
+          to: null,
+        },
       };
-      this.$store
-        .dispatch("keep/backupLocal", request)
+      this.$store.dispatch("keep/backupLocal", payload)
         .then((r) => {})
         .finally(() => {
           this.backupPending = false;
@@ -433,12 +435,15 @@ export default defineComponent({
       this.showDone = false;
       this.showAutoSetDone = false;
 
-      const request: LocalManyRequest = {
-        agentName: this.agentName,
-        freq: parseInt(this.freq),
+      const payload: ManyPayload = {
+        many: {
+          from: this.agentName,
+          to: null,
+          freq: parseInt(this.freq),
+        }
       };
       this.$store
-        .dispatch("keep/localMany", request)
+        .dispatch("keep/localMany", payload)
         .then((r) => {})
         .finally(() => {
           this.autoSetPending = false;

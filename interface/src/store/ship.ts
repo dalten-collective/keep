@@ -3,7 +3,6 @@ import airlock from "../api";
 import {
   AgentSubscription,
   KeepAgentSubscriptionResponse,
-  KeepSubscriptionResponse,
   EventType,
 } from "@/types";
 
@@ -51,24 +50,22 @@ export default {
 
   actions: {
     setDesks({ commit }, desks: Array<string>) {
-      commit('setDesks', desks)
+      commit("setDesks", desks);
     },
 
     openKeepAirlock({ dispatch }) {
       console.log("opening to keep...");
       airlock.openKeepAirlock(
-        (data: KeepSubscriptionResponse) => {
+        (data: KeepAgentSubscriptionResponse) => {
           console.log("keep data ", data);
 
           if (data.type === EventType.Initial) {
             const agents = data.state.agents;
-            dispatch("keep/setAgents", agents, { root: true }).then(
-              () => {
-                dispatch("keep/openAgentAirlocks", agents, {
-                  root: true,
-                });
-              }
-            );
+            dispatch("keep/setAgents", agents, { root: true }).then(() => {
+              dispatch("keep/openAgentAirlocks", agents, {
+                root: true,
+              });
+            });
           }
 
           dispatch("keep/handleKeepResponseState", data.state, {
@@ -99,15 +96,12 @@ export default {
         agentName,
         (data: KeepAgentSubscriptionResponse) => {
           console.log("agentName ", agentName);
-          console.log(
-            `sub-agent response ('${agentName}' agent)`,
-            data
-          );
+          console.log(`sub-agent response ('${agentName}' agent)`, data);
 
           // Only set full state on initial. all else through diffs (below)
           if (data.type == "initial") {
             dispatch(
-              "keep/handleAgentResponseState",
+              "keep/handleWrapperResponseState",
               { agentName, responseState: data.state },
               { root: true }
             );
@@ -132,10 +126,7 @@ export default {
       commit("unsetSubscription", subscription);
     },
 
-    addSubscription(
-      { state, commit, dispatch },
-      payload: AgentSubscription
-    ) {
+    addSubscription({ state, commit, dispatch }, payload: AgentSubscription) {
       const existing:
         | Array<AgentSubscription>
         | [] = state.subscriptions.filter((s: AgentSubscription) => {
