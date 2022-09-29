@@ -26,7 +26,9 @@
           <section class="tw-my-2 tw-mb-4 tw-text-sm">
             <p v-if="ship" class="tw-mb-2">
               Settings for %{{ agentName }}'s backups with
-              <span v-if="ship" class="tw-font-mono">{{ $filters.sigShip(ship) }}</span>
+              <span v-if="ship" class="tw-font-mono">{{
+                $filters.sigShip(ship)
+              }}</span>
             </p>
             <p v-else class="tw-mb-2">
               Settings for %{{ agentName }}'s backups to local disk
@@ -43,7 +45,10 @@
                     >Last backup</v-chip
                   >
                   <!-- not sure why this guard is needed: -->
-                  <div class="keep-info-data" v-if="status.saved && status.saved[0]">
+                  <div
+                    class="keep-info-data"
+                    v-if="status.saved && status.saved[0]"
+                  >
                     {{
                       $filters.sectToDate(status.saved[0].time).toLocaleString()
                     }}
@@ -63,6 +68,25 @@
                       {{ autoBackupPrint }}
                     </span>
                     <span v-else> Not performing automatic backups </span>
+                  </div>
+                </div>
+
+                <div
+                  v-if="!ship"
+                  class="keep-info-items"
+                  style="max-width: 46rem"
+                >
+                  <v-chip
+                    label
+                    color="surface"
+                    class="keep-info-label"
+                    size="small"
+                    >Destination</v-chip
+                  >
+                  <div class="keep-info-data">
+                    <span class="tw-font-mono"
+                      >.urb/put/keep/{{ agentName }}</span
+                    >
                   </div>
                 </div>
               </article>
@@ -110,9 +134,7 @@
                 </v-btn>
               </div>
               <div class="tw-mb-2">
-                <p>
-                  Backup %{{ agentName }} to local disk one time, now.
-                </p>
+                <p>Backup %{{ agentName }} to local disk one time, now.</p>
                 <p v-if="isRecurringBackup">
                   Since you already have recurring backups enabled, this will
                   also re-start the frequency timer from right now.
@@ -133,7 +155,9 @@
                   <template v-if="isRecurringBackup">
                     Currently backing up {{ autoBackupPrint }}.
                   </template>
-                  <template v-else> Not backing up on a schedule yet. </template>
+                  <template v-else>
+                    Not backing up on a schedule yet.
+                  </template>
                 </div>
                 <div class="tw-flex tw-flex-row">
                   <div class="mr-4">
@@ -177,7 +201,9 @@
                   <template v-if="isRecurringBackup">
                     Currently backing up {{ autoBackupPrint }}.
                   </template>
-                  <template v-else> Not backing up to disk on a schedule yet. </template>
+                  <template v-else>
+                    Not backing up to disk on a schedule yet.
+                  </template>
                 </div>
                 <div class="tw-flex tw-flex-row">
                   <div class="mr-4">
@@ -226,11 +252,12 @@
               </div>
               <div v-if="showDone">
                 <v-alert type="success" variant="tonal">
-                  <span v-if="ship">
-                    Backup request sent!
-                  </span>
+                  <span v-if="ship"> Backup request sent! </span>
                   <span v-else>
-                    Backup to disk complete!
+                    Backup to disk complete! Check
+                    <span class="tw-font-mono"
+                      >.urb/put/keep/{{ agentName }}</span
+                    >
                   </span>
                 </v-alert>
               </div>
@@ -249,6 +276,12 @@
               <div v-if="showAutoSetDone">
                 <v-alert type="success" variant="tonal">
                   Recurring backups set!
+                  <span v-if="!ship">
+                    Check
+                    <span class="tw-font-mono"
+                      >.urb/put/keep/{{ agentName }}</span
+                    >
+                  </span>
                 </v-alert>
               </div>
               <div v-if="showAutoOffDone">
@@ -380,9 +413,10 @@ export default defineComponent({
 
     doLocalBackup() {
       const request: LocalBackupRequest = {
-        agentName: this.agentName
+        agentName: this.agentName,
       };
-      this.$store.dispatch("keep/backupLocal", request)
+      this.$store
+        .dispatch("keep/backupLocal", request)
         .then((r) => {})
         .finally(() => {
           this.backupPending = false;
