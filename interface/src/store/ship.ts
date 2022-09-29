@@ -3,6 +3,8 @@ import airlock from "../api";
 import {
   AgentSubscription,
   KeepAgentSubscriptionResponse,
+  KeepWrapperSubscriptionResponse,
+  KeepWrapperState,
   EventType,
 } from "@/types";
 
@@ -60,6 +62,10 @@ export default {
           console.log("keep data ", data);
 
           if (data.type === EventType.Initial) {
+            dispatch("keep/handleKeepResponseState", data.state, {
+              root: true,
+            });
+
             const agents = data.state.agents;
             dispatch("keep/setAgents", agents, { root: true }).then(() => {
               dispatch("keep/openAgentAirlocks", agents, {
@@ -68,17 +74,11 @@ export default {
             });
           }
 
-          dispatch("keep/handleKeepResponseState", data.state, {
-            root: true,
-          });
-          // TODO:
-          //dispatch("keep/handleKeepResponseType", data.type, { root: true });
-          // TODO:
-          dispatch(
-            "keep/handleKeepResponseDiff",
-            { diff: data.diff, responseType: data.type, state: data.state },
-            { root: true }
-          );
+          // TODO: handle agent diffs. change the below
+          // dispatch("keep/handleKeepResponseState", data.state, {
+          //   root: true,
+          // });
+
         },
         (subscriptionNumber: number) => {
           console.log("keep sub: ", subscriptionNumber);
@@ -94,24 +94,35 @@ export default {
     openAirlockToAgent({ dispatch, commit }, agentName: string) {
       airlock.openAirlockTo(
         agentName,
-        (data: KeepAgentSubscriptionResponse) => {
+        (data: KeepWrapperSubscriptionResponse) => {
           console.log("agentName ", agentName);
           console.log(`sub-agent response ('${agentName}' agent)`, data);
 
           // Only set full state on initial. all else through diffs (below)
-          if (data.type == "initial") {
+          if (data.type == EventType.Initial) {
+            const payload: { agentName: AgentName; state: KeepWrapperState } = {
+              agentName,
+              state: data.state
+            }
+            console.log('handing wrapper init... ', payload)
             dispatch(
               "keep/handleWrapperResponseState",
-              { agentName, responseState: data.state },
+              payload,
+              { root: true }
+            );
+          } else {
+            console.log('got keep wrapper diff ', data, agentName)
+            dispatch(
+              "keep/handleKeepWrapperDiff",
+              { data, agentName },
               { root: true }
             );
           }
-
-          dispatch(
-            "keep/handleAgentResponseType",
-            { agentName, responseType: data.type, diff: data.diff },
-            { root: true }
-          );
+          // dispatch(
+          //   "keep/handleAgentResponseType",
+          //   { agentName, responseType: data.type, diff: data.diff },
+          //   { root: true }
+          // );
         },
         (subscriptionNumber: number) => {
           dispatch("addSubscription", {

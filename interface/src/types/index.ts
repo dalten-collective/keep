@@ -159,8 +159,8 @@ export interface RestoreDiff {
 }
 
 export interface SavedDiff {
-  ship: Ship;
-  time: number;
+  diff: SavedStatus;
+  agent: AgentName;
 }
 
 export interface AgentDiff {
