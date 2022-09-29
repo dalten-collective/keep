@@ -11,7 +11,7 @@ import {
   WytePoke,
   CopyDepsPoke,
   WyteAblePoke,
-  BackupPayload
+  BackupPayload,
   Ship,
   BackupPoke,
   ManyPayload,
