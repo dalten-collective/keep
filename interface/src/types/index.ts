@@ -1,5 +1,5 @@
 export enum EventType {
-  Success = "success", // Backup saved successfull
+  Success = "success", // Backup saved successfully
   Initial = "initial", // first response on subscrtiption start
   Agent = "agent", // the main keep agent has done something (like wrapping)
   Backup = "backup", // WE did a backup for someone else
@@ -7,7 +7,7 @@ export enum EventType {
   Auto = "auto", // auto-backup configured
   Pending = "pending", // backup-to ship invited
   Restored = "restored", // backup has been restored
-  Active = "active", // wrapper 'live' has changed
+  Active = "active", // wrapper 'live' has changed // TODO: deprecated
   NewAgent = "agent", // new agent has been wrapped
   CopiedDeps = "copied-deps", // Begun copying deps for agent
 }
@@ -191,6 +191,7 @@ export interface AutoOffDiff {
 }
 
 export interface SuccessDiff {
+  agent: AgentName;
   ship: Ship;
   sent: number;
   kept: number;

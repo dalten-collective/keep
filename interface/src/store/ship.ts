@@ -75,9 +75,9 @@ export default {
           }
 
           // TODO: handle agent diffs. change the below
-          // dispatch("keep/handleKeepResponseState", data.state, {
-          //   root: true,
-          // });
+          dispatch("keep/handleKeepAgentDiff", data, {
+            root: true,
+          });
 
         },
         (subscriptionNumber: number) => {
