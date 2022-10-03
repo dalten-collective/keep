@@ -15,8 +15,6 @@
   ++  noun  wrap:poke
   ++  json
     %+  corl  wrap:poke
-    =,  dejs:format
-    (ot mend/(se %p))
-    ==
+    (of ~[mend/(se %p)]):dejs:format
   --
 --
