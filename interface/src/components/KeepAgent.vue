@@ -57,10 +57,10 @@
 
         <h4 class="tw-text-xl tw-mb-4">Live backup targets</h4>
 
+        {{ backupsByShip }}
+
         <article class="tw-mt-6" v-if="backupsByShip.length == 0">
-          <h3 class="tw-text-lg">
-            No on-network backup targets configured
-          </h3>
+          <h3 class="tw-text-lg">No on-network backup targets configured</h3>
         </article>
 
         <article
@@ -111,8 +111,8 @@
             </div>
             <RestoreButton
               :ship="target[0]"
-              :status="target[1]"
               :agent-name="agentName"
+              :status="target[1]"
             />
           </div>
         </article>
@@ -130,13 +130,13 @@
         <h4 class="my-2 tw-text-lg">Outstanding Invites</h4>
         <p class="my-2 tw-text-sm">
           You've initiated a backup to these ships, but they haven't yet
-          responded. Either they don't have %keep installed or they
-          haven't accepted your request yet.
+          responded. Either they don't have %keep installed or they haven't
+          accepted your request yet.
         </p>
         <ul class="my-2 tw-list-disc">
           <li v-for="p in pending" :key="p.ship" class="tw-ml-4">
             <span class="tw-font-mono tw-italic tw-text-gray-400">{{
-              $filters.sigShip(p.ship)
+              $filters.sigShip(target.ship)
             }}</span>
             <!-- <v-btn>Remove</v-btn> -->
           </li>
@@ -149,7 +149,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
-import { BackupPayload, RestoreRequest } from "../types";
+import {
+  BackupPayload,
+  RestoreRequest,
+  SavedStatus,
+  AutoStatus,
+  Ship,
+} from "../types";
 
 import BackupButton from "@/components/BackupButton.vue";
 import RestoreButton from "@/components/RestoreButton.vue";
@@ -174,7 +180,7 @@ export default defineComponent({
   computed: {
     ...mapGetters("keep", ["agents", "wrapperStatus", "agentStatus"]),
     ourWrapperStatus() {
-      console.log('ourstatus ', this.wrapperStatus('gora'))
+      console.log("ourstatus ", this.wrapperStatus("gora"));
       const status = this.wrapperStatus(this.agentName);
       if (status) {
         return status;
@@ -183,17 +189,17 @@ export default defineComponent({
     },
 
     ourAgentStatus() {
-      return this.agentStatus('gora')
+      return this.agentStatus("gora");
     },
 
     diskBackup() {
       return {
-          auto: [],
-          saved: [],
-          pending: [],
-        }
+        auto: [],
+        saved: [],
+        pending: [],
+      };
       // TODO
-      
+
       // const status = {
       //   auto: this.ourStatus.auto.filter((s) => s.ship === null),
       //   saved: this.ourStatus.saved.filter((s) => s.ship === null),
@@ -205,7 +211,10 @@ export default defineComponent({
       // return status;
     },
     backupsByShip() {
-      return []
+      // return this.ourAgentStatus.saved.filter((s: SavedStatus) => {
+      //   return s.ship !== null;
+      // })
+
       // return AgentStatus items for this agent
       const shipList = new Set();
       // TODO: test structure:
@@ -220,73 +229,79 @@ export default defineComponent({
       //   ],
       // };
 
-      this.ourStatus.saved.forEach((s) => {
-        let ship;
+      let ship: null | Ship;
+      this.ourAgentStatus.saved.forEach((s: SavedStatus) => {
         if (s.ship) {
           ship = s.ship;
         } else {
-          ship = this.ourShip;
+          ship = null;
         }
         shipList.add(ship);
       });
-      this.ourStatus.auto.forEach((s) => {
-        let ship;
+      this.ourAgentStatus.auto.forEach((s: SavedStatus) => {
         if (s.ship) {
           ship = s.ship;
         } else {
-          ship = this.ourShip;
+          ship = null;
         }
         shipList.add(ship);
       });
-      const status = [];
+      const status: Array<Array<Ship | { auto: AutoStatus; saved: SavedStatus; }>> = [];
 
       shipList.forEach((ship) => {
-        const shipStatus = {
-          auto: this.ourStatus.auto
-            .filter((a) => a.ship === ship)
-            .map((a) => {
+        const shipStatus: { auto: AutoStatus; saved: SavedStatus } = {
+          auto: this.ourAgentStatus.auto
+            .filter((a: AutoStatus) => a.ship === ship)
+            .map((a: AutoStatus) => {
               return { freq: a.freq };
             }),
-          saved: this.ourStatus.saved
-            .filter((s) => s.ship === ship)
-            .map((s) => {
+          saved: this.ourAgentStatus.saved
+            .filter((s: SavedStatus) => s.ship === ship)
+            .map((s: SavedStatus) => {
               return { time: s.time };
             }),
         };
         status.push([ship, shipStatus]);
       });
 
-      return status.sort((a, b) => {
-        // compare lengths (ship type)
-        if (a[0].length < b[0].length) {
-          return -1;
-        }
-        if (a[0].length > b[0].length) {
-          return 1;
-        }
+      if (status.length > 0) {
+        // First remove 'us' / null / local disk
+        return status
+          .filter((s) => s[0] !== null)
+          .sort((a, b) => {
+            // compare lengths (ship type)
+            if (a[0].length < b[0].length) {
+              return -1;
+            }
+            if (a[0].length > b[0].length) {
+              return 1;
+            }
 
-        // Then order recurring to the top
-        if (a[1].auto.length > 0) {
-          return -1;
-        }
-        if (a[1].auto.length === 0) {
-          return 1;
-        }
+            // Then order recurring to the top
+            if (a[1].auto.length > 0) {
+              return -1;
+            }
+            if (a[1].auto.length === 0) {
+              return 1;
+            }
 
-        // then alphabetize
-        if (a[0] < b[0]) {
-          return -1;
-        }
-        if (a[0] > b[0]) {
-          return 1;
-        }
+            // then alphabetize
+            if (a[0] < b[0]) {
+              return -1;
+            }
+            if (a[0] > b[0]) {
+              return 1;
+            }
 
-        return 0;
-      });
+            return 0;
+          });
+      } else {
+        return [];
+      }
     },
 
     pending() {
-      return false
+      return false;
       // TODO: how pending?
       // return this.ourStatus.pending;
     },

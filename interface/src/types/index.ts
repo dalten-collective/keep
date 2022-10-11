@@ -1,7 +1,6 @@
 export enum EventType {
   Success = "success", // Backup saved successfully
   Initial = "initial", // first response on subscrtiption start
-  Agent = "agent", // the main keep agent has done something (like wrapping)
   Backup = "backup", // WE did a backup for someone else
   Saved = "saved", // OUR backup was requested with someone else
   Auto = "auto", // auto-backup configured
@@ -10,6 +9,7 @@ export enum EventType {
   Active = "active", // wrapper 'live' has changed // TODO: deprecated
   NewAgent = "agent", // new agent has been wrapped
   CopiedDeps = "copied-deps", // Begun copying deps for agent
+  Agent = "agent", // the main keep agent has done something (like wrapping)
 }
 
 export interface WytePokePayload {
@@ -41,6 +41,11 @@ export interface CopyDepsPoke {
   app: "keep";
   mark: "keep-agent";
   json: CopyDepsPayload;
+}
+export interface CopyDepsDiff {
+  type: EventType.CopiedDeps;
+  diff: AgentName;
+  state: KeepAgentState;
 }
 
 export interface BackupPayload {
@@ -175,6 +180,13 @@ export interface BackupDiff {
 
 export interface AutoOnDiff {
   ship: Ship;
+  agent: AgentName;
+  freq: number;
+}
+
+export interface AutoOffDiff {
+  ship: Ship;
+  agent: AgentName;
   freq: number;
 }
 
@@ -184,11 +196,6 @@ export interface PendingDiff {
 }
 
 export type ActiveDiff = boolean;
-
-export interface AutoOffDiff {
-  ship: Ship;
-  time: number;
-}
 
 export interface SuccessDiff {
   agent: AgentName;

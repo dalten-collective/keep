@@ -301,6 +301,7 @@
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
 import type { PropType } from "vue";
+import { siggedShip } from "@/api/keep";
 
 import {
   OnceRequest,
@@ -461,12 +462,13 @@ export default defineComponent({
       this.showDone = false;
       this.showAutoSetDone = false;
 
-      const request: OnceRequest = {
-        agentName: this.agentName,
-        ship: this.backupShip,
+      const payload: BackupPayload = {
+        once: {
+          from: this.agentName,
+          to: siggedShip(this.backupShip),
+        },
       };
-      this.$store
-        .dispatch("keep/testOnce", request)
+      this.$store.dispatch("keep/backupRemote", payload)
         .then((r) => {})
         .finally(() => {
           this.backupPending = false;
@@ -483,13 +485,15 @@ export default defineComponent({
       this.showDone = false;
       this.showAutoSetDone = false;
 
-      const request: ManyRequest = {
-        agentName: this.agentName,
-        ship: this.backupShip,
-        freq: parseInt(this.freq),
+      const payload: ManyPayload = {
+        many: {
+          from: this.agentName,
+          to: siggedShip(this.backupShip),
+          freq: parseInt(this.freq),
+        },
       };
       this.$store
-        .dispatch("keep/testMany", request)
+        .dispatch("keep/backupRemote", payload)
         .then((r) => {})
         .finally(() => {
           this.autoSetPending = false;
@@ -503,13 +507,16 @@ export default defineComponent({
       this.showAutoSetDone = false;
       this.showAutoOffDone = false;
 
-      const request: UnsetManyRequest = {
-        agentName: this.agentName,
-        ship: this.backupShip,
-        freq: null,
+      const payload: ManyPayload = {
+        many: {
+          from: this.agentName,
+          to: siggedShip(this.backupShip),
+          freq: null,
+        },
       };
+
       this.$store
-        .dispatch("keep/testMany", request)
+        .dispatch("keep/backupRemote", payload)
         .then((r) => {})
         .finally(() => {
           this.autoOffPending = false;
