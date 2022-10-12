@@ -1,6 +1,6 @@
 ::  keep: backup manager
 ::
-/+  dbug, *mip, verb
+/+  dbug, *mip, verb, *parse
 /=  default-agent  /keep/lib/default-agent
 /=  agentio        /keep/lib/agentio
 /=  sane           /keep/lib/sane
@@ -19,7 +19,7 @@
         kept=(map [dude ship] [data=noun time=@da])
         live=(set dude)
         able=(each (set ship) (set ship))
-        into=(set desk)
+        into=(jug desk dude)
         auto=(mip dude (unit ship) @dr)
         last=(mip dude (unit ship) @da)
     ==
@@ -63,10 +63,11 @@
   |=  old=vase
   ^-  (quip card _this)
   =.  state  !<(state-0 old)
-  :_  this
-  %+  turn  ~(tap in into)
-  |=  =desk
-  (~(poke-self pass:io /trigger/[desk]) keep-agent/!>(`agent:poke`copy/desk))
+  `this
+::  :_  this
+::  %+  turn  ~(tap by into)
+::  |=  =desk
+::  (~(poke-self pass:io /trigger/[desk]) keep-agent/!>(`agent:poke`copy/desk))
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -164,24 +165,35 @@
   ::
   ::  "Copy the wrapper to a desk," said our operator.
       %copy
+    |^
     ?>  =(src.bowl our.bowl)
-    =.  into  (~(put in into) to.cmd)
+    =.  into  (~(put ju into) desk.cmd dude.cmd)
     :_  this
-    :~  (emit copied-deps/s/to.cmd)
+    :~  (emit copied-deps/s/desk.cmd)
     ::
-        =/  base-now  /(scot %p src.bowl)/base/(scot %da now.bowl)
-        =/  keep-now  /(scot %p src.bowl)/[q.byk.bowl]/(scot %da now.bowl)
-        %-  ~(arvo pass:io /copy/[to.cmd])
-        :*  %c  %info  to.cmd  %&
+        %-  ~(arvo pass:io /copy/[desk.cmd])
+        :*  %c  %info  desk.cmd  %&
+            %-  snoc  :_
+              =/  agent=path  /app/[dude.cmd]/hoon
+              :*  agent  %mut  %txt  !>  :_  ~
+                  ~|  [%rash-crash desk=(now desk.cmd) agent=agent]
+                  %-  rash  :_  main-parser
+                  .^(@t cx/(weld (now desk.cmd) agent))
+              ==
+            ^-  soba:clay
             :-  =/  =path  /lib/skeleton/hoon  ::  Dependency management lol
-                [keep/path %ins txt+!>(~[.^(@t cx/(weld base-now path))])]
+                [keep/path %ins txt+!>(~[.^(@t cx/(weld (now %base) path))])]
             %+  turn
               ^-  (list path)
               :+  /mar/keep/hoon  /mar/json/hoon
-              .^((list path) ct/(weld keep-now /keep))
+              .^((list path) ct/(weld (now %keep) /keep))
             |=  =path
-            [path %ins txt+!>(~[.^(@t cx/(weld keep-now path))])]
+            [path %ins txt+!>(~[.^(@t cx/(weld (now %keep) path))])]
+        ::
     ==  ==
+    ::
+    ++  now  |=(=desk /(scot %p src.bowl)/[desk]/(scot %da now.bowl))
+    --
   ==
 ::
 ++  on-agent
@@ -247,6 +259,35 @@
 --
 ::
 |%
+++  parse-agent
+  %-  full
+  |^
+  ;~  plug
+    ;~(plug gay (punt ;~(plug fas wut gap dem gap)))
+  ::
+    ;~(plug fas hep gap dem)
+  ::
+  ::%+  cook  (bake zing (list (list taut)))
+  ::%+  rune  hep
+  ::(most ;~(plug com gaw)
+    gay
+  ==
+  ::
+  ++  pant
+    |*  fel=rule
+    ;~(pose fel (easy ~))
+  ::
+  ++  mast
+    |*  [bus=rule fel=rule]
+    ;~(plug (more bus fel) bus)
+  ::
+  ++  rune
+    |*  [bus=rule fel=rule]
+    %-  pant
+    %+  mast  gap
+    ;~(plug fas bus gap fel)
+  --
+::
 ++  json
   =,  enjs:format
   |_  state=state-0
@@ -262,7 +303,11 @@
         %-  pairs
         :~  [%saved a/(turn ~(tap bi last.state) da:event)]
             [%agents a/(turn ~(tap in live.state) (lead %s))]
-            [%desks a/(turn ~(tap in into.state) (lead %s))]
+        ::
+            :+  %desks
+              %a
+            %+  turn  ~(tap by into.state)
+            |=([=desk =(set dude)] (frond desk a/(turn ~(tap in set) (lead %s))))
         ::
             :+  %auto
               %a

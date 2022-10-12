@@ -11,7 +11,7 @@
         [%tell dap=dude]                :: Register wrapped agent
         [%able (each ship ship)]
         [%wyte on=?]
-        [%copy to=desk]
+        [%copy =desk =dude]
         [%once dap=dude to=(unit ship)]
         [%many dap=dude to=(unit ship) freq=(unit @dr)] :: Repeat backup
         [%okay dap=dude time=@da]
