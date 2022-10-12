@@ -113,8 +113,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { RestoreRequest } from "../types";
+import { MendPayload } from "../types";
 import type { PropType } from "vue";
+import { siggedShip } from "@/api/keep";
 
 import { KeepAgentSubscriptionStatus, Ship } from "../types";
 
@@ -185,8 +186,9 @@ export default defineComponent({
     restore() {
       this.confirmOpen = false;
       this.restorePending = true;
-      const request: RestoreRequest = {
-        ship: this.ship,
+      const mendPayload: MendPayload = { mend: siggedShip(this.ship) }
+      const request = {
+        payload: mendPayload,
         agentName: this.agentName,
       };
       this.$store.dispatch("keep/mendFromShip", request)

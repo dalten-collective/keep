@@ -2,6 +2,7 @@ import urbitAPI from "./urbitAPI";
 import { Scry } from "@urbit/http-api";
 import {
   OnceRequest,
+  MendPoke,
   ManyRequest,
   UnsetManyRequest,
   RestoreRequest,
@@ -203,11 +204,11 @@ export function pokeUnsetMany(payload: UnsetManyRequest) {
     });
 }
 
-export function mendFromShip(payload: { mend: MendPayload, agentName: AgentName }) {
+export function mendFromShip(request: { payload: MendPayload, agentName: AgentName }) {
   const poke: MendPoke = {
-    app: payload.agentName,
-    mark: 'keep',
-    json: payload.mend,
+    app: request.agentName,
+    mark: "keep",
+    json: request.payload,
   }
   return urbitAPI
     .poke(poke)

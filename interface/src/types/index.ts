@@ -74,7 +74,7 @@ export interface ManyPoke {
 }
 
 export interface MendPayload {
-  ship: Ship;
+  mend: Ship;
 }
 export interface MendPoke {
   app: AgentName;
