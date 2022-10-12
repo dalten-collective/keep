@@ -72,7 +72,6 @@
                 </div>
 
                 <div
-                  v-if="!ship"
                   class="keep-info-items"
                   style="max-width: 46rem"
                 >
@@ -84,9 +83,12 @@
                     >Destination</v-chip
                   >
                   <div class="keep-info-data">
-                    <span class="tw-font-mono"
+                  <span v-if="!ship" class="tw-font-mono"
                       >.urb/put/keep/{{ agentName }}</span
                     >
+                  <span v-if="ship" class="tw-font-mono">{{
+                    $filters.sigShip(ship)
+                  }}</span>
                   </div>
                 </div>
               </article>
@@ -97,8 +99,8 @@
             class="tw-mb-2 tw-bg-surface tw-rounded-keep tw-shadow-inner tw-p-4"
           >
             <h4 class="tw-text-lg tw-mb-2">One-time backup</h4>
-            <div v-if="ship" class="tw-flex tw-flex-row">
-              <div class="mr-4">
+            <div v-if="ship" class="tw-flex tw-flex-col sm:tw-flex-row">
+              <div class="mr-4 sm:tw-mb-0 tw-mb-4">
                 <v-btn
                   color="success"
                   text="white"
@@ -121,8 +123,8 @@
                 </p>
               </div>
             </div>
-            <div v-else class="tw-mt-2 tw-flex tw-flex-row">
-              <div class="mr-4">
+            <div v-else class="tw-flex tw-flex-col sm:tw-flex-row">
+              <div class="mr-4 sm:tw-mb-0 tw-mb-4">
                 <v-btn
                   color="success"
                   text="white"
@@ -159,8 +161,8 @@
                     Not backing up on a schedule yet.
                   </template>
                 </div>
-                <div class="tw-flex tw-flex-row">
-                  <div class="mr-4">
+                <div class="tw-flex tw-flex-col tw-flex-col-reverse sm:tw-flex-row">
+                  <div class="sm:mr-4">
                     <v-btn
                       color="success"
                       text="white"
@@ -189,7 +191,7 @@
                   <div class="tw-flex-grow"></div>
                 </div>
 
-                <div v-if="isRecurringBackup">
+                <div v-if="isRecurringBackup" class="sm:tw-mt-0 tw-mt-4">
                   <v-btn color="success" @click="unsetMany"
                     >Stop recurring backups</v-btn
                   >
@@ -205,8 +207,8 @@
                     Not backing up to disk on a schedule yet.
                   </template>
                 </div>
-                <div class="tw-flex tw-flex-row">
-                  <div class="mr-4">
+                <div class="tw-flex tw-flex-col tw-flex-col-reverse sm:tw-flex-row">
+                  <div class="sm:mr-4">
                     <v-btn
                       color="success"
                       text="white"
@@ -222,6 +224,7 @@
                       <template v-else> Set Recurring disk backup</template>
                     </v-btn>
                   </div>
+
                   <div class="tw-flex-grow">
                     <v-text-field
                       label="Frequency (seconds)"
@@ -235,7 +238,7 @@
                   <div class="tw-flex-grow"></div>
                 </div>
 
-                <div v-if="isRecurringBackup">
+                <div v-if="isRecurringBackup" class="sm:tw-mt-0 tw-mt-4">
                   <v-btn color="success" @click="unsetLocalMany"
                     >Stop recurring backups</v-btn
                   >

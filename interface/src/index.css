@@ -532,15 +532,20 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
     @apply tw-items-center;
     @apply tw-mb-1;
     @apply tw-grid;
-    @apply tw-grid-cols-6;
-    @apply tw-gap-4;
-    max-width: 46rem;
+    @apply tw-grid-cols-12;
+    @apply sm:tw-grid-cols-6;
+    @apply tw-gap-1;
+    @apply sm:tw-gap-4;
+    @apply sm:tw-max-w-[46rem];
+    @apply tw-max-w-full;
   }
   .keep-info-label {
-    @apply tw-col-span-1;
+    @apply tw-col-span-5;
+    @apply sm:tw-col-span-1;
   }
   .keep-info-data {
-    @apply tw-col-span-2;
+    @apply tw-col-span-7;
+    @apply sm:tw-col-span-2;
   }
 }
 

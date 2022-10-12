@@ -12,9 +12,9 @@
     <section class="tw-flex tw-flex-col">
       <article>
         <article
-          class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
+          class="tw-flex tw-flex-col sm:tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
         >
-          <div class="tw-flex-grow">
+          <div class="tw-flex-grow tw-mb-4 sm:tw-mb-0">
             <v-tooltip location="top" v-if="diskBackup.auto.length > 0">
               <template v-slot:activator="{ props }">
                 <v-chip
@@ -42,7 +42,7 @@
             </v-chip>
           </div>
 
-          <div class="tw-flex tw-flex-row tw-justify-end tw-flex-grow">
+          <div class="tw-flex tw-flex-row tw-justify-between sm:tw-justify-start sm:tw-justify-end tw-flex-grow">
             <div class="tw-mr-2">
               <BackupButton
                 :ship="null"
@@ -67,9 +67,9 @@
           v-else
           v-for="target in backupsByShip"
           :key="target[0]"
-          class="tw-flex tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
+          class="tw-flex tw-flex-col sm:tw-flex-row tw-justify-between tw-mb-4 tw-border tw-rounded-keep tw-p-4"
         >
-          <div class="tw-flex-grow">
+          <div class="tw-flex-grow tw-mb-4 sm:tw-mb-0">
             <v-tooltip location="top" v-if="target[1].auto.length > 0">
               <template v-slot:activator="{ props }">
                 <v-chip
@@ -101,7 +101,7 @@
             </v-chip>
           </div>
 
-          <div class="tw-flex tw-flex-row tw-justify-end tw-flex-grow">
+          <div class="tw-flex tw-flex-row tw-justify-between sm:tw-justify-start sm:tw-justify-end tw-flex-grow">
             <div class="tw-mr-2">
               <BackupButton
                 :ship="target[0]"

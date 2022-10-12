@@ -1,6 +1,5 @@
 <template>
   <v-card>
-
     <div class="d-flex" :class="mobileClasses">
       <div class="flex-row d-flex">
         <v-tabs
@@ -11,51 +10,56 @@
         >
           <v-tab value="active">
             <v-icon start>mdi-flare</v-icon>
-            Agents
+            <span v-if="!onSmall"> Agents </span>
           </v-tab>
           <v-tab value="inactive">
             <v-icon start>mdi-cog</v-icon>
-            Configuration
+            <span v-if="!onSmall"> Configuration </span>
           </v-tab>
           <v-tab value="holdingBackups">
             <v-icon start>mdi-folder</v-icon>
-            Held Backups
+            <span v-if="!onSmall"> Backup Provider </span>
           </v-tab>
         </v-tabs>
       </div>
 
       <v-window v-model="tab">
         <v-window-item value="active" class="tw-w-xl">
-          <v-card class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg">
+          <v-card
+            class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg"
+          >
             <div class="tw-flex tw-flex-row tw-my-8">
-              <ActiveAgents class="tw-grow"/>
+              <ActiveAgents class="tw-grow" />
             </div>
           </v-card>
         </v-window-item>
 
         <v-window-item value="inactive" class="tw-w-xl">
-          <v-card class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg">
+          <v-card
+            class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg"
+          >
             <div class="tw-flex tw-flex-row tw-my-8">
-              <InactiveAgents class="tw-grow"/>
+              <InactiveAgents class="tw-grow" />
             </div>
           </v-card>
         </v-window-item>
 
         <v-window-item value="holdingBackups" class="tw-w-xl">
-          <v-card class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg">
+          <v-card
+            class="tw-grow tw-p-4 tw-bg-white tw-border-r tw-border-t tw-border-l tw-border-b tw-border-secondary tw-rounded-none tw-rounded-r-lg"
+          >
             <div class="tw-flex tw-flex-row tw-my-8">
-              <HeldBackups class="tw-grow"/>
+              <HeldBackups class="tw-grow" />
             </div>
           </v-card>
         </v-window-item>
       </v-window>
     </div>
-
   </v-card>
 </template>
 
 <script lang="ts">
-import { useDisplay } from 'vuetify'
+import { useDisplay } from "vuetify";
 
 import { defineComponent } from "vue";
 
@@ -69,22 +73,24 @@ import HeldBackups from "@/components/HeldBackups.vue";
 export default defineComponent({
   name: "HomeView",
   components: {
-    ActiveAgents, InactiveAgents, HeldBackups
+    ActiveAgents,
+    InactiveAgents,
+    HeldBackups,
   },
   computed: {
     ...mapGetters("keep", ["agents", "activeAgents", "inactiveAgents"]),
     ...mapState("keep", ["backups"]),
     mobileClasses() {
-      const smol = this.onSmall ? true : false
+      const smol = this.onSmall ? true : false;
       return {
-        'tw-flex-col': smol,
-        'tw-flex-row': !smol,
-      }
+        "tw-flex-col": smol,
+        "tw-flex-row": !smol,
+      };
     },
 
     onSmall() {
-      const display = useDisplay()
-      return display.smAndDown.value
+      const display = useDisplay();
+      return display.smAndDown.value;
     },
   },
   data() {
@@ -105,7 +111,7 @@ export default defineComponent({
       this.activePending = true;
       setTimeout(() => {
         this.activePending = false;
-      }, 400)
+      }, 400);
     },
   },
 });
