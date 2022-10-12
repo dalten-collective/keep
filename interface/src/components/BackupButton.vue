@@ -367,6 +367,9 @@ export default defineComponent({
         // reset things
         this.backupPending = false;
         this.showDone = false;
+        this.showAutoSetDone = false;
+        this.autoSetPending = false;
+        this.showAutoOffDone = false;
       } else {
         this.backupShip = this.ship;
       }
@@ -435,6 +438,7 @@ export default defineComponent({
       this.autoSetPending = true;
       this.showDone = false;
       this.showAutoSetDone = false;
+      this.showAutoOffDone = false;
 
       const payload: ManyPayload = {
         many: {
@@ -484,6 +488,7 @@ export default defineComponent({
       this.autoSetPending = true;
       this.showDone = false;
       this.showAutoSetDone = false;
+      this.showAutoOffDone = false;
 
       const payload: ManyPayload = {
         many: {
@@ -530,16 +535,20 @@ export default defineComponent({
       this.showAutoSetDone = false;
       this.showAutoOffDone = false;
 
-      const request: LocalManyRequest = {
-        agentName: this.agentName,
-        freq: null,
+      const payload: ManyPayload = {
+        many: {
+          from: this.agentName,
+          to: null,
+          freq: null,
+        },
       };
+
       this.$store
-        .dispatch("keep/localMany", request)
+        .dispatch("keep/backupRemote", payload)
         .then((r) => {})
         .finally(() => {
-          this.autoSetPending = false;
-          this.showAutoSetDone = true;
+          this.autoOffPending = false;
+          this.showAutoOffDone = true;
         });
     },
 

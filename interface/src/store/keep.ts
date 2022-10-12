@@ -320,7 +320,7 @@ export default {
 
     wyteOn({ commit }) {
       return keepApi
-        .wyteOn()
+        .pokeWyteOn()
         .then((r) => {
           commit("localOnWyte");
           return r;
@@ -331,7 +331,7 @@ export default {
     },
     wyteOff({ commit }) {
       return keepApi
-        .wyteOff()
+        .pokeWyteOff()
         .then((r) => {
           commit("localOffWyte");
           return r;
@@ -342,7 +342,7 @@ export default {
     },
     wyteDisallow({ commit }, ship: Ship) {
       return keepApi
-        .wyteDisable(ship)
+        .pokeWyteDisable(ship)
         .then((r) => {
           commit("removeFromWyte", ship);
           return r;
@@ -353,7 +353,7 @@ export default {
     },
     wyteAllow({ commit }, ship: Ship) {
       return keepApi
-        .wyteAble(ship)
+        .pokeWyteAble(ship)
         .then((r) => {
           commit("addToWyte", ship);
           return r;

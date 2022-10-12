@@ -3,8 +3,10 @@
     <header class="tw-mb-4 tw-flex tw-justify-between">
       <h3 class="tw-text-2xl">%{{ agentName }}</h3>
       <!-- DEBUG TODO: <v-btn @click="deactivateAgent">Deactivate</v-btn> -->
-      <pre>wrapper {{ ourWrapperStatus }}</pre>
-      <pre>agent {{ ourAgentStatus }}</pre>
+      <!-- TODO: remove
+        <pre>wrapper {{ ourWrapperStatus }}</pre>
+        <pre>agent {{ ourAgentStatus }}</pre>
+      -->
     </header>
 
     <section class="tw-flex tw-flex-col">
@@ -48,7 +50,7 @@
                 :status="diskBackup"
               />
             </div>
-            <v-btn @click="redirectToUpload" color="success">
+            <v-btn @click="redirectWarningOpen = true" color="success">
               <v-icon start>mdi-content-duplicate</v-icon>
               restore
             </v-btn>
@@ -56,8 +58,6 @@
         </article>
 
         <h4 class="tw-text-xl tw-mb-4">Live backup targets</h4>
-
-        {{ backupsByShip }}
 
         <article class="tw-mt-6" v-if="backupsByShip.length == 0">
           <h3 class="tw-text-lg">No on-network backup targets configured</h3>
@@ -143,6 +143,103 @@
         </ul>
       </article>
     </section>
+
+    <v-dialog v-model="redirectWarningOpen" width="500">
+      <v-card class="tw-w-96 tw-border-4 tw-border-primary tw-bg-surface tw-p-4">
+        <v-card-title>
+          <div class="tw-flex tw-flex-row tw-justify-between">
+            <h2 class="tw-text-2xl">Restore</h2>
+            <div>
+              <span
+                @click="redirectWarningOpen = !redirectWarningOpen"
+                class="tw-text-sm tw-cursor-pointer tw-underline"
+                >Close</span>
+            </div>
+          </div>
+        </v-card-title>
+
+        <v-card-text>
+          <div class="tw-mt-2">
+            <section class="tw-my-2 tw-mb-4 tw-text-sm">
+
+              <p class="tw-my-2">Double-check these details:</p>
+
+              <div class="keep-info-items tw-grid-cols-3">
+                <v-chip label color="surface" class="keep-info-label" size="small"
+                  >Agent</v-chip
+                >
+                <div class="keep-info-data">%{{ agentName }}</div>
+              </div>
+              <div class="keep-info-items tw-grid-cols-3">
+                <v-chip label color="surface" class="keep-info-label" size="small"
+                  >Saved On</v-chip
+                >
+                <div class="keep-info-data">
+                  {{ lastBackupOn.toLocaleString() }}
+                </div>
+              </div>
+              <div class="keep-info-items tw-grid-cols-3">
+                <v-chip label color="surface" class="keep-info-label" size="small"
+                  >Source</v-chip
+                >
+                <div class="keep-info-data">
+                  local disk
+                </div>
+              </div>
+
+              <v-alert class="tw-my-2" type="warning">
+                Warning! This will replace %{{ agentName }}'s current state with
+                the state saved in the last local disk backup.
+              </v-alert>
+            </section>
+
+            <v-dialog v-model="redirectConfirmOpen" persistent max-width="500px">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  color="success"
+                  text="white"
+                  @click="redirectConfirmOpen = true"
+                  :disabled="lastBackupSect === 0"
+                  >Restore</v-btn
+                >
+              </template>
+              <v-card class="tw-bg-white">
+                <v-card-title> Are you sure? </v-card-title>
+                <v-card-text>
+                  <div class="tw-my-4">
+                    <span class="tw-font-bold">You
+                    will be redirected to a page where you'll upload a <span
+                    class="tw-font-mono">.jam</span> file from
+                    your local disk.</span>
+                  </div>
+
+                  <div class="tw-my-4">
+                    If you confirm, your agent state will be replaced with the
+                    backup version. Any changes you've made since the backup will
+                    be lost.
+                  </div>
+
+                  <div class="tw-flex tw-justify-around tw-mt-4">
+                    <v-btn @click="redirectConfirmOpen = false" flat class="mr-4"
+                      >Wait, no. Cancel</v-btn
+                    >
+                    <v-btn
+                      color="error"
+                      text="white"
+                      @click="redirectToUpload"
+                      :disabled="lastBackupSect === 0"
+                      >I'm sure, Redirect!</v-btn
+                    >
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
   </div>
 </template>
 
@@ -155,6 +252,7 @@ import {
   SavedStatus,
   AutoStatus,
   Ship,
+  PendingStatus,
 } from "../types";
 
 import BackupButton from "@/components/BackupButton.vue";
@@ -175,10 +273,22 @@ export default defineComponent({
   data() {
     return {
       newTarget: "",
+      redirectWarningOpen: false,
+      redirectConfirmOpen: false,
     };
   },
   computed: {
     ...mapGetters("keep", ["agents", "wrapperStatus", "agentStatus"]),
+    lastBackupSect() {
+      if ("saved" in this.ourAgentStatus && this.ourAgentStatus.saved.length > 0) {
+        return this.ourAgentStatus.saved[0].time;
+      }
+      return 0;
+    },
+    lastBackupOn() {
+      return this.$filters.sectToDate(this.lastBackupSect);
+    },
+
     ourWrapperStatus() {
       console.log("ourstatus ", this.wrapperStatus("gora"));
       const status = this.wrapperStatus(this.agentName);
@@ -193,22 +303,24 @@ export default defineComponent({
     },
 
     diskBackup() {
-      return {
+      let disk = {
         auto: [],
         saved: [],
         pending: [],
       };
-      // TODO
-
-      // const status = {
-      //   auto: this.ourStatus.auto.filter((s) => s.ship === null),
-      //   saved: this.ourStatus.saved.filter((s) => s.ship === null),
-      //   pending: this.ourStatus.pending
-      //     .filter((s) => s.ship === null)
-      //     .map((s) => s),
-      // };
-
-      // return status;
+      disk.auto = this.ourAgentStatus.auto.filter((a: AutoStatus) => a.ship ===
+      null).map((a: AutoStatus) => {
+        return {
+          freq: a.freq
+        }
+      })
+      disk.saved = this.ourAgentStatus.saved.filter((s: SavedStatus) => s.ship ===
+      null).map((s: SavedStatus) => {
+        return {
+          time: s.time
+        }
+      })
+      return disk
     },
     backupsByShip() {
       // return this.ourAgentStatus.saved.filter((s: SavedStatus) => {
@@ -313,6 +425,8 @@ export default defineComponent({
         ? locationString.slice(0, -1)
         : locationString;
       const redirectLocation = `${baseURL}/${this.agentName}/upload`;
+      this.redirectConfirmOpen = false;
+      this.redirectWarningOpen = false;
       window.open(redirectLocation, "_blank");
     },
 

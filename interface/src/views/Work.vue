@@ -14,12 +14,12 @@
             Agents
           </v-tab>
           <v-tab value="inactive">
-            <v-icon start>mdi-folder</v-icon>
-            Backups
+            <v-icon start>mdi-cog</v-icon>
+            Configuration
           </v-tab>
           <v-tab value="holdingBackups">
             <v-icon start>mdi-folder</v-icon>
-            Configuration
+            Held Backups
           </v-tab>
         </v-tabs>
       </div>

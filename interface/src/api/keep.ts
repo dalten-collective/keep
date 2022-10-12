@@ -96,6 +96,7 @@ export function pokeWyteAble(ship: Ship) {
       // return 'error'
     });
 }
+
 export function pokeWyteDisable(ship: Ship) {
   const poke: WyteAblePoke = {
     app: 'keep',
