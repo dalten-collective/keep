@@ -1,6 +1,6 @@
 ::  keep: backup manager
 ::
-/+  dbug, *mip, verb, *parse
+/+  dbug, *mip, verb, parse
 /=  default-agent  /keep/lib/default-agent
 /=  agentio        /keep/lib/agentio
 /=  sane           /keep/lib/sane
@@ -177,7 +177,7 @@
               =/  agent=path  /app/[dude.cmd]/hoon
               :*  agent  %mut  %txt  !>  :_  ~
                   ~|  [%rash-crash desk=(now desk.cmd) agent=agent]
-                  %-  rash  :_  main-parser
+                  %-  rash  :_  parse
                   .^(@t cx/(weld (now desk.cmd) agent))
               ==
             ^-  soba:clay

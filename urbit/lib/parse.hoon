@@ -1,4 +1,4 @@
-|%  ++  main-parser
+|^
   %-  full
   ;~  cata
     gay
@@ -16,7 +16,7 @@
     ;~(cata sym gap stap)
   ::
     %+  rune  sig
-    ;~(cata sym gap wyde gap stap)  ::TODO wyde:vast
+    ;~(cata sym gap wyde gap stap)
   ::
     %+  rune  cen
     ;~(cata sym gap cen sym)
