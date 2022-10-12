@@ -3,7 +3,7 @@
     class="tw-grow tw-p-4 tw-bg-white tw-border tw-border-secondary tw-rounded"
   >
     <div class="tw-flex tw-flex-row tw-my-8">
-      <v-card-text>
+      <v-card-text class="tw-w-1/2">
         <div class="tw-flex tw-flex-row tw-items-center tw-justify-center">
 
 
