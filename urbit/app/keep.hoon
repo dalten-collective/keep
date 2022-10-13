@@ -21,7 +21,7 @@
         able=(each (set ship) (set ship))
         into=(set desk)
         auto=(mip dude (unit ship) @dr)
-        last=(mip dude (unit ship) @da)
+        last=(mip dude (unit ship) [sent=@da kept=(unit @da)])
     ==
   ::
   ++  path-of
@@ -108,7 +108,7 @@
       %once
     ?>  =(src.bowl our.bowl)
     =/  freq  (~(get bi auto) dap.cmd to.cmd)
-    =/  prev  (~(get bi last) dap.cmd to.cmd)
+    =/  prev  (bind (~(get bi last) dap.cmd to.cmd) head)
     =/  behn  ~(. pass:io behn/dap.cmd^(path-of to.cmd))
     :_  this
     %-  catunits
@@ -121,7 +121,7 @@
       %many
     ?>  =(src.bowl our.bowl)
     =/  freq  (~(get bi auto) dap.cmd to.cmd)
-    =/  prev  (~(get bi last) dap.cmd to.cmd)
+    =/  prev  (bind (~(get bi last) dap.cmd to.cmd) head)
     =.  auto
       ?~  freq.cmd
         (~(del bi auto) dap.cmd to.cmd)
@@ -138,15 +138,12 @@
   ::
   ::  Successful backup
       %okay
-    :_  this
-    :_  ~
-    %+  emit  %success
-    %:  ok:event:json
-      dap.cmd
-      src.bowl
+    =/  current
+      =-  -(kept `time.cmd)
       (~(got bi last) dap.cmd `src.bowl)
-      time.cmd
-    ==
+    =.  last  (~(put bi last) dap.cmd `src.bowl current)
+    :_  this
+    ~[(emit success/(ok:event:json dap.cmd `src.bowl current))]
   ::
   ::  "(De)whitelist this ship," said our operator.
       %able
@@ -196,7 +193,10 @@
     ?^  p.sign
       :_  this
       ~[(emit no-save/(da:event:json &2.wire (of-wire |2.wire) now.bowl))]  
-    =.  last  (~(put bi last) &2.wire (of-wire |2.wire) now.bowl)
+    =.  last
+      %^  ~(put bi last)  &2.wire  (of-wire |2.wire)
+      =-  -(sent now.bowl)
+      (~(gut bi last) &2.wire (of-wire |2.wire) [sent=now.bowl ~])
     :_  this
     ~[(emit saved/(da:event:json &2.wire (of-wire |2.wire) now.bowl))]
   ::
@@ -260,7 +260,7 @@
         [%diff diff]
         :-  %state
         %-  pairs
-        :~  [%saved a/(turn ~(tap bi last.state) da:event)]
+        :~  [%saved a/(turn ~(tap bi last.state) ok:event)]
             [%agents a/(turn ~(tap in live.state) (lead %s))]
             [%desks a/(turn ~(tap in into.state) (lead %s))]
         ::
@@ -297,9 +297,12 @@
       ==
     ::
     ++  ok
-      |=  [dap=dude =@p sent=@da kept=@da]
+      |=  [dap=dude place=(unit @p) sent=@da kept=(unit @da)]
       ^-  ^json
-      (pairs ~[agent/s/dap ship/(ship p) sent/(sect sent) kept/(sect kept)])
+      %-  pairs
+      :~  agent/s/dap       ship/(bindcast place ship)
+          sent/(sect sent)  kept/(bindcast kept sect)
+      ==
     --
   --
 --
