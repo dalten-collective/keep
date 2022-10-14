@@ -1,7 +1,6 @@
 ::  keep: backup manager
 ::
-/+  dbug, *mip, verb, parse
-/=  default-agent  /keep/lib/default-agent
+/+  dbug, *mip, verb, default-agent, parse-agent
 /=  agentio        /keep/lib/agentio
 /=  sane           /keep/lib/sane
 /=  keep-sur       /keep/sur/keep
@@ -49,25 +48,21 @@
 +*  this  .
     def   ~(. (default-agent this %|) bowl)
     io    ~(. agentio bowl)
+    disk  ~(. ^disk bowl)
     whitelisted  |(?=(%| -.able) (~(has in p.able) src.bowl))
     emit  ~(website json state)
     send
       |=  [dap=dude to=(unit ship)]
-      %.  [dap keep/!>(`wrap:poke`send/to)]
-      %~  poke-our  pass:io
-      send/dap^(path-of to)
+      %+  ~(poke-our pass:io send/dap^(path-of to))  dap
+      keep/!>(`wrap:poke`send/to)
 ::
 ++  on-save  !>(state)
+++  on-init  [~[mult-deps:disk] this]
 ::
 ++  on-load
   |=  old=vase
   ^-  (quip card _this)
-  =.  state  !<(state-0 old)
-  `this
-::  :_  this
-::  %+  turn  ~(tap by into)
-::  |=  =desk
-::  (~(poke-self pass:io /trigger/[desk]) keep-agent/!>(`agent:poke`copy/desk))
+  `this(state !<(state-0 old))
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -165,42 +160,25 @@
   ::
   ::  "Copy the wrapper to a desk," said our operator.
       %copy
-    |^
     ?>  =(src.bowl our.bowl)
     =.  into  (~(put ju into) desk.cmd dude.cmd)
     :_  this
-    :~  (emit copied-deps/s/desk.cmd)
-    ::
-        %-  ~(arvo pass:io /copy/[desk.cmd])
-        :*  %c  %info  desk.cmd  %&
-            %-  snoc  :_
-              =/  agent=path  /app/[dude.cmd]/hoon
-              :*  agent  %mut  %txt  !>  :_  ~
-                  ~|  [%rash-crash desk=(now desk.cmd) agent=agent]
-                  %-  rash  :_  parse
-                  .^(@t cx/(weld (now desk.cmd) agent))
-              ==
-            ^-  soba:clay
-            :-  =/  =path  /lib/skeleton/hoon  ::  Dependency management lol
-                [keep/path %ins txt+!>(~[.^(@t cx/(weld (now %base) path))])]
-            %+  turn
-              ^-  (list path)
-              :+  /mar/keep/hoon  /mar/json/hoon
-              .^((list path) ct/(weld (now %keep) /keep))
-            |=  =path
-            [path %ins txt+!>(~[.^(@t cx/(weld (now %keep) path))])]
-        ::
-    ==  ==
-    ::
-    ++  now  |=(=desk /(scot %p src.bowl)/[desk]/(scot %da now.bowl))
-    --
+    %-  snoc  :_  (emit transformed/a/~[s/desk.cmd s/dude.cmd])
+    %+  weld
+      ?:  (~(has by into) desk.cmd)  ~
+      :~  (info-deps:disk deps:disk desk.cmd)
+          mult-deps:disk
+      ==
+    ?:  (~(has ju into) desk.cmd dude.cmd)  ~
+    %^  info-dude:disk  desk.cmd  dude.cmd
+    .^(@t cx/(scry:io desk.cmd /app/[dude.cmd]/hoon))
   ==
 ::
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
   ?+    wire  (on-agent:def wire sign)
-      [?(%copy %trigger) *]
+      [%clay *]
     `this
   ::
       [%send term ^]
@@ -240,52 +218,95 @@
 ++  on-peek
   |=  =path
   ^-  (unit (unit cage))
-  ?.  ?=([%x %desks *] path)  ~
+  ?.  ?=([%x %agents *] path)  ~
   :^  ~  ~  %json  !>  ^-  ^json
+  ::
   :-  %a
-  %+  turn
-    ~(tap in .^((set desk) cd+/(scot %p our.bowl)/base/(scot %da now.bowl)))
-  (lead %s)
+  %+  turn  ~(tap in .^((set desk) cd/(scry:io %base /)))
+  |=  =desk
+  %+  frond:enjs:format  desk
+  :-  %a
+  %+  turn  ~(tap in .^((set [dude ?]) ge/(scry:io desk /)))
+  |=  [=dude on=?]  (pairs:enjs:format ~[agent+s/dude on+b/on])
 ::
 ++  on-arvo
   |=  [=wire =sign-arvo]
   ^-  (quip card _this)
-  ?.  ?=([%behn term ^] wire)  (on-arvo:def wire sign-arvo)
-  (on-poke keep-agent/!>(`agent:poke`[%once &2.wire (of-wire |2.wire)]))
+  ?+    wire  (on-arvo:def wire sign-arvo)
+      [%behn term ^]
+    (on-poke keep-agent/!>(`agent:poke`[%once &2.wire (of-wire |2.wire)]))
+  ::
+      [%clay %deps ~]
+    ?>  ?=([%clay %wris *] sign-arvo)
+    :_  this
+    :-  mult-deps:disk
+    %+  turn  ~(tap in ~(key by into))
+    (cury info-deps:disk (~(run in q.sign-arvo) tail))
+  ::
+      [%clay %dude @ @ ~]
+    ?>  ?=([%clay %writ *] sign-arvo)
+    =*  desk  &3.wire
+    =*  dude  &4.wire
+    =*  file  /app/[dude]/hoon
+    ::
+    ?~  p.sign-arvo
+      ~&  >>>  "-keep-no-rant {<desk>} {<dude>}"  `this
+    ?.  =(desk r.p.u.p.sign-arvo)
+      ~&  >>>  "-keep-wrong-desk {<r.p.u.p.sign-arvo>}"  `this
+    ?.  =(file q.u.p.sign-arvo)
+      ~&  >>>  "-keep-wrong-path {<q.u.p.sign-arvo>}"  `this
+    ?.  ?=(%x p.p.u.p.sign-arvo)
+      ~&  >>>  "-keep-wrong-care {<q.p.u.p.sign-arvo>}"  `this
+    ?.  ?=(%hoon p.r.u.p.sign-arvo)
+      ~&  >>>  "-keep-wrong-mark {<p.r.u.p.sign-arvo>}"  `this
+    ::
+    :_  this
+    (info-dude:disk desk dude !<(@t q.r.u.p.sign-arvo))
+  ==
 ::
-++  on-init   on-init:def
 ++  on-leave  on-leave:def
 ++  on-fail   on-fail:def
 --
 ::
 |%
-++  parse-agent
-  %-  full
-  |^
-  ;~  plug
-    ;~(plug gay (punt ;~(plug fas wut gap dem gap)))
+++  disk
+  |_  =bowl:agent:gall
+  +*  io  ~(. agentio bowl)
   ::
-    ;~(plug fas hep gap dem)
+  ++  deps  (sy ~[/mar/json/hoon /mar/keep/hoon /keep])
   ::
-  ::%+  cook  (bake zing (list (list taut)))
-  ::%+  rune  hep
-  ::(most ;~(plug com gaw)
-    gay
-  ==
+  ++  mult-deps
+    ^-  card
+    %-  ~(warp-our pass:io /clay/deps)
+    [q.byk.bowl `[%mult da/now.bowl (~(run in deps) (lead %d))]]
   ::
-  ++  pant
-    |*  fel=rule
-    ;~(pose fel (easy ~))
+  ++  info-deps
+    |=  [deps=(set path) =desk]
+    ^-  card
+    %-  ~(arvo pass:io /clay/info/[desk])
+    :*  %c  %info  desk  %&
+        %-  ~(rep in deps)
+        |=  [=path acc=(list [path miso:clay])]
+        %+  weld  acc
+        %+  turn  .^((list ^path) ct/(scry:io q.byk.bowl path))
+        |=  =^path
+        [path `miso:clay`[%ins txt+!>(~[.^(@t cx/(scry:io q.byk.bowl path))])]]
+    ==
   ::
-  ++  mast
-    |*  [bus=rule fel=rule]
-    ;~(plug (more bus fel) bus)
-  ::
-  ++  rune
-    |*  [bus=rule fel=rule]
-    %-  pant
-    %+  mast  gap
-    ;~(plug fas bus gap fel)
+  ++  info-dude
+    |=  [=desk =dude code=cord]
+    ^-  (list card)
+    :-  %-  ~(warp-our pass:io /clay/dude/[desk]/[dude])
+        [desk `[%next %x da/now.bowl /app/[dude]/hoon]]
+    ::
+    %-  drop
+    %+  bind  (rush code parse-agent)
+    |=  wrapped=_code
+    %-  ~(arvo pass:io /clay/info/[desk]/[dude])
+    :*  %c  %info  desk  %&
+        ~|  [%rash-crash desk=desk dude=dude code=code]
+        [/app/[dude]/hoon %mut txt/!>(~[wrapped])]~
+    ==
   --
 ::
 ++  json

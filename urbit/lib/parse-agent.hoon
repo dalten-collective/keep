@@ -35,10 +35,11 @@
       stap
     ==
   ::
-    %-  cook  :_  (star ;~(pose prn (just `@`10)))
+    %-  cook
+      :_  ;~(less (jest '%-  agent:keep') (star ;~(pose prn (just `@`10))))
     |=  =cord
     %-  crip
-    :(weld "%-  agent:keep\0a=~\0a" (trip cord) "\0a==\0a")
+    :(weld "%-  agent:keep\0a=~  .\0a" (trip cord) "\0a==\0a")
   ==
 ::
 ++  pant

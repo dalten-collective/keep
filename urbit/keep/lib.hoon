@@ -7,7 +7,6 @@
 ::
 ::
 /+  verb
-/=  default-agent  /keep/lib/default-agent
 /=  agentio        /keep/lib/agentio
 /=  multipart      /keep/lib/multipart
 /=  sane           /keep/lib/sane
@@ -79,7 +78,6 @@
   ^-  agent:gall
   |_  bowl:gall
   +*  this  .
-      def   ~(. (default-agent this %|) +<)
       sup   =-  [our=(my p.-) their=(my q.-)]
             %+  skid  ~(tap by ^sup)
             |=  [* * =path]
@@ -204,7 +202,7 @@
       [cards this]
     ::
     ?:  ?=([%http-response ^] path)  `this
-    ?+  +.path  (on-watch:def path)
+    ?+  +.path  ~|  "unexpected subscription to %keep on wire {<wire>}"  !!
         [%website ~]
       ?>  =(src.bowl our.bowl)
       :_  this
@@ -235,13 +233,13 @@
       =^  cards  agent  (on-arvo:ag wire sign-arvo)
       [cards this]
     ::
-    ?+    +.wire  (on-arvo:def wire sign-arvo)  ::TODO use ?.
-        [%eyre ~]
-      ?>  ?=([%eyre %bound *] sign-arvo)
-      %.  `this
-      ?:  accepted.sign-arvo  same
-      (slog leaf+"keep-wrapper-fail -binding-eyre-for-import" ~)
-    ==
+    ?.  ?=([%eyre ~] +.wire)
+      ~|  "unexpected system response {<-.sign-arvo>} to %keep on wire {<wire>}"
+      !!
+    ?>  ?=([%eyre %bound *] sign-arvo)
+    %.  `this
+    ?:  accepted.sign-arvo  same
+    (slog leaf+"keep-wrapper-fail -binding-eyre-for-import" ~)
   ::
   ++  on-fail
     |=  [=term =tang]
