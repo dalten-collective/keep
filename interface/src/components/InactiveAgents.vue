@@ -2,7 +2,7 @@
   <div class="tw-w-screen">
     <div class="tw-flex tw-space-between tw-mb-4">
       <div class="tw-grow">
-        <h3 class="tw-text-3xl tw-font-silom">Inactive Agents</h3>
+        <h3 class="tw-text-3xl tw-font-silom">Installed Desks</h3>
         <p class="tw-my-2">
           Agents/Apps on your ship need to be prepared for use with %keep and
           then <span class="tw-font-mono">ACTIVATED</span> before you can back
@@ -122,6 +122,7 @@ import { mapGetters, mapState } from "vuex";
 import { Scry } from "@urbit/http-api";
 
 import KeepAgent from "@/components/KeepAgent.vue";
+import { CopyDepsPayload } from "@/types";
 
 export default defineComponent({
   name: "HomeView",
@@ -170,9 +171,13 @@ export default defineComponent({
       return false;
     },
 
-    copyDepsFor(deskName) {
+    copyDepsFor(deskName: DeskName) {
       this.preparePending = true;
-      this.$store.dispatch("keep/copyDeps", deskName).finally(() => {
+      const payload: CopyDepsPayload = {
+        copy: deskName,
+      };
+
+      this.$store.dispatch("keep/copyDeps", payload).finally(() => {
         this.preparePending = false;
       });
     },

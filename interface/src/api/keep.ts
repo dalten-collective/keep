@@ -2,65 +2,42 @@ import urbitAPI from "./urbitAPI";
 import { Scry } from "@urbit/http-api";
 import {
   OnceRequest,
+  MendPoke,
   ManyRequest,
   UnsetManyRequest,
   RestoreRequest,
   LocalBackupRequest,
   LocalManyRequest,
+  WytePokePayload,
+  WytePoke,
+  CopyDepsPoke,
+  WyteAblePoke,
+  BackupPayload,
+  Ship,
+  BackupPoke,
+  ManyPayload,
+  ManyPoke,
+  MendPayload,
+  AgentName,
 } from "@/types";
 
-export function siggedShip(ship) {
+export function siggedShip(ship: string) {
   if (ship[0] === "~") {
     return ship;
   }
   return `~${ship}`;
 }
 
-export function activate(agentName: string) {
+export function pokeWyteOn() {
+  const poke: WytePoke = {
+    app: 'keep',
+    mark: 'keep-agent',
+    json: {
+      wyte: true
+    },
+  }
   return urbitAPI
-    .poke({
-      app: agentName,
-      mark: "keep",
-      json: {
-        live: true,
-      },
-    })
-    .then((r) => {
-      console.log("res ", r);
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-    });
-}
-
-export function deactivate(agentName: string) {
-  return urbitAPI
-    .poke({
-      app: agentName,
-      mark: "keep",
-      json: {
-        live: false,
-      },
-    })
-    .then((r) => {
-      console.log("res ", r);
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-    });
-}
-
-export function wyteOn() {
-  return urbitAPI
-    .poke({
-      app: 'keep',
-      mark: "keep-agent",
-      json: {
-        wyte: true,
-      },
-    })
+    .poke(poke)
     .then((r) => {
       console.log("res ", r);
       return r;
@@ -72,15 +49,17 @@ export function wyteOn() {
     });
 }
 
-export function copyDeps(agentName: string) {
+export function pokeWyteOff() {
+  const poke: WytePoke = {
+    app: 'keep',
+    mark: 'keep-agent',
+    json: {
+      wyte: false
+    }
+  }
+
   return urbitAPI
-    .poke({
-      app: 'keep',
-      mark: "keep-agent",
-      json: {
-        copy: agentName,
-      },
-    })
+    .poke(poke)
     .then((r) => {
       console.log("res ", r);
       return r;
@@ -92,61 +71,20 @@ export function copyDeps(agentName: string) {
     });
 }
 
-export function wyteOff() {
-  return urbitAPI
-    .poke({
-      app: 'keep',
-      mark: "keep-agent",
-      json: {
-        wyte: false,
-      },
-    })
-    .then((r) => {
-      console.log("res ", r);
-      return r;
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-      return e
-    });
-}
+export function pokeWyteAble(ship: Ship) {
+  const poke: WyteAblePoke = {
+    app: 'keep',
+    mark: 'keep-agent',
+    json: {
+      able: {
+        able: true,
+        ship: siggedShip(ship)
+      }
+    }
+  }
 
-export function wyteAble(ship: Ship) {
   return urbitAPI
-    .poke({
-      app: 'keep',
-      mark: "keep-agent",
-      json: {
-        able: {
-          able: true,
-          ship: siggedShip(ship)
-        }
-      },
-    })
-    .then((r) => {
-      console.log("res ", r);
-      return r;
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-      throw e
-      // return 'error'
-    });
-}
-export function wyteDisable(ship: Ship) {
-  return urbitAPI
-    .poke({
-      app: 'keep',
-      mark: "keep-agent",
-      json: {
-        able: {
-          able: false,
-          ship: siggedShip(ship)
-        }
-      },
-    })
+    .poke(poke)
     .then((r) => {
       console.log("res ", r);
       return r;
@@ -159,6 +97,132 @@ export function wyteDisable(ship: Ship) {
     });
 }
 
+export function pokeWyteDisable(ship: Ship) {
+  const poke: WyteAblePoke = {
+    app: 'keep',
+    mark: 'keep-agent',
+    json: {
+      able: {
+        able: false,
+        ship: siggedShip(ship)
+      }
+    }
+  }
+
+  return urbitAPI
+    .poke(poke)
+    .then((r) => {
+      console.log("res ", r);
+      return r;
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      throw e
+      // return 'error'
+    });
+}
+
+export function pokeCopyDeps(payload: CopyDepsPayload) {
+  const poke: CopyDepsPoke = {
+    app: 'keep',
+    mark: 'keep-agent',
+    json: payload,
+  }
+  return urbitAPI
+    .poke(poke)
+    .then((r) => {
+      console.log("res ", r);
+      return r;
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      return e
+    });
+}
+
+
+export function pokeOnce(payload: BackupPayload): Promise<any> {
+  // gets data: { pending: { status: "invite", ship: "sum" } }
+  const poke: BackupPoke = {
+    app: 'keep',
+    mark: 'keep-agent',
+    json: payload
+  }
+
+  return urbitAPI
+    .poke(poke)
+    .then((r) => {
+      console.log("res ", r);
+      return r;
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      throw e.response;
+    });
+}
+
+export function pokeMany(payload: ManyPayload) {
+  const poke: ManyPoke = {
+    app: 'keep',
+    mark: 'keep-agent',
+    json: payload,
+  }
+
+  return urbitAPI
+    .poke(poke)
+    .then((r) => {
+      console.log("res ", r);
+      return r
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      return e
+    });
+}
+
+export function pokeUnsetMany(payload: UnsetManyRequest) {
+  // gets data: { pending: { status: "invite", ship: "sum" } }
+  const poke: ManyPoke = {
+    app: 'keep',
+    mark: 'keep-agent',
+    json: payload,
+  }
+
+  return urbitAPI
+    .poke(poke)
+    .then((r) => {
+      console.log("res ", r);
+      return r
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      return e
+    });
+}
+
+export function mendFromShip(request: { payload: MendPayload, agentName: AgentName }) {
+  const poke: MendPoke = {
+    app: request.agentName,
+    mark: "keep",
+    json: request.payload,
+  }
+  return urbitAPI
+    .poke(poke)
+    .then((r) => {
+      console.log("res ", r);
+      return r
+    })
+    .catch((e) => {
+      // TODO: 'e' is undefined
+      console.log("err ", e);
+      return e
+    });
+}
 
 export function scry(scry: Scry) {
   return urbitAPI
@@ -170,152 +234,5 @@ export function scry(scry: Scry) {
     .catch((e) => {
       console.log(e);
       throw e
-    });
-}
-
-export function localBackup(payload: LocalBackupRequest): Promise<any> {
-  return urbitAPI
-    .poke({
-      app: payload.agentName,
-      mark: "keep",
-      json: { once: null },
-    })
-    .then((r) => {
-      console.log("res ", r);
-      return r;
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-      throw e.response;
-    });
-}
-
-export function testOnce(payload: OnceRequest): Promise<any> {
-  // gets data: { pending: { status: "invite", ship: "sum" } }
-  return urbitAPI
-    .poke({
-      app: payload.agentName,
-      mark: "keep",
-      json: { once: siggedShip(payload.ship) },
-    })
-    .then((r) => {
-      console.log("res ", r);
-      return r;
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-      throw e.response;
-    });
-}
-
-export function localMany(payload: LocalManyRequest) {
-  return urbitAPI
-    .poke({
-      app: payload.agentName,
-      mark: "keep",
-      json: {
-        many: {
-          to: null,
-          freq: payload.freq,
-        },
-      },
-    })
-    .then((r) => {
-      console.log("res ", r);
-      return r
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-      return e
-    });
-}
-
-export function testMany(payload: ManyRequest) {
-  return urbitAPI
-    .poke({
-      app: payload.agentName,
-      mark: "keep",
-      json: {
-        many: {
-          to: siggedShip(payload.ship),
-          freq: payload.freq,
-        },
-      },
-    })
-    .then((r) => {
-      console.log("res ", r);
-      return r
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-      return e
-    });
-}
-
-export function testUnsetMany(payload: UnsetManyRequest) {
-  // gets data: { pending: { status: "invite", ship: "sum" } }
-  return urbitAPI
-    .poke({
-      app: payload.agentName,
-      mark: "keep",
-      json: {
-        many: {
-          to: siggedShip(payload.ship),
-          freq: payload.freq,
-        },
-      },
-    })
-    .then((r) => {
-      console.log("res ", r);
-      return r
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-      return e
-    });
-}
-
-export function mendFromShip(payload: RestoreRequest) {
-  return urbitAPI
-    .poke({
-      app: payload.agentName,
-      mark: "keep",
-      json: {
-        mend: {
-          ship: siggedShip(payload.ship),
-        },
-      },
-    })
-    .then((r) => {
-      console.log("res ", r);
-      return r
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-      return e
-    });
-}
-
-export function testRestore(payload: RestoreRequest) {
-  return urbitAPI
-    .poke({
-      app: payload.agentName,
-      mark: "keep",
-      json: { mend: siggedShip(payload.ship) },
-    })
-    .then((r) => {
-      console.log("res ", r);
-      return r
-    })
-    .catch((e) => {
-      // TODO: 'e' is undefined
-      console.log("err ", e);
-      return e
     });
 }
