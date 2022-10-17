@@ -97,7 +97,7 @@ export default defineComponent({
       this.$store.dispatch("ship/openKeepAirlock");
     },
     getDesks() {
-      const scry: Scry = { app: 'keep', path: '/desks' };
+      const scry: Scry = { app: 'keep', path: '/agents' };
       this.$store.dispatch("keep/scry", scry)
         .then((r) => {
           console.log('scried ', r)

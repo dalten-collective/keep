@@ -8,7 +8,7 @@ export enum EventType {
   Restored = "restored", // backup has been restored
   Active = "active", // wrapper 'live' has changed // TODO: deprecated
   NewAgent = "agent", // new agent has been wrapped
-  CopiedDeps = "copied-deps", // Begun copying deps for agent
+  CopiedDeps = "transformed", // Begun copying deps for agent
   Agent = "agent", // the main keep agent has done something (like wrapping)
 }
 
@@ -34,8 +34,10 @@ export interface WyteAblePoke {
 }
 
 export interface CopyDepsPayload {
-  copy: string;
-  // TODO: soon to include a boolean for disabling
+  copy: {
+    desk: string;
+    dude: string;
+  };
 }
 export interface CopyDepsPoke {
   app: "keep";

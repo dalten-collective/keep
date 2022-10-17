@@ -40,33 +40,61 @@
           <span class="tw-font-mono">PREPARE</span> the desk to make it ready
           for activation.
         </p>
-        <div class="tw-grid xs:tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-1">
+        <div class="tw-flex tw-flex-col">
           <div
             v-for="d in safeInstalledDesks"
-            class="tw-grid-col-span-1 tw-border tw-rounded-keep tw-p-4"
+            :key="d"
+            class=""
           >
-            <div class="tw-flex tw-justify-between">
-              <div>%{{ d }}</div>
-              <div>
-                <div v-if="deskCopying(d)">
-                  <v-btn
-                    v-bind="props"
-                    color="success"
-                    size="x-small"
-                    disabled
-                    icon="mdi-thumb-up"
-                  />
-                </div>
-                <div v-else>
-                  <v-btn
-                    color="success"
-                    size="x-small"
-                    @click="copyDepsFor(d)"
-                    :loading="preparePending"
-                    >Prepare</v-btn
-                  >
-                </div>
+            <div class="tw-flex tw-flex-col tw-justify-between tw-p-4 tw-border tw-my-2">
+              {{ deskName(d) }}
+              <div v-for="a in agentsInDesk(d)" :key="a">
+                {{ a.agent }}
+                  <div v-if="deskCopying(a.agent)">
+                    <v-btn
+                      v-bind="props"
+                      color="success"
+                      size="x-small"
+                      disabled
+                      icon="mdi-thumb-up"
+                    />
+                  </div>
+                  <div v-else>
+                <v-btn
+                  color="success"
+                  size="x-small"
+                  @click="copyDepsFor(deskName(d), a.agent)"
+                  :loading="preparePending"
+                  >Prepare</v-btn
+                >
+                  </div>
               </div>
+
+              <div v-if="false">
+                <div>%{{ d }}</div>
+                <div>
+                  <div v-if="deskCopying(d)">
+                    <v-btn
+                      v-bind="props"
+                      color="success"
+                      size="x-small"
+                      disabled
+                      icon="mdi-thumb-up"
+                    />
+                  </div>
+                  <div v-else>
+                    <v-btn
+                      color="success"
+                      size="x-small"
+                      @click="copyDepsFor(d)"
+                      :loading="preparePending"
+                      >Prepare</v-btn
+                    >
+                  </div>
+                </div>
+
+              </div>
+
             </div>
           </div>
         </div>
@@ -132,13 +160,13 @@ export default defineComponent({
   computed: {
     ...mapGetters("keep", ["agents", "inactiveAgents"]),
     ...mapState("ship", ["installedDesks"]),
-    ...mapState("keep", ["desks"]),
+    ...mapState("keep", ["desks", "agents"]),
     installedButNotCopying() {
       // TODO: return installedDesks minus copying-to
       return this.installedDesks;
     },
     copyingDepsAgents() {
-      return this.desks;
+      return this.agents;
     },
     safeInstalledDesks(): Array<string> {
       const badBoys = [
@@ -164,17 +192,28 @@ export default defineComponent({
     };
   },
   methods: {
-    deskCopying(deskName) {
-      if (this.copyingDepsAgents.includes(deskName)) {
+    deskCopying(agentName) {
+      if (this.copyingDepsAgents.includes(agentName)) {
         return true;
       }
       return false;
     },
 
-    copyDepsFor(deskName: DeskName) {
+    deskName(desk) {
+      return Object.keys(desk)[0]
+    },
+    agentsInDesk(desk) {
+      return Object.keys(desk).map((deskName) => desk[deskName]).flat()
+    },
+
+    copyDepsFor(deskName: string, agentName: string) {
+      console.log('d ', deskName, ' a ', agentName)
       this.preparePending = true;
       const payload: CopyDepsPayload = {
-        copy: deskName,
+        copy: {
+          desk: deskName,
+          dude: agentName,
+        }
       };
 
       this.$store.dispatch("keep/copyDeps", payload).finally(() => {
