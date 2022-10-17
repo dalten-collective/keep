@@ -57,7 +57,7 @@
       keep/!>(`wrap:poke`send/to)
 ::
 ++  on-save  !>(state)
-++  on-init  [~[mult-deps:disk] this]
+++  on-init  [~[mult-deps next-deps]:disk this]
 ::
 ++  on-load
   |=  old=vase
@@ -161,9 +161,10 @@
   ::  "Copy the wrapper to a desk," said our operator.
       %copy
     ?>  =(src.bowl our.bowl)
-    =.  into  (~(put ju into) desk.cmd dude.cmd)
-    :_  this
-    %-  snoc  :_  (emit transformed/a/~[s/desk.cmd s/dude.cmd])
+    =;  caz=(list card)
+      =.  into  (~(put ju into) desk.cmd dude.cmd)
+      :_  this
+      (snoc caz (emit transformed/a/~[s/desk.cmd s/dude.cmd]))
     %+  weld
       ?:  (~(has by into) desk.cmd)  ~
       :~  (info-deps:disk deps:disk desk.cmd)
@@ -236,31 +237,53 @@
       [%behn term ^]
     (on-poke keep-agent/!>(`agent:poke`[%once &2.wire (of-wire |2.wire)]))
   ::
-      [%clay %deps ~]
+      [%clay %deps %mult ~]
     ?>  ?=([%clay %wris *] sign-arvo)
     :_  this
     :-  mult-deps:disk
     %+  turn  ~(tap in ~(key by into))
-    (cury info-deps:disk (~(run in q.sign-arvo) tail))
+    (cury info-deps:disk (turn ~(tap in q.sign-arvo) tail))
+  ::
+      [%clay %deps %next ~]
+    ?>  ?=([%clay %writ *] sign-arvo)
+    :_  this
+    :-  next-deps:disk
+    ::
+    ?~  p.sign-arvo
+      ~&  >>>  "-keep-no-rant deps"  ~
+    ?.  =(q.byk.bowl r.p.u.p.sign-arvo)
+      ~&  >>>  "-keep-wrong-desk {<r.p.u.p.sign-arvo>}"  ~
+    ?.  =(/keep q.u.p.sign-arvo)
+      ~&  >>>  "-keep-wrong-path {<q.u.p.sign-arvo>}"  ~
+    ?.  ?=(%t p.p.u.p.sign-arvo)
+      ~&  >>>  "-keep-wrong-care {<p.p.u.p.sign-arvo>}"  ~
+    ?.  ?=(%file-list p.r.u.p.sign-arvo)
+      ~&  >>>  "-keep-wrong-mark {<p.r.u.p.sign-arvo>}"  ~
+    ::
+    :-  mult-deps:disk
+    %+  turn  ~(tap in ~(key by into))
+    %+  cury  info-deps:disk
+    %+  diff  !<((list path) q.r.u.p.sign-arvo)
+    .^((list path) ct+/(scot %p our.bowl)/[q.byk.bowl]/(scot %ud (dec our-rev:disk))/keep)
   ::
       [%clay %dude @ @ ~]
     ?>  ?=([%clay %writ *] sign-arvo)
+    :_  this
     =*  desk  &3.wire
     =*  dude  &4.wire
     =*  file  /app/[dude]/hoon
     ::
     ?~  p.sign-arvo
-      ~&  >>>  "-keep-no-rant {<desk>} {<dude>}"  `this
+      ~&  >>>  "-keep-no-rant {<desk>} {<dude>}"  ~
     ?.  =(desk r.p.u.p.sign-arvo)
-      ~&  >>>  "-keep-wrong-desk {<r.p.u.p.sign-arvo>}"  `this
+      ~&  >>>  "-keep-wrong-desk {<r.p.u.p.sign-arvo>}"  ~
     ?.  =(file q.u.p.sign-arvo)
-      ~&  >>>  "-keep-wrong-path {<q.u.p.sign-arvo>}"  `this
+      ~&  >>>  "-keep-wrong-path {<q.u.p.sign-arvo>}"  ~
     ?.  ?=(%x p.p.u.p.sign-arvo)
-      ~&  >>>  "-keep-wrong-care {<q.p.u.p.sign-arvo>}"  `this
+      ~&  >>>  "-keep-wrong-care {<p.p.u.p.sign-arvo>}"  ~
     ?.  ?=(%hoon p.r.u.p.sign-arvo)
-      ~&  >>>  "-keep-wrong-mark {<p.r.u.p.sign-arvo>}"  `this
+      ~&  >>>  "-keep-wrong-mark {<p.r.u.p.sign-arvo>}"  ~
     ::
-    :_  this
     (info-dude:disk desk dude !<(@t q.r.u.p.sign-arvo))
   ==
 ::
@@ -273,24 +296,33 @@
   |_  =bowl:agent:gall
   +*  io  ~(. agentio bowl)
   ::
-  ++  deps  (sy ~[/mar/json/hoon /mar/keep/hoon /keep])
+  ++  our-rev
+    ^-  @ud
+    ud:.^(cass:clay cw/(scry:io q.byk.bowl /))
+  ::
+  ++  deps
+    ^-  (list path)
+    :+  /mar/json/hoon  /mar/keep/hoon
+    .^((list path) ct/(scry:io q.byk.bowl /keep))
   ::
   ++  mult-deps
     ^-  card
-    %-  ~(warp-our pass:io /clay/deps)
-    [q.byk.bowl `[%mult da/now.bowl (~(run in deps) (lead %d))]]
+    %-  ~(warp-our pass:io /clay/deps/mult)
+    [q.byk.bowl `[%mult da/now.bowl (sy (turn deps (lead %x)))]]
+  ::
+  ++  next-deps
+    ^-  card
+    %-  ~(warp-our pass:io /clay/deps/next)
+    [q.byk.bowl `[%next %t da/now.bowl /keep]]
   ::
   ++  info-deps
-    |=  [deps=(set path) =desk]
+    |=  [deps=(list path) =desk]
     ^-  card
     %-  ~(arvo pass:io /clay/info/[desk])
     :*  %c  %info  desk  %&
-        %-  ~(rep in deps)
-        |=  [=path acc=(list [path miso:clay])]
-        %+  weld  acc
-        %+  turn  .^((list ^path) ct/(scry:io q.byk.bowl path))
-        |=  =^path
-        [path `miso:clay`[%ins txt+!>(~[.^(@t cx/(scry:io q.byk.bowl path))])]]
+        %+  turn  (skim deps |=(=path =((rear path) %hoon)))
+        |=  =path
+        [path `miso:clay`[%ins txt/!>(~[.^(@t cx/(scry:io q.byk.bowl path))])]]
     ==
   ::
   ++  info-dude
