@@ -87,7 +87,6 @@ export default {
     },
 
     agentStatus: (state: KeepAgentState) => (soughtAgentName: AgentName) => {
-      console.log(state);
       const auto: Array<AutoStatus> | [] = state.auto.filter(
         (a: AutoStatus) => {
           return a.agent === soughtAgentName;
@@ -134,7 +133,6 @@ export default {
     },
 
     setAgents(state, agents: Array<string>) {
-      console.log("setting agents ", agents);
       state.agents = agents;
     },
     removeAgent(state, agentName: string) {
@@ -148,7 +146,6 @@ export default {
         state: KeepWrapperState;
       }
     ) {
-      console.log("setWrapperStatus...: ", payload);
       state.wrappers[payload.agentName] = payload.state;
     },
 
@@ -184,7 +181,6 @@ export default {
       agent.status.pending.push(payload.dif);
     },
 
-    // TODO: I AM THE MODEL
     updateSaved(
       state,
       payload: {
@@ -223,7 +219,6 @@ export default {
       }
     ) {
       // remove if existing
-      console.log("remove backups", payload);
       if (
         state.backups.map((b: Backup) => b.agent).includes(payload.diff.agent)
       ) {
@@ -299,7 +294,6 @@ export default {
   actions: {
     scry({}, scry: Scry) {
       // TODO: need to insure that path is prefixed with /
-      console.log(scry);
       return keepApi
         .scry(scry)
         .then((r) => {
@@ -369,7 +363,6 @@ export default {
     },
 
     setAgents({ commit, dispatch }, agents: Array<string>) {
-      console.log("setting agents");
       commit("setAgents", agents);
       //agents.forEach((agentName: string) => {
       //dispatch("ship/openAirlockToAgent", agentName, { root: true });
@@ -377,7 +370,6 @@ export default {
     },
 
     openAgentAirlocks({ commit, dispatch }, agents: Array<string>) {
-      console.log("opening airlocks");
       Promise.all(
         agents.map((agentName) => {
           return dispatch("ship/openAirlockToAgent", agentName, { root: true });
@@ -388,7 +380,6 @@ export default {
     },
 
     handleKeepResponseState({ commit }, responseState: KeepAgentState) {
-      console.log("keep response state: ", responseState);
       commit("setAuto", responseState.auto);
       commit("setBackups", responseState.backups);
       commit("setSaved", responseState.saved);
@@ -398,9 +389,7 @@ export default {
     },
 
     handleKeepAgentDiff(ctx, payload) {
-      console.log("in handle keep agent diff ", payload);
       if (payload.type === EventType.Backup) {
-        // TODO: I AM THE MODEL
         ctx.dispatch("applyBackupDiff", {
           diff: payload.diff as Backup,
           state: payload.state,
@@ -436,10 +425,8 @@ export default {
       ctx,
       payload: { data: KeepWrapperSubscriptionResponse; agentName: AgentName }
     ) {
-      console.log("in handle keep wrapper diff ", payload);
 
       if (payload.data.type === EventType.Saved) {
-        // TODO: I AM THE MODEL
         ctx.dispatch("applySavedDiff", {
           agentName: payload.agentName as AgentName,
           diff: payload.data.diff as SavedStatus,
@@ -454,11 +441,6 @@ export default {
           state: payload.data.state as KeepWrapperState,
         });
       }
-
-      // TODO for all
-      // if (payload.type === EventType.Saved) {
-      //   ctx.dispatch('applySavedDiff', payload as KeepWrapperSavedResponse)
-      // }
     },
 
     applySavedDiff(
@@ -469,7 +451,6 @@ export default {
         state: KeepWrapperState;
       }
     ) {
-      // TODO: I AM THE MODEL
       ctx.dispatch("addSavedBackup", payload);
       ctx.dispatch("addSavedBackupMessage", payload);
     },
@@ -532,18 +513,6 @@ export default {
       ctx.dispatch("addRestoredSuccessMessage", payload);
     },
 
-    // TODO
-    handleKeepResponseType(
-      {},
-      payload: { diff: object; responseType: EventType }
-    ) {
-      console.log("keep response type: ", payload.responseType);
-      console.log("keep response diff: ", payload.diff);
-      if (payload.responseType == EventType.NewAgent) {
-        console.log("new agent! ", payload.diff);
-      }
-    },
-
     handleKeepResponseDiff(
       { dispatch },
       payload: {
@@ -553,8 +522,6 @@ export default {
         state: { agents: Array<string> };
       }
     ) {
-      // TODO: whitelist updates
-
       if (payload.responseType === EventType.Backup) {
         const d = payload.diff as BackupDiff;
         const time = d.time;
@@ -570,15 +537,6 @@ export default {
         };
         dispatch("message/addMessage", logMsg, { root: true });
       }
-
-      // TODO: this does add to state: { agents }, but I think we're not getting
-      //       the agentStatus, so it doesn't immediately show up as Activateable.
-      // if (payload.responseType === EventType.Agent) {
-      //   const agentName = payload.diff as AgentDiff;
-      //   console.log('got wrap diff' , payload);
-      //   const agents = payload.state.agents;
-      //   dispatch("setAgents", agents);
-      // }
     },
 
     handleWrapperResponseState(
@@ -588,124 +546,11 @@ export default {
         state: KeepWrapperState;
       }
     ) {
-      console.log(
-        `handle %${payload.agentName} agent response state: `,
-        payload.state
-      );
       commit("setWrapperStatus", {
         agentName: payload.agentName,
         state: payload.state,
       });
     },
-
-    // For handling diffs
-    // handleAgentResponseType(
-    //   { dispatch },
-    //   payload: {
-    //     agentName: string;
-    //     responseType: EventType;
-    //     diff: Diff;
-    //   }
-    // ) {
-    //   console.log("agent response type: ", payload.responseType);
-    //   console.log("agent response diff ", payload.diff);
-
-    //   if (payload.responseType === EventType.Pending) {
-    //     const d = payload.diff as PendingDiff;
-    //     const time = Date.now() / 1000;
-    //     const ship = d.ship;
-    //     const status = d.status;
-
-    //     if (status === InviteStatus.Invite) {
-    //       dispatch("addPending", { dif: d, agent: payload.agentName });
-
-    //       const logMsg: LogMessage = {
-    //         msg: `Invite pending to ${ship}`,
-    //         time,
-    //         type: "pend",
-    //       };
-    //       dispatch("message/addMessage", logMsg, { root: true });
-    //     }
-    //     if (status === InviteStatus.Restore) {
-    //       // TODO: Handle this type of pending.
-    //       const logMsg: LogMessage = {
-    //         msg: `Waiting for restore of %${payload.agentName} from ${ship}.`,
-    //         time,
-    //         type: "pend",
-    //       };
-    //       dispatch("message/addMessage", logMsg, { root: true });
-    //     }
-    //   }
-
-    //   if (payload.responseType === EventType.Restored) {
-    //     const d = payload.diff as RestoreDiff;
-    //     const time = d.time;
-    //     const ship = d.ship;
-
-    //     // TODO: handle as dif?
-
-    //     // TODO: also remove from pending.
-
-    //     let targetShip;
-    //     if (ship) {
-    //       targetShip = ship;
-    //     } else {
-    //       targetShip = "local disk";
-    //     }
-
-    //     const logMsg: LogMessage = {
-    //       msg: `Restored %${payload.agentName} from ${targetShip} at ${time}`,
-    //       time,
-    //       type: "succ",
-    //     };
-    //     dispatch("message/addMessage", logMsg, { root: true });
-    //   }
-
-    //   if (payload.responseType === EventType.Auto) {
-    //     if (
-    //       Object.prototype.hasOwnProperty.call(payload.diff, "freq") &&
-    //       payload.diff.freq
-    //     ) {
-    //       const d = payload.diff as AutoOnDiff;
-    //       const freq = d.freq;
-    //       const ship = d.ship;
-    //       const time = Date.now() / 1000;
-
-    //       dispatch("addAuto", { dif: d, agent: payload.agentName });
-
-    //       let targetShip;
-    //       if (ship) {
-    //         targetShip = ship;
-    //       } else {
-    //         targetShip = "local disk";
-    //       }
-    //       const logMsg: LogMessage = {
-    //         msg: `Recurring backups for %${payload.agentName} to ${targetShip} activated every ${freq} seconds`,
-    //         time,
-    //         type: "info",
-    //       };
-    //       dispatch("message/addMessage", logMsg, { root: true });
-    //     } else {
-    //       const d = payload.diff as AutoOffDiff;
-    //       const time = Date.now() / 1000;
-    //       const ship = d.ship;
-
-    //       dispatch("removeAuto", { dif: d, agent: payload.agentName });
-
-    //       let targetShip;
-    //       if (ship) {
-    //         targetShip = ship;
-    //       } else {
-    //         targetShip = "local disk";
-    //       }
-    //       const logMsg: LogMessage = {
-    //         msg: `Recurring backups for %${payload.agentName} to ${targetShip} stopped`,
-    //         time,
-    //         type: "info",
-    //       };
-    //       dispatch("message/addMessage", logMsg, { root: true });
-    //     }
-    //   }
 
     removeAgent({ commit }, agentName: string) {
       commit("removeAgent", agentName);
@@ -826,7 +671,6 @@ export default {
         state: KeepWrapperState;
       }
     ) {
-      // TODO: I AM THE MODEL
       commit("updateSaved", payload);
     },
     addSavedBackupMessage(

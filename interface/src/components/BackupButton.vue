@@ -464,7 +464,6 @@ export default defineComponent({
     },
 
     backupOnce() {
-      // TODO: use loading state somewhere
       this.backupPending = true;
       this.showDone = false;
       this.showAutoSetDone = false;

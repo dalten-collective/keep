@@ -2,11 +2,6 @@
   <div>
     <header class="tw-mb-4 tw-flex tw-justify-between">
       <h3 class="tw-text-2xl">%{{ agentName }}</h3>
-      <!-- DEBUG TODO: <v-btn @click="deactivateAgent">Deactivate</v-btn> -->
-      <!-- TODO: remove
-        <pre>wrapper {{ ourWrapperStatus }}</pre>
-        <pre>agent {{ ourAgentStatus }}</pre>
-      -->
     </header>
 
     <section class="tw-flex tw-flex-col">
@@ -413,8 +408,6 @@ export default defineComponent({
 
     pending() {
       return false;
-      // TODO: how pending?
-      // return this.ourStatus.pending;
     },
   },
   methods: {
@@ -430,13 +423,11 @@ export default defineComponent({
     },
 
     activateAgent() {
-      console.log("activating");
       this.$store.dispatch("keep/activate", {
         agentName: this.agentName,
       });
     },
     deactivateAgent() {
-      console.log("deactivating");
       this.$store.dispatch("keep/deactivate", {
         agentName: this.agentName,
       });

@@ -5,21 +5,6 @@
       <div class="tw-grow">
         <h3 class="tw-text-3xl tw-mb-6 tw-font-silom">Kept Agents</h3>
       </div>
-      <!--
-      <div>
-        <v-btn
-          :loading="activePending"
-          :disabled="activePending"
-          color="white"
-          variant="tonal"
-          class="tw-inline-block text-success"
-          @click="getActive"
-        >
-          <v-icon start>mdi-cached</v-icon>
-          refresh
-        </v-btn>
-      </div>
-      -->
     </div>
 
     <div v-if="!agents || agents.length === 0">
@@ -78,20 +63,11 @@ export default defineComponent({
   },
   methods: {
     testScry() {
-      console.log("scrying ", this.scryApp, this.scryPath);
       const scry: Scry = { app: this.scryApp, path: this.scryPath };
       this.$store.dispatch("keep/scry", scry);
     },
     closeAgentAirlock() {
       this.$store.dispatch("ship/closeKeepAirlock");
-    },
-
-    getActive() {
-      // TODO:
-      this.activePending = true;
-      setTimeout(() => {
-        this.activePending = false;
-      }, 400);
     },
   },
 });

@@ -39,11 +39,9 @@ export function pokeWyteOn() {
   return urbitAPI
     .poke(poke)
     .then((r) => {
-      console.log("res ", r);
       return r;
     })
     .catch((e) => {
-      // TODO: 'e' is undefined
       console.log("err ", e);
       return e
     });
@@ -61,11 +59,9 @@ export function pokeWyteOff() {
   return urbitAPI
     .poke(poke)
     .then((r) => {
-      console.log("res ", r);
       return r;
     })
     .catch((e) => {
-      // TODO: 'e' is undefined
       console.log("err ", e);
       return e
     });
@@ -86,11 +82,9 @@ export function pokeWyteAble(ship: Ship) {
   return urbitAPI
     .poke(poke)
     .then((r) => {
-      console.log("res ", r);
       return r;
     })
     .catch((e) => {
-      // TODO: 'e' is undefined
       console.log("err ", e);
       throw e
       // return 'error'
@@ -112,14 +106,11 @@ export function pokeWyteDisable(ship: Ship) {
   return urbitAPI
     .poke(poke)
     .then((r) => {
-      console.log("res ", r);
       return r;
     })
     .catch((e) => {
-      // TODO: 'e' is undefined
       console.log("err ", e);
       throw e
-      // return 'error'
     });
 }
 
@@ -132,11 +123,9 @@ export function pokeCopyDeps(payload: CopyDepsPayload) {
   return urbitAPI
     .poke(poke)
     .then((r) => {
-      console.log("res ", r);
       return r;
     })
     .catch((e) => {
-      // TODO: 'e' is undefined
       console.log("err ", e);
       return e
     });
@@ -154,11 +143,9 @@ export function pokeOnce(payload: BackupPayload): Promise<any> {
   return urbitAPI
     .poke(poke)
     .then((r) => {
-      console.log("res ", r);
       return r;
     })
     .catch((e) => {
-      // TODO: 'e' is undefined
       console.log("err ", e);
       throw e.response;
     });
@@ -174,11 +161,9 @@ export function pokeMany(payload: ManyPayload) {
   return urbitAPI
     .poke(poke)
     .then((r) => {
-      console.log("res ", r);
       return r
     })
     .catch((e) => {
-      // TODO: 'e' is undefined
       console.log("err ", e);
       return e
     });
@@ -195,11 +180,9 @@ export function pokeUnsetMany(payload: UnsetManyRequest) {
   return urbitAPI
     .poke(poke)
     .then((r) => {
-      console.log("res ", r);
       return r
     })
     .catch((e) => {
-      // TODO: 'e' is undefined
       console.log("err ", e);
       return e
     });
@@ -214,11 +197,9 @@ export function mendFromShip(request: { payload: MendPayload, agentName: AgentNa
   return urbitAPI
     .poke(poke)
     .then((r) => {
-      console.log("res ", r);
       return r
     })
     .catch((e) => {
-      // TODO: 'e' is undefined
       console.log("err ", e);
       return e
     });
@@ -228,7 +209,6 @@ export function scry(scry: Scry) {
   return urbitAPI
     .scry(scry)
     .then((r) => {
-      console.log(r);
       return r
     })
     .catch((e) => {

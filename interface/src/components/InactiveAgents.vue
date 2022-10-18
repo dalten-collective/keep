@@ -14,21 +14,6 @@
           about how %keep wraps agents for backup.
         </p>
       </div>
-      <!--
-      <div>
-        <v-btn
-          :loading="activePending"
-          :disabled="activePending"
-          color="white"
-          variant="tonal"
-          class="tw-inline-block text-success"
-          @click="getActive"
-        >
-          <v-icon start>mdi-cached</v-icon>
-          refresh
-        </v-btn>
-      </div>
-      -->
     </div>
 
     <v-divider/>
@@ -197,14 +182,7 @@ export default defineComponent({
   computed: {
     ...mapGetters("keep", ["agents", "inactiveAgents"]),
     ...mapState("ship", ["installedDesks"]),
-    // all the desks installed on this ship
     ...mapState("keep", ["desks", "agents"]),
-    // desks  == the [{desk: [agent, agent]}, {desk: [agent]}] array of copying agents.
-    // agents == the [agent, agent]                            array of copying agents.
-    installedButNotCopying() {
-      // TODO: return installedDesks minus copying-to
-      return this.installedDesks;
-    },
     copyingDepsAgents() {
       return this.agents;
     },
@@ -259,7 +237,6 @@ export default defineComponent({
     },
 
     copyDepsFor(deskName: string, agentName: string) {
-      console.log("d ", deskName, " a ", agentName);
       this.preparePending = true;
       const payload: CopyDepsPayload = {
         copy: {
@@ -274,20 +251,11 @@ export default defineComponent({
     },
 
     testScry() {
-      console.log("scrying ", this.scryApp, this.scryPath);
       const scry: Scry = { app: this.scryApp, path: this.scryPath };
       this.$store.dispatch("keep/scry", scry);
     },
     closeAgentAirlock() {
       this.$store.dispatch("ship/closeKeepAirlock");
-    },
-
-    getActive() {
-      // TODO:
-      this.activePending = true;
-      setTimeout(() => {
-        this.activePending = false;
-      }, 400);
     },
   },
 });

@@ -146,8 +146,6 @@ export default defineComponent({
       };
       this.$store.dispatch("keep/backupRemote", payload)
         .then((r) => {
-          // TODO: this doesn't return anything.
-          console.log("backup done ", r);
           this.showDone = true;
         })
         .catch((e) => {

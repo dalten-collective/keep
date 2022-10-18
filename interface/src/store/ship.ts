@@ -69,10 +69,8 @@ export default {
     },
 
     openKeepAirlock({ dispatch, commit }) {
-      console.log("opening to keep...");
       airlock.openKeepAirlock(
         (data: KeepAgentSubscriptionResponse) => {
-          console.log("keep data ", data);
           commit("doHaveInitialAirlock")
 
           if (data.type === EventType.Initial) {
@@ -88,15 +86,13 @@ export default {
             });
           }
 
-          // TODO: handle agent diffs. change the below
           dispatch("keep/handleKeepAgentDiff", data, {
             root: true,
           });
 
         },
         (subscriptionNumber: number) => {
-          console.log("keep sub: ", subscriptionNumber);
-          // TODO: this should be close, I think.
+          // TODO: this should be close?
           dispatch("addSubscription", {
             agentName: "keep",
             subscriptionNumber,
@@ -109,23 +105,18 @@ export default {
       airlock.openAirlockTo(
         agentName,
         (data: KeepWrapperSubscriptionResponse) => {
-          console.log("agentName ", agentName);
-          console.log(`sub-agent response ('${agentName}' agent)`, data);
-
           // Only set full state on initial. all else through diffs (below)
           if (data.type == EventType.Initial) {
             const payload: { agentName: AgentName; state: KeepWrapperState } = {
               agentName,
               state: data.state
             }
-            console.log('handing wrapper init... ', payload)
             dispatch(
               "keep/handleWrapperResponseState",
               payload,
               { root: true }
             );
           } else {
-            console.log('got keep wrapper diff ', data, agentName)
             dispatch(
               "keep/handleKeepWrapperDiff",
               { data, agentName },

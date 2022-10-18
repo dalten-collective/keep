@@ -105,7 +105,6 @@ export default defineComponent({
       const scry: Scry = { app: 'keep', path: '/agents' };
       this.$store.dispatch("keep/scry", scry)
         .then((r) => {
-          console.log('scried ', r)
           this.$store.dispatch("ship/setDesks", r)
         })
     },
