@@ -14,10 +14,6 @@
               <p>
                 %keep is a tool for backing up and restoring the data in your gall agents/apps. This is particularly useful across breaches: restore your %pals, %gora and anything else you loved on your ship before it sunk.
               </p>
-              <p class="tw-mt-2 tw-border-l-2 tw-pl-2 tw-border-info">
-                For now, there is a small, manual change required in agent hoon source code which might make %keep difficult to get going for the average user. We hope to automate this last bit soon.<br/>
-                Get in touch if you have questions.
-              </p>
 
               <h2 class="tw-text-2xl tw-my-4">Preparing Agents</h2>
 
@@ -25,18 +21,14 @@
                 Before backing up agents, they'll need to be prepared for %keep. The technical explanation of this is farther below.
               </p>
               <p class="tw-my-2">
-                In the <span class="tw-text-info tw-font-bold">INACTIVE AGENTS</span> tab you'll find desks you have installed on your ship and agents that are ready to be activated for backup.<br/>
-                Clicking the <span class="tw-text-info tw-font-bold">PREPARE</span> button for a desk will copy the relevant dependencies and keep them up-to-date.
+                In the <span class="tw-text-info tw-font-bold">CONFIGURATION</span> tab you'll find desks you have installed on your ship and agents that are ready to be activated for backup.<br/>
+                Clicking the <span class="tw-text-info tw-font-bold">PREPARE</span> button for an agent will wrap the source code with the %keep middleware, copy the relevant dependencies and keep them up-to-date.
               </p>
-              <p class="tw-my-2">
-                Once prepared, an agent's app file needs to be modified (see below). When this is done, the agent will appear under "Inactive Agents" with an <span class="tw-text-info tw-font-bold">ACTIVATE</span> button. Click this to send it to the <span class="tw-text-info tw-font-bold">ACTIVE AGENTS</span> tab.
-              </p>
-
 
               <h2 class="tw-text-2xl tw-my-4">Backup</h2>
 
               <p class="tw-my-2">
-                The <span class="tw-text-info tw-font-bold">ACTIVE AGENTS</span> tab lists all agents that are ready for backup. Backups can be done one time or on a schedule.
+                The <span class="tw-text-info tw-font-bold">AGENTS</span> tab lists all agents that are ready for backup. Backups can be done one time or on a schedule.
               </p>
 
               <h3 class="tw-text-xl tw-my-4">Local Disk</h3>
@@ -52,7 +44,7 @@
                   <span class="mr-2 tw-font-mono">Local Disk</span>
                 </v-chip>
                 line click <span class="tw-text-info tw-font-bold">BACKUP</span> to view the details for this agent. In this window the <span class="tw-text-info tw-font-bold">BACKUP TO DISK</span> button will initiate a single backup to the filesystem of your pier.<br/>
-                You'll find a <span class="tw-font-mono">.jam</span> file, named by date, in your pier's <span class="tw-font-mono">.urb/put/keep/{{ agentName }}</span> folder.
+                You'll find a <span class="tw-font-mono">.jam</span> file, named by date, in your pier's <span class="tw-font-mono">.urb/put/keep/&lt;agent-name&gt;</span> folder.
               </p>
               <p>
                 You can enter a frequency and click <span class="tw-text-info tw-font-bold">SET RECURRING DISK BACKUP</span> to have %keep save your agent state on a schedule. (Note: upon setting this frequency, a single backup will first happen immediately.)
@@ -70,7 +62,7 @@
               <h3 class="tw-text-xl tw-my-4">Backing Up to a Remote Provider</h3>
 
               <p>
-                Other ships on the network can hold backups for you. Similarly, you can be a backup provider for others. Providers will find these details in the <span class="tw-text-info tw-font-bold">HOLDING BACKUPS</span> tab.
+                Other ships on the network can hold backups for you. Similarly, you can be a backup provider for others. Providers will find these details in the <span class="tw-text-info tw-font-bold">BACKUP PROVIDER</span> tab.
               </p>
 
               <h2 class="tw-text-lg tw-my-4">Whitelist</h2>
@@ -89,7 +81,7 @@
               <h2 class="tw-text-lg tw-my-4">Sending Backups to a Remote Provider</h2>
 
               <p class="tw-my-2">
-                In the <span class="tw-text-info tw-font-bold">ACTIVE AGENTS</span> tab, use the <span class="tw-text-info tw-font-bold">ADD BACKUP TARGET</span> button to declare which ship you'd like to backup with. Assuming they have whitelisted you, an initial backup will be sent and you'll find them listed under "Live backup targets".
+                In the <span class="tw-text-info tw-font-bold">AGENTS</span> tab, use the <span class="tw-text-info tw-font-bold">ADD BACKUP TARGET</span> button to declare which ship you'd like to backup with. Assuming they have %keep installed <em>and</em> whitelisted you, an initial backup will be sent and you'll find them listed under "Live backup targets".
               </p>
               <p class="tw-my-2">
                 The single/recurring backup process works the same as with Local Disk. <span class="tw-text-info tw-font-bold">RESTORE</span> will fetch the most recent backup from them and the agent's state will be restored to it.
@@ -128,6 +120,7 @@
 </pre>
 
                 Once these two changes are made and the desk is <span class="tw-font-mono">|commit</span>ed, the agent is <span class="tw-font-bold">wrapped</span> and ready to be activated.
+              <p class="tw-mt-2">%keep handles all of these activities for you in the <span class="tw-text-info">PREPARE</span> process outlined far above.</p>
 
 
               </p>
