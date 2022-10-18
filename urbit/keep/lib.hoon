@@ -6,7 +6,6 @@
 ::  %-(agent:keep your-agent)
 ::
 ::
-/=  default-agent  /keep/lib/default-agent
 /=  agentio        /keep/lib/agentio
 /=  multipart      /keep/lib/multipart
 /=  sane           /keep/lib/sane
