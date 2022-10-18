@@ -290,7 +290,6 @@ export default defineComponent({
     },
 
     ourWrapperStatus() {
-      console.log("ourstatus ", this.wrapperStatus("gora"));
       const status = this.wrapperStatus(this.agentName);
       if (status) {
         return status;
@@ -299,7 +298,7 @@ export default defineComponent({
     },
 
     ourAgentStatus() {
-      return this.agentStatus("gora");
+      return this.agentStatus(this.agentName);
     },
 
     diskBackup() {

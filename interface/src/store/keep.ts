@@ -41,6 +41,10 @@ import {
 } from "@/types";
 import { siggedShip } from "@/api/keep";
 
+const sectToDate = (sects: number) => {
+  return (new Date(sects * 1000)).toLocaleString()
+}
+
 export default {
   namespaced: true,
   state() {
@@ -556,7 +560,7 @@ export default {
         dispatch("addKeptBackup", { dif: d, agent });
 
         const logMsg: LogMessage = {
-          msg: `Kept a backup of %${agent} for ${ship} at ${time}`,
+          msg: `Kept a backup of %${agent} for ${ship} at ${sectToDate(time)}`,
           time,
           type: "info",
         };
@@ -837,14 +841,14 @@ export default {
       if (ship) {
         targetShip = ship;
         logMsg = {
-          msg: `Requested backup of %${agentName} to ${targetShip} at ${time}`,
+          msg: `Requested backup of %${agentName} to ${targetShip} at ${sectToDate(time)}`,
           time,
           type: "pend",
         };
       } else {
         targetShip = "local disk";
         logMsg = {
-          msg: `Backed up %${agentName} to ${targetShip} at ${time}`,
+          msg: `Backed up %${agentName} to ${targetShip} at ${sectToDate(time)}`,
           time,
           type: "succ",
         };
@@ -876,14 +880,14 @@ export default {
       if (ship) {
         targetShip = ship;
         logMsg = {
-          msg: `Saved backup of %${agentName} from ${targetShip} at ${time}`,
+          msg: `Saved backup of %${agentName} from ${targetShip} at ${sectToDate(time)}`,
           time,
           type: "succ",
         };
       } else {
         targetShip = "local disk";
         logMsg = {
-          msg: `Backed up %${agentName} to local disk at ${time}`,
+          msg: `Backed up %${agentName} to local disk at ${sectToDate(time)}`,
           time,
           type: "succ",
         };
@@ -967,14 +971,14 @@ export default {
       if (ship) {
         targetShip = ship;
         logMsg = {
-          msg: `Backup of %${agentName} saved by ${targetShip} at ${kept}. (sent at ${sent})`,
+          msg: `Backup of %${agentName} saved by ${targetShip} at ${kept}. (sent at ${sectToDate(sent)})`,
           time: kept,
           type: "succ",
         };
       } else {
         targetShip = "local disk";
         logMsg = {
-          msg: `Backup of %${agentName} saved to ${targetShip} at ${kept}. (sent at ${sent})`,
+          msg: `Backup of %${agentName} saved to ${targetShip} at ${kept}. (sent at ${sectToDate(sent)})`,
           time: kept,
           type: "succ",
         };
@@ -998,14 +1002,14 @@ export default {
       if (ship) {
         targetShip = ship;
         logMsg = {
-          msg: `Restored backup of %${agentName} from ${targetShip} at ${time}`,
+          msg: `Restored backup of %${agentName} from ${targetShip} at ${sectToDate(time)}`,
           time,
           type: "succ",
         };
       } else {
         targetShip = "local disk";
         logMsg = {
-          msg: `Restored backup %${agentName} from ${targetShip} at ${time}`,
+          msg: `Restored backup %${agentName} from ${targetShip} at ${sectToDate(time)}`,
           time,
           type: "succ",
         };
