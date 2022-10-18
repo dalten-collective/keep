@@ -378,9 +378,13 @@ export default {
 
     openAgentAirlocks({ commit, dispatch }, agents: Array<string>) {
       console.log("opening airlocks");
-      agents.forEach((agentName: string) => {
-        dispatch("ship/openAirlockToAgent", agentName, { root: true });
-      });
+      Promise.all(
+        agents.map((agentName) => {
+          return dispatch("ship/openAirlockToAgent", agentName, { root: true });
+        })
+      ).then(() => {
+        dispatch('ship/setHaveAllSubscriptions', {}, { root: true });
+      })
     },
 
     handleKeepResponseState({ commit }, responseState: KeepAgentState) {

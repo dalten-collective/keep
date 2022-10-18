@@ -14,6 +14,8 @@ export default {
     return {
       subscriptions: [] as Array<AgentSubscription>,
       installedDesks: [] as Array<string>,
+      haveInitialAirlock: false,
+      haveAllSubscriptions: false,
     };
   },
 
@@ -48,6 +50,13 @@ export default {
       const sub = state.subscriptions.find((s) => s === subscription);
       state.subscriptions = state.subscriptions.filter((s) => s != sub);
     },
+
+    doHaveInitialAirlock(state) {
+      state.haveInitialAirlock = true;
+    },
+    doHaveAllSubscriptions(state) {
+      state.haveAllSubscriptions = true;
+    }
   },
 
   actions: {
@@ -55,11 +64,16 @@ export default {
       commit("setDesks", desks);
     },
 
-    openKeepAirlock({ dispatch }) {
+    setHaveAllSubscriptions({ commit }) {
+      commit("doHaveAllSubscriptions")
+    },
+
+    openKeepAirlock({ dispatch, commit }) {
       console.log("opening to keep...");
       airlock.openKeepAirlock(
         (data: KeepAgentSubscriptionResponse) => {
           console.log("keep data ", data);
+          commit("doHaveInitialAirlock")
 
           if (data.type === EventType.Initial) {
             dispatch("keep/handleKeepResponseState", data.state, {

@@ -39,18 +39,21 @@
       </v-navigation-drawer>
 
       <v-main class="tw-container tw-mx-auto tw-my-8">
-        <router-view></router-view>
-        <!--
-        <button @click="startMainAirlock">Start Main airlock(s)</button>
-        <button @click="closeMainAirlock">Close keep airlock</button>
-        <button @click="closeAgentAirlocks">Close all agent airlocks</button>
-        <div>
-          messages:
-          <ul>
-            <li v-for="m in messages" :key="m">{{ m }}</li>
-          </ul>
+        <div v-if="!haveAllSubscriptions || !haveInitialAirlock" class="tw-w-full tw-h-full tw-flex tw-flex-col">
+          <div class="tw-my-4">
+            <v-progress-linear height="25" color="info" rounded v-if="!haveInitialAirlock" indeterminate>
+              Connecting to Keep...
+            </v-progress-linear>
+          </div>
+          <div class="tw-my-4">
+            <v-progress-linear height="25" color="info" rounded v-if="!haveAllSubscriptions" indeterminate>
+              Connecting to managed agents...
+            </v-progress-linear>
+          </div>
         </div>
-        -->
+        <div v-else>
+        <router-view></router-view>
+        </div>
       </v-main>
       <Message style="position: fixed; bottom: 0;" class="tw-fixed tw-bottom-0 tw-right-0 tw-w-full tw-p-2 tw-opacity-100 sm:tw-w-1/3"/>
     </div>
@@ -58,6 +61,7 @@
 </template>
 
 <script lang="ts">
+import { mapState } from "vuex";
 import { defineComponent } from "vue";
 import Message from "@/components/Message.vue"
 import logo from "@/assets/quartus-logo-white-square-no-text.png";
@@ -91,6 +95,7 @@ export default defineComponent({
     this.closeAgentAirlocks();
   },
   computed: {
+    ...mapState('ship', ['haveInitialAirlock', 'haveAllSubscriptions']),
   },
   methods: {
     startMainAirlock() {
