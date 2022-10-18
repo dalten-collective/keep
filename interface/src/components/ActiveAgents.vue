@@ -3,7 +3,7 @@
 
     <div class="tw-flex tw-space-between tw-mb-4">
       <div class="tw-grow">
-        <h3 class="tw-text-3xl tw-font-silom">Kept Agents</h3>
+        <h3 class="tw-text-3xl tw-mb-6 tw-font-silom">Kept Agents</h3>
       </div>
       <!--
       <div>
@@ -33,7 +33,7 @@
       <div v-else v-for="agent in orderedAgents" :key="agent" class="tw-my-2">
         <KeepAgent
           :agent-name="agent"
-          class="tw-p-2 tw-my-4 tw-bg-white tw-border tw-rounded-keep"
+          class="tw-p-2 tw-my-6 tw-bg-white tw-border tw-shadow-md tw-rounded-keep"
         />
       </div>
     </div>
