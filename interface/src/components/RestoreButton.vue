@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="restoreOpen" width="500">
+  <v-dialog v-model="restoreOpen" persistent max-width="500px">
     <template v-slot:activator="{ props }">
       <v-btn v-bind="props" color="success" text="white" @click="openRestore">
         <v-icon start>mdi-content-duplicate</v-icon>

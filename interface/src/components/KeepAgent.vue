@@ -139,7 +139,7 @@
       </article>
     </section>
 
-    <v-dialog v-model="redirectWarningOpen" width="500">
+    <v-dialog v-model="redirectWarningOpen" max-width="500px">
       <v-card class="tw-w-96 tw-border-4 tw-border-primary tw-bg-surface tw-p-4">
         <v-card-title>
           <div class="tw-flex tw-flex-row tw-justify-between">
