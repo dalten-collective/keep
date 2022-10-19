@@ -1,9 +1,9 @@
 :~  title+'Keep'
     info+'Back up your Urbit.'
     color+0x81.88c9
-    site+/apps/keep
+    glob-http+['https://freedom-club.sfo2.digitaloceanspaces.com/glob-0v3.qnl5j.oht20.jjdnj.qe8m7.pfi97.glob' 0v3.qnl5j.oht20.jjdnj.qe8m7.pfi97]
     base+'keep'
-    version+[0 0 1]
+    version+[0 1 0]
     website+'https://dalten.org/'
     license+'AGPL'
 ==

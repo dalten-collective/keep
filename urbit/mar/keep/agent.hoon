@@ -1,19 +1,28 @@
 ::
-::  keep agent pokes
+::  keep agent user pokes
 ::
-/-  *keep
-|_  =agent:poke
+/=  sur  /keep/sur/keep
+=,  sur
+::
+|_  pok=user:agent:poke
 ++  grad  %noun
 ++  grow
   |%
-  ++  noun  agent
+  ++  noun  pok
   --
 ++  grab
   |%
-  ++  noun  agent:poke
+  ++  noun  user:agent:poke
   ++  json
-    %+  corl  $>(%tell agent:poke)
+    %+  corl  user:agent:poke
     =,  dejs:format
-    (of ~[['tell' (ot ~[['dap' so] ['live' bo]])]])
+    %-  of
+    :~  [%able (ot ~[able/bo ship/(se %p)])]
+        [%wyte bo]
+        [%wrap (ot ~[desk/so dude/so])]
+        [%once (ot ~[from/so to/(mu (se %p))])]
+        :-  %many
+        (ot ~[from/so to/(mu (se %p)) freq/(cu (lift (cury mul ~s1)) (mu ni))])
+    ==
   --
 --

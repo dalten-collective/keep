@@ -1,150 +1,39 @@
 # keep
-Back up your Urbit
+Back up your Urbit agents
 
 ## Architecture
 
 Keep consists of two parts:
 
-- a wrapper, which is a function from an `agent:gall` to an `agent:gall`. It turns a regular agent into a keep-enriched agent, specifically it adds a few additional pokes, one subscription path and one scry.
-- an agent `%keep`, which stores backups passed to it from keep-enriched agents on other ships, as well as keeps track of which agents on the same ship that are keep-enriched.
+- An agent transformer in `keep/lib.hoon`, i.e. a function from an `agent:gall` to an `agent:gall`. It transforms a regular agent into one that can be backed up.
+- An agent `%keep`, which stores backups passed to it, as well as controls the transformer on other agents, and stores settings/logs related to this, such as repeating backups, last time an agent was backed up and so on. Architecturally, many of these options would be much simpler to store in the transformer, but due to issues with middleware and agent transformers, we need to keep the transformer stateless. We hope that this can be changed in the future.
 
-## Pokes
+# Development Setup
 
-All actions are initiated by poking keep-enriched agents (i.e. **not** the `%keep` agent). To find out which agents that are keep-enriched, see the *Subscriptions* and *Scries* sections further down.
+You will need to create a fakezod and install the agent.
+Run `bin/setup.sh` in a separate process and follow the instructions there. No changes will be made on your behalf.
 
-All keep-enriched agents can be poked with the mark `%keep` and support the following pokes:
+Once the agent is installed, proceed to setting up the interface (below).
 
-```hoon
-[%once to=ship]                 :: Backup
-[%many to=ship freq=(unit @dr)] :: Repeat backup
-[%mend from=ship]               :: Initiate recovery
-[%live live=?]                  :: (De)activate. Deact before uninstall!
-```
+# Interface
 
-These can also come in the form of JSON:
+- Vue 3
+- Typescript
+- Vite (for proxying to the urbit web interface)
+- NPM (for package management, handled by `bin` scripts)
 
-```json
-{"once": "~sampel-palnet"}
-{"many": {"to": "~sampel", "freq": 500}}
-{"many": {"to": "~palnet", "freq": null}}
-{"mend": "~sampel-palnet"}
-{"live": true}
-{"live": false}
-```
+## Setup
 
-- `%once`
-  Trigger a single backup to the specified ship.
-  If repeating backups are set for this ship, this resets the timer.
-- `%many`
-  Set or unset repeating backups to the specified ship.
+npm-wrapping scripts are provided in the `bin/` directory. Follow the steps below to set up your local development environment:
 
-  The frequency is either null for unsetting, or the desired frequency in seconds for setting.
+- `bin/install-js-dependencies.sh`
+- Have your fakeship from above running. Note the web interface port (ie. `dojo> http: web interface live on http://localhost:8080`)
+- Get your login code from the fakeship (`dojo> +code`)
+- Copy `interface/.env.example` to `interface/.env` (not checked into git) and edit the port there to reflect the web interface on your fakeship.
+- `bin/serve-interface.sh`
+- (For running multiple ships in multiple vite instances, you can bypass the bin script and run npm directly from the repo root, passing the ENV variable for the ship's interface a-la: `KEEP_URBIT_TARGET='http://localhost:8081' npm run serve --prefix interface`)
 
-  If setting repeating backups and this agent **hasn't** been backed up to the specified ship before, this will trigger an immediate backup.
+The fakeship web interface should now be accessible at `http://localhost:3000` (provided by Vite). When you first visit the URL you should be prompted for your `+code` from above.
 
-  If setting repeating backups and this agent **has** been backed up to the specified ship at time `t`, this will trigger a backup immediately or at time `t+freq`, whichever comes last.
-- `%mend`
-  Load a backup from the specified ship.
-- `%live`
-  Activate/deactivate the keep wrapper. Always initialized to false/deactivated.
+The Vue interface for this application will be served from `http://localhost:3000/apps/keep/` (**note the trailing slash!**)
 
-  This *needs* to be set to false before the wrapper is removed from the source code of any keep-enriched agent. Otherwise the previously enriched agent will most likely crash, or worse exhibit unexpected behaviour, possibly corrupting its own state.
-
-  When the wrapper is deactivated, the only available poke is to activate it again. However, subscribers will not be kicked, and new subscriptions will still be accepted.
-
-## Subscriptions
-
-### The `%keep` agent
-
-Subscribe to `/website` to get JSON objects specifying which keep-enriched agents that exist.
-
-After initial subscription, you will receive:
-
-```json
-{"agents": ["agent0", "agent1", "agent2"]}
-```
-
-Whenever a new agent becomes keep-enriched, you will receive:
-
-```json
-{"agent": "agent3"}
-```
-
-**Note** that these agents are not guaranteed to stay keep-enriched. Because of the way Gall works, the agent `%keep` has no way of knowing when the wrapper is removed from an agent. You'll have to try subscribing/scrying and be prepared to handle failures.
-
-### Keep-enriched agents
-
-Subscribe to `/keep/website` to get JSON objects specifying new backups as well as the current settings. As a subscriber, you will receive:
-
-#### After initial subscription
-
-You will receive two objects. One tells you whether the wrapper is active or not:
-
-```json
-{"active": false}
-```
-
-The other contains the current state:
-
-```json
-{
-  "saved": [
-    {"ship": "~sampel", "time": 100},
-    {"ship": "~palnet", "time": 1000}
-  ],
-  "auto": [
-    {"ship": "~sampel", "freq": 500},
-    {"ship": "~palnet", "freq": 5000}
-  ],
-  "pending": [
-    {"ship": "~sampel", "status": "invite"},
-    {"ship": "~palnet", "status": "restore"}
-  ]
-}
-```
-
-- `saved` is an array of objects, each containing a ship and a unix timestamp, specifying when this agent was last backed up to each ship.
-- `auto` is an array of objects, each containing a ship and a frequency in seconds, specifying how often we automatically back up to each ship, if at all.
-- `pending` is an array of objects, each containing a ship and a status `"invite"` or `"restore"`. These are ships from which we currently await a response to a request to either keep our state or hand us an old state, respectively.
-
-Note that if the wrapper is deactivated, its state **may disappear without notice** and no automatic backups will be performed, so if the second object contains any information, treat it as a historical record rather than current fact. We still provide it, and frontends may choose to simply discard it, or display parts of it to the user. Obviously any entries in `saved` will still be correct.
-
-#### After a successful backup
-
-```json
-{"saved": {"ship": "~sampel-palnet", "time": 555}}
-```
-
-This has exactly the same format as the `"saved"` entry in the initial json object, except that it will not be an array but only a single object.
-
-#### After successfully (un)setting automatic backups
-
-```json
-{"auto": {"ship": "~sampel-palnet", "freq": 1000}}
-```
-
-Again, this has the same format as the `"auto"` entry in the initial json object, except that it's a single entry. Additionally, the frequency may be `null`, meaning that automatic backups were turned off.
-
-#### After initialized backup/restoration
-
-```json
-{"pending": {"ship": "~sampel-palnet", "status": "invite"}}
-```
-
-This has the same format as the `"pending"` entry in the initial json object, except that it's a single entry.
-
-#### After successful restoration
-
-```json
-{"restored": {"ship": "~sampel-palnet", "time": 600}}
-```
-
-This means that at unix time `600`, the state was restored using the backup kept by `~sampel-palnet`.
-
-#### After successful (de)activation
-
-You will receive the same two objects as when initially subscribing, with the exception that if the wrapper was deactivated, you will not receive the object containing the current state.
-
-## Scries
-
-Keep-enriched agents can be scried at `/keep/live/loob`. It will return a boolean, signifying whether the wrapper is active or not.
