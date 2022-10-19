@@ -39,11 +39,12 @@
 ::
 |_  =bowl:gall
 +*  this  .
-    def   ~(. (default-agent this %|) bowl)
-    io    ~(. agentio bowl)
-    disk  ~(. ^disk bowl)
+    def          ~(. (default-agent this %|) bowl)
+    io           ~(. agentio bowl)
+    disk         ~(. ^disk bowl)
+    state-type   ~(. ^state-type bowl)
     whitelisted  |(?=(%| -.able) (~(has in p.able) src.bowl))
-    emit  ~(website json state)
+    emit         ~(website json state)
     send
       |=  [dap=dude to=(unit ship)]
       %+  ~(poke-our pass:io send/dap^(path-of to))  dap
@@ -344,7 +345,9 @@
   --
 ::
 ++  state-type
-  |%
+  |_  =bowl:gall
+  +*  scry  ~(scry agentio bowl)
+  ::
   +$  current  [%1 state]
   +$  versioned
     $%  $:  %0
@@ -362,8 +365,20 @@
     |=  old=versioned
     ^-  current
     ?-  -.old
-      %0  [%1 +.old(into ~)]
-      %1  old
+        %1  old
+        %0  :-  %1
+      %=    +.old
+          into
+        %-  my
+        ^-  (list (pair desk (set dude)))
+        %+  turn  ~(tap in into.old)
+        |=  =desk
+        :-  desk  %-  sy
+        %+  skim  ~(tap in live.old)
+        %+  curr  contains
+        %-  turn  :_  head
+        ~(tap in .^((set [dude ?]) ge/(scry desk /)))
+      ==
     ==
   --
 ::
