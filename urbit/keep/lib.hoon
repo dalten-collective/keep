@@ -91,7 +91,7 @@
       start
         :~  (connect:(pass /eyre) `upload-path dap.bowl)
             %+  poke-our:(pass /tell)  %keep
-            keep-agent+!>(`internal:agent:poke`tell+dap.bowl)
+            keep-internal+!>(`internal:agent:poke`tell+dap.bowl)
         ==
   ::
   ++  on-poke
@@ -137,7 +137,7 @@
         :_  this
         :~  (~(try-invite json state) u.to.cmd)
             %+  poke:(pass /init/(scot %p u.to.cmd))  u.to.cmd^%keep
-            keep-agent+!>(`internal:agent:poke`[%init dap.bowl key])
+            keep-internal+!>(`internal:agent:poke`[%init dap.bowl key])
         ==
       ::  Yes. Give the fact or write to put and set new timers.
       =/  backup  [wex.dish sup.dish +:on-save:ag]
@@ -154,7 +154,7 @@
       :_  this
       :~  (~(try-restore json state) from.cmd)
           %+  poke:(pass /grab/(scot %p from.cmd))  [from.cmd %keep]
-          keep-agent+!>(`internal:agent:poke`grab+dap.bowl^key)
+          keep-internal+!>(`internal:agent:poke`grab+dap.bowl^key)
       ==
     ::  Load this back
         %data

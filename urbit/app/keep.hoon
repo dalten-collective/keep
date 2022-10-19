@@ -62,6 +62,7 @@
 ::
 ++  on-poke
   |=  [=mark =vase]
+  ~&  >  "on-poke with mark {(trip mark)}"
   ^-  (quip card _this)
   ?+    mark  (on-poke mark vase)
       %keep-agent
@@ -206,7 +207,7 @@
     :_  this
     :~  (emit backup/(da:event:json dap `src.bowl now.bowl))
         %+  ~(poke pass:io /okay/(scot %p src.bowl)/[dap])  [src.bowl %keep]
-        keep-agent/!>(`internal:agent:poke`[%okay dap now.bowl])
+        keep-internal/!>(`internal:agent:poke`[%okay dap now.bowl])
     ==
   ==
 ::
