@@ -87,7 +87,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
-import { OnceRequest } from "../types";
+import { OnceRequest, BackupPayload } from "../types";
 import { siggedShip } from "@/api/keep";
 
 export default defineComponent({
@@ -137,15 +137,15 @@ export default defineComponent({
       // TODO: don't add if already on invites list.
       // show error
       this.addPending = true;
-      const request: OnceRequest = {
-        agentName: this.agentName,
-        ship: this.backupShip,
+
+      const payload: BackupPayload = {
+        once: {
+          from: this.agentName,
+          to: this.backupShip,
+        },
       };
-      this.$store
-        .dispatch("keep/testOnce", request)
+      this.$store.dispatch("keep/backupRemote", payload)
         .then((r) => {
-          // TODO: this doesn't return anything.
-          console.log("backup done ", r);
           this.showDone = true;
         })
         .catch((e) => {

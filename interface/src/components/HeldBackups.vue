@@ -2,7 +2,7 @@
   <div class="tw-w-screen">
     <div class="tw-flex tw-space-between tw-mb-4">
       <div class="tw-grow">
-        <h3 class="tw-text-3xl tw-font-silom">Kept Backups</h3>
+        <h3 class="tw-text-3xl tw-mb-6 tw-font-silom">Kept Backups</h3>
         <p class="tw-my-2">
           These are the backups you hold for other ships on the network.
         </p>

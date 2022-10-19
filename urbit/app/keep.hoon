@@ -1,6 +1,6 @@
 ::  keep: backup manager
 ::
-/+  dbug, *mip, verb, default-agent, parse-agent
+/+  dbug, *mip, default-agent, parse-agent
 /=  agentio        /keep/lib/agentio
 /=  sane           /keep/lib/sane
 /=  keep-sur       /keep/sur/keep
@@ -31,7 +31,6 @@
   --
 ::
 %-  agent:dbug
-%+  verb  &
 ::
 =<
 =|  current:state-type
