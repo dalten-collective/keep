@@ -9,20 +9,14 @@
 ::
 =>
   |%
-  +$  versioned-state
-    $%  state-0
-    ==
-  ::
-  +$  state-0
-    $:  %0
-        kept=(map [dude ship] [data=noun time=@da])
+  +$  state
+    $:  kept=(map [dude ship] [data=noun time=@da])
         live=(set dude)
         able=(each (set ship) (set ship))
         into=(jug desk dude)
         auto=(mip dude (unit ship) @dr)
         last=(mip dude (unit ship) @da)
     ==
-  ::
   ++  path-of
     |=  to=(unit ship)  ^-  path
     ?~  to  /put
@@ -40,7 +34,7 @@
 %+  verb  &
 ::
 =<
-=|  state-0
+=|  current:state-type
 =*  state  -
 ^-  agent:gall
 ::
@@ -62,7 +56,10 @@
 ++  on-load
   |=  old=vase
   ^-  (quip card _this)
-  `this(state !<(state-0 old))
+  ?-  ole=!<(versioned:state-type old)
+    [%1 *]  `this(state ole)
+    [%0 *]  on-init:this(state (upgrade:state-type ole))
+  ==
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -341,9 +338,33 @@
     ==
   --
 ::
+++  state-type
+  |%
+  +$  current  [%1 state]
+  +$  versioned
+    $%  $:  %0
+            kept=(map [dude ship] [data=noun time=@da])
+            live=(set dude)
+            able=(each (set ship) (set ship))
+            into=(set desk)
+            auto=(mip dude (unit ship) @dr)
+            last=(mip dude (unit ship) @da)
+        ==
+        current
+    ==
+  +$  upgrade
+    $&  versioned
+    |=  old=versioned
+    ^-  current
+    ?-  -.old
+      %0  [%1 +.old(into ~)]
+      %1  old
+    ==
+  --
+::
 ++  json
   =,  enjs:format
-  |_  state=state-0
+  |_  state=current:state-type
   ++  website
     |=  [type=cord diff=^json]
     ^-  card
