@@ -3,7 +3,7 @@
     color+0x81.88c9
     glob-http+['https://freedom-club.sfo2.digitaloceanspaces.com/glob-0v6.9e37d.7gsfl.vi477.35scp.n6mml.glob' 0v6.9e37d.7gsfl.vi477.35scp.n6mml]
     base+'keep'
-    version+[0 0 2]
+    version+[0 1 0]
     website+'https://dalten.org/'
     license+'AGPL'
 ==
