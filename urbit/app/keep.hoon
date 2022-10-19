@@ -63,112 +63,118 @@
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
-  ?>  ?=(%keep-agent mark)
-  =/  cmd  !<(agent:poke vase)
-  ?-  -.cmd
-  ::
-  ::  "Subscribe to my stuff," said someone else's wrapper.
-      %init
-    ~|  %not-whitelisted
-    ?>  whitelisted
-    :_  this
-    :_  ~
-    %+  ~(watch pass:io /backups/(scot %p src.bowl)/[dap.cmd])
-      [src.bowl dap.cmd]
-    /keep/data/[key.cmd]
-  ::
-  ::  "Give me my stuff," said someone else's wrapper.
-      %grab
-    ~|  %not-whitelisted
-    ?>  whitelisted
-    :_  this
-    :_  ~
-    ~|  [%has-no dap.cmd from=src.bowl]
-    %+  ~(poke pass:io /recoveries/(scot %p src.bowl)/[dap.cmd])
-      [src.bowl dap.cmd]
-    keep+!>(`wrap:poke`[%data data:(~(got by kept) [dap.cmd src.bowl]) key.cmd])
-  ::
-  ::  "I exist," said a wrapper on our own ship.
-      %tell
-    ?>  =(src.bowl our.bowl)
-    ?:  (~(has in live) dap.cmd)  `this
-    =.  live  (~(put in live) dap.cmd)
-    :_  this
-    ~[(emit agent/s+dap.cmd)]
-  ::
-  ::  Back up once
-      %once
-    ?>  =(src.bowl our.bowl)
-    =/  freq  (~(get bi auto) dap.cmd to.cmd)
-    =/  prev  (~(get bi last) dap.cmd to.cmd)
-    =/  behn  ~(. pass:io behn/dap.cmd^(path-of to.cmd))
-    :_  this
-    %-  catunits
-    :~  (bind (both `now.bowl freq) (cork add wait:behn))  :: set next
-        (bind (both prev freq) (cork add rest:behn))       :: unset old next
-        `(send [dap to]:cmd)
-    ==
-  ::
-  ::  Set/unset repeating backups
-      %many
-    ?>  =(src.bowl our.bowl)
-    =/  freq  (~(get bi auto) dap.cmd to.cmd)
-    =/  prev  (~(get bi last) dap.cmd to.cmd)
-    =.  auto
-      ?~  freq.cmd
-        (~(del bi auto) dap.cmd to.cmd)
-      (~(put bi auto) dap.cmd to.cmd u.freq.cmd)
-    :_  this
-    %-  catunits
-    =/  behn  ~(. pass:io behn/dap.cmd^(path-of to.cmd))
-    :~  (bind (both prev freq) (cork add rest:behn))  :: unset old next
-        `(emit auto/(dr:event:json dap.cmd to.cmd freq.cmd))
-        ?^  new=(bind (both prev freq.cmd) (cork add wait:behn))
-          new  ::  set next later
-        (bind freq.cmd |=(* (wait:behn now.bowl)))  :: set next now
-    ==
-  ::
-  ::  Successful backup
-      %okay
-    :_  this
-    :_  ~
-    %+  emit  %success
-    %:  ok:event:json
-      dap.cmd
-      src.bowl
-      (~(got bi last) dap.cmd `src.bowl)
-      time.cmd
-    ==
-  ::
-  ::  "(De)whitelist this ship," said our operator.
-      %able
-    ?>  =(src.bowl our.bowl)
-    ?-  +<.cmd
-      %&  `this(p.able (~(put in p.able) p.cmd))
-      %|  `this(p.able (~(del in p.able) p.cmd))
-    ==
-  ::
-  ::  "(De)activate the whitelist," said our operator.
-      %wyte
-    ?>  =(src.bowl our.bowl)
-    =*  res  `this(able [on.cmd p.able])
-    ?:(on.cmd res res)
-  ::
-  ::  "Copy the wrapper to a desk," said our operator.
-      %copy
-    ?>  =(src.bowl our.bowl)
-    =;  caz=(list card)
-      =.  into  (~(put ju into) desk.cmd dude.cmd)
+  ?+    mark  (on-poke mark vase)
+      %keep-agent
+    ?-  cmd=!<(user:agent:poke vase)
+    ::
+    ::  Back up once
+        [%once *]
+      ?>  =(src.bowl our.bowl)
+      =/  freq  (~(get bi auto) dap.cmd to.cmd)
+      =/  prev  (~(get bi last) dap.cmd to.cmd)
+      =/  behn  ~(. pass:io behn/dap.cmd^(path-of to.cmd))
       :_  this
-      (snoc caz (emit transformed/a/~[s/desk.cmd s/dude.cmd]))
-    %+  weld
-      ?:  (~(has by into) desk.cmd)  ~
-      :~  (info-deps:disk deps:disk desk.cmd)
-          mult-deps:disk
+      %-  catunits
+      :~  (bind (both `now.bowl freq) (cork add wait:behn))  :: set next
+          (bind (both prev freq) (cork add rest:behn))       :: unset old next
+          `(send [dap to]:cmd)
       ==
-    ?:  (~(has ju into) desk.cmd dude.cmd)  ~
-    %^  info-dude:disk  desk.cmd  dude.cmd
-    .^(@t cx/(scry:io desk.cmd /app/[dude.cmd]/hoon))
+    ::
+    ::  Set/unset repeating backups
+        [%many *]
+      ?>  =(src.bowl our.bowl)
+      =/  freq  (~(get bi auto) dap.cmd to.cmd)
+      =/  prev  (~(get bi last) dap.cmd to.cmd)
+      =.  auto
+        ?~  freq.cmd
+          (~(del bi auto) dap.cmd to.cmd)
+        (~(put bi auto) dap.cmd to.cmd u.freq.cmd)
+      :_  this
+      %-  catunits
+      =/  behn  ~(. pass:io behn/dap.cmd^(path-of to.cmd))
+      :~  (bind (both prev freq) (cork add rest:behn))  :: unset old next
+          `(emit auto/(dr:event:json dap.cmd to.cmd freq.cmd))
+          ?^  new=(bind (both prev freq.cmd) (cork add wait:behn))
+            new  ::  set next later
+          (bind freq.cmd |=(* (wait:behn now.bowl)))  :: set next now
+      ==
+    ::
+    ::  "(De)whitelist this ship," said our operator.
+        [%able *]
+      ?>  =(src.bowl our.bowl)
+      ?-  +<.cmd
+        %&  `this(p.able (~(put in p.able) p.cmd))
+        %|  `this(p.able (~(del in p.able) p.cmd))
+      ==
+    ::
+    ::  "(De)activate the whitelist," said our operator.
+        [%wyte *]
+      ?>  =(src.bowl our.bowl)
+      =*  res  `this(able [on.cmd p.able])
+      ?:(on.cmd res res)
+    ::
+    ::  "Copy the wrapper to a desk," said our operator.
+        [%wrap *]
+      ?>  =(src.bowl our.bowl)
+      =;  caz=(list card)
+        =.  into  (~(put ju into) desk.cmd dude.cmd)
+        :_  this
+        (snoc caz (emit transformed/a/~[s/desk.cmd s/dude.cmd]))
+      %+  weld
+        ?:  (~(has by into) desk.cmd)  ~
+        :~  (info-deps:disk deps:disk desk.cmd)
+            mult-deps:disk
+        ==
+      ?:  (~(has ju into) desk.cmd dude.cmd)  ~
+      %^  info-dude:disk  desk.cmd  dude.cmd
+      .^(@t cx/(scry:io desk.cmd /app/[dude.cmd]/hoon))
+    ==
+  ::
+      %keep-internal
+    ?-  cmd=!<(internal:agent:poke vase)
+    ::
+    ::  "Subscribe to my stuff," said someone else's wrapper.
+        [%init *]
+      ~|  %not-whitelisted
+      ?>  whitelisted
+      :_  this
+      :_  ~
+      %+  ~(watch pass:io /backups/(scot %p src.bowl)/[dap.cmd])
+        [src.bowl dap.cmd]
+      /keep/data/[key.cmd]
+    ::
+    ::  "Give me my stuff," said someone else's wrapper.
+        [%grab *]
+      ~|  %not-whitelisted
+      ?>  whitelisted
+      :_  this
+      :_  ~
+      ~|  [%has-no dap.cmd from=src.bowl]
+      %+  ~(poke pass:io /recoveries/(scot %p src.bowl)/[dap.cmd])
+        [src.bowl dap.cmd]
+      :-  %keep
+      !>(`wrap:poke`[%data data:(~(got by kept) [dap.cmd src.bowl]) key.cmd])
+    ::
+    ::  "I exist," said a wrapper on our own ship.
+        [%tell *]
+      ?>  =(src.bowl our.bowl)
+      ?:  (~(has in live) dap.cmd)  `this
+      =.  live  (~(put in live) dap.cmd)
+      :_  this
+      ~[(emit agent/s+dap.cmd)]
+    ::
+    ::  Successful backup
+        [%okay *]
+      :_  this
+      :_  ~
+      %+  emit  %success
+      %:  ok:event:json
+        dap.cmd
+        src.bowl
+        (~(got bi last) dap.cmd `src.bowl)
+        time.cmd
+      ==
+    ==
   ==
 ::
 ++  on-agent
@@ -200,7 +206,7 @@
     :_  this
     :~  (emit backup/(da:event:json dap `src.bowl now.bowl))
         %+  ~(poke pass:io /okay/(scot %p src.bowl)/[dap])  [src.bowl %keep]
-        keep-agent/!>(`agent:poke`[%okay dap now.bowl])
+        keep-internal/!>(`internal:agent:poke`[%okay dap now.bowl])
     ==
   ==
 ::
@@ -231,7 +237,7 @@
   ^-  (quip card _this)
   ?+    wire  (on-arvo:def wire sign-arvo)
       [%behn term ^]
-    (on-poke keep-agent/!>(`agent:poke`[%once &2.wire (of-wire |2.wire)]))
+    (on-poke keep-agent/!>(`user:agent:poke`[%once &2.wire (of-wire |2.wire)]))
   ::
       [%clay %deps %mult ~]
     ?>  ?=([%clay %wris *] sign-arvo)

@@ -34,7 +34,7 @@ export interface WyteAblePoke {
 }
 
 export interface CopyDepsPayload {
-  copy: {
+  wrap: {
     desk: string;
     dude: string;
   };
