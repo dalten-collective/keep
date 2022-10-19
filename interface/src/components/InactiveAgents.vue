@@ -239,7 +239,7 @@ export default defineComponent({
     copyDepsFor(deskName: string, agentName: string) {
       this.preparePending = true;
       const payload: CopyDepsPayload = {
-        copy: {
+        wrap: {
           desk: deskName,
           dude: agentName,
         },
