@@ -1,20 +1,20 @@
 ::
-::  keep agent pokes
+::  keep agent user pokes
 ::
 /=  sur  /keep/sur/keep
 =,  sur
 ::
-|_  =agent:poke
+|_  pok=user:agent:poke
 ++  grad  %noun
 ++  grow
   |%
-  ++  noun  agent
+  ++  noun  pok
   --
 ++  grab
   |%
-  ++  noun  agent:poke
+  ++  noun  user:agent:poke
   ++  json
-    %+  corl  agent:poke
+    %+  corl  user:agent:poke
     =,  dejs:format
     %-  of
     :~  [%able (ot ~[able/bo ship/(se %p)])]
