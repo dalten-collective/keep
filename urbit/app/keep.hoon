@@ -114,7 +114,7 @@
       ?:(on.cmd res res)
     ::
     ::  "Copy the wrapper to a desk," said our operator.
-        [%copy *]
+        [%wrap *]
       ?>  =(src.bowl our.bowl)
       =;  caz=(list card)
         =.  into  (~(put ju into) desk.cmd dude.cmd)
