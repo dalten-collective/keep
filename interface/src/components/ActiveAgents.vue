@@ -3,23 +3,8 @@
 
     <div class="tw-flex tw-space-between tw-mb-4">
       <div class="tw-grow">
-        <h3 class="tw-text-3xl tw-font-silom">Active Agents</h3>
+        <h3 class="tw-text-3xl tw-mb-6 tw-font-silom">Kept Agents</h3>
       </div>
-      <!--
-      <div>
-        <v-btn
-          :loading="activePending"
-          :disabled="activePending"
-          color="white"
-          variant="tonal"
-          class="tw-inline-block text-success"
-          @click="getActive"
-        >
-          <v-icon start>mdi-cached</v-icon>
-          refresh
-        </v-btn>
-      </div>
-      -->
     </div>
 
     <div v-if="!agents || agents.length === 0">
@@ -29,11 +14,11 @@
     </div>
 
     <div v-else>
-      <div v-if="activeAgents.length === 0">No active agents</div>
-      <div v-else v-for="agent in orderedActiveAgents" :key="agent" class="tw-my-2">
+      <div v-if="agents.length === 0">No active agents</div>
+      <div v-else v-for="agent in orderedAgents" :key="agent" class="tw-my-2">
         <KeepAgent
-          :agent-name="agent.agentName"
-          class="tw-p-2 tw-my-4 tw-bg-white tw-border tw-rounded-keep"
+          :agent-name="agent"
+          class="tw-p-2 tw-my-6 tw-bg-white tw-border tw-shadow-md tw-rounded-keep"
         />
       </div>
     </div>
@@ -56,8 +41,8 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters("keep", ["agents", "activeAgents"]),
-    orderedActiveAgents() {
-      return this.activeAgents.slice().sort((a, b) => {
+    orderedAgents() {
+      return this.agents.slice().sort((a, b) => {
         if (a.agentName < b.agentName) {
           return -1;
         }
@@ -78,20 +63,11 @@ export default defineComponent({
   },
   methods: {
     testScry() {
-      console.log("scrying ", this.scryApp, this.scryPath);
       const scry: Scry = { app: this.scryApp, path: this.scryPath };
       this.$store.dispatch("keep/scry", scry);
     },
     closeAgentAirlock() {
       this.$store.dispatch("ship/closeKeepAirlock");
-    },
-
-    getActive() {
-      // TODO:
-      this.activePending = true;
-      setTimeout(() => {
-        this.activePending = false;
-      }, 400);
     },
   },
 });

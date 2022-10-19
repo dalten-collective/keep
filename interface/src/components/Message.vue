@@ -139,26 +139,6 @@ export default defineComponent({
     clearAll() {
       this.$store.dispatch("message/clearMessages");
     },
-    // TODO: remove
-    addMessages() {
-      const messages = [
-        {
-          msg: "test",
-          time: 12344,
-        },
-        {
-          msg: "test 2",
-          time: 12345,
-        },
-        {
-          msg: "test 3",
-          time: 12346,
-        },
-      ];
-      messages.forEach((m) => {
-        this.$store.dispatch("message/addMessage", m);
-      });
-    },
     collapse() {
       this.collapsed = true;
     },

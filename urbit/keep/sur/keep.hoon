@@ -11,16 +11,16 @@
         [%tell dap=dude]                :: Register wrapped agent
         [%able (each ship ship)]
         [%wyte on=?]
-        [%copy to=desk]
+        [%copy =desk =dude]
+        [%once dap=dude to=(unit ship)]
+        [%many dap=dude to=(unit ship) freq=(unit @dr)] :: Repeat backup
+        [%okay dap=dude time=@da]
     ==
   ::                                           :: To the wrapper.
   +$  wrap                                     ::
-    $%  [%once to=(unit ship)]                 :: Backup to a ship or the put dir
-        [%many to=(unit ship) freq=(unit @dr)] :: Repeat backup
+    $%  [%send to=(unit ship)]                 :: Backup to a ship or the put dir
         [%mend from=ship]                      :: Initiate recovery
         [%data data=noun key=term]             :: Old state and secret (internal only)
-        [%live live=?]                         :: (De)activate. Deact before uninstall!
-        [%okay time=@da]
     ==
   --
 --

@@ -14,13 +14,15 @@
   |%
   ++  noun  agent:poke
   ++  json
-    %+  corl  $<(?(%init %grab) agent:poke)
+    %+  corl  agent:poke
     =,  dejs:format
     %-  of
-    :~  [%tell (ot ~[['dap' so] ['live' bo]])]
-        [%able (ot ~[able+bo ship+(se %p)])]
+    :~  [%able (ot ~[able/bo ship/(se %p)])]
         [%wyte bo]
-        [%copy so]
+        [%copy (ot ~[desk/so dude/so])]
+        [%once (ot ~[from/so to/(mu (se %p))])]
+        :-  %many
+        (ot ~[from/so to/(mu (se %p)) freq/(cu (lift (cury mul ~s1)) (mu ni))])
     ==
   --
 --

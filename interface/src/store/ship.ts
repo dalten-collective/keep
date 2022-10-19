@@ -3,7 +3,8 @@ import airlock from "../api";
 import {
   AgentSubscription,
   KeepAgentSubscriptionResponse,
-  KeepSubscriptionResponse,
+  KeepWrapperSubscriptionResponse,
+  KeepWrapperState,
   EventType,
 } from "@/types";
 
@@ -13,6 +14,8 @@ export default {
     return {
       subscriptions: [] as Array<AgentSubscription>,
       installedDesks: [] as Array<string>,
+      haveInitialAirlock: false,
+      haveAllSubscriptions: false,
     };
   },
 
@@ -47,45 +50,49 @@ export default {
       const sub = state.subscriptions.find((s) => s === subscription);
       state.subscriptions = state.subscriptions.filter((s) => s != sub);
     },
+
+    doHaveInitialAirlock(state) {
+      state.haveInitialAirlock = true;
+    },
+    doHaveAllSubscriptions(state) {
+      state.haveAllSubscriptions = true;
+    }
   },
 
   actions: {
     setDesks({ commit }, desks: Array<string>) {
-      commit('setDesks', desks)
+      commit("setDesks", desks);
     },
 
-    openKeepAirlock({ dispatch }) {
-      console.log("opening to keep...");
+    setHaveAllSubscriptions({ commit }) {
+      commit("doHaveAllSubscriptions")
+    },
+
+    openKeepAirlock({ dispatch, commit }) {
       airlock.openKeepAirlock(
-        (data: KeepSubscriptionResponse) => {
-          console.log("keep data ", data);
+        (data: KeepAgentSubscriptionResponse) => {
+          commit("doHaveInitialAirlock")
 
           if (data.type === EventType.Initial) {
+            dispatch("keep/handleKeepResponseState", data.state, {
+              root: true,
+            });
+
             const agents = data.state.agents;
-            dispatch("keep/setAgents", agents, { root: true }).then(
-              () => {
-                dispatch("keep/openAgentAirlocks", agents, {
-                  root: true,
-                });
-              }
-            );
+            dispatch("keep/setAgents", agents, { root: true }).then(() => {
+              dispatch("keep/openAgentAirlocks", agents, {
+                root: true,
+              });
+            });
           }
 
-          dispatch("keep/handleKeepResponseState", data.state, {
+          dispatch("keep/handleKeepAgentDiff", data, {
             root: true,
           });
-          // TODO:
-          //dispatch("keep/handleKeepResponseType", data.type, { root: true });
-          // TODO:
-          dispatch(
-            "keep/handleKeepResponseDiff",
-            { diff: data.diff, responseType: data.type, state: data.state },
-            { root: true }
-          );
+
         },
         (subscriptionNumber: number) => {
-          console.log("keep sub: ", subscriptionNumber);
-          // TODO: this should be close, I think.
+          // TODO: this should be close?
           dispatch("addSubscription", {
             agentName: "keep",
             subscriptionNumber,
@@ -97,27 +104,30 @@ export default {
     openAirlockToAgent({ dispatch, commit }, agentName: string) {
       airlock.openAirlockTo(
         agentName,
-        (data: KeepAgentSubscriptionResponse) => {
-          console.log("agentName ", agentName);
-          console.log(
-            `sub-agent response ('${agentName}' agent)`,
-            data
-          );
-
+        (data: KeepWrapperSubscriptionResponse) => {
           // Only set full state on initial. all else through diffs (below)
-          if (data.type == "initial") {
+          if (data.type == EventType.Initial) {
+            const payload: { agentName: AgentName; state: KeepWrapperState } = {
+              agentName,
+              state: data.state
+            }
             dispatch(
-              "keep/handleAgentResponseState",
-              { agentName, responseState: data.state },
+              "keep/handleWrapperResponseState",
+              payload,
+              { root: true }
+            );
+          } else {
+            dispatch(
+              "keep/handleKeepWrapperDiff",
+              { data, agentName },
               { root: true }
             );
           }
-
-          dispatch(
-            "keep/handleAgentResponseType",
-            { agentName, responseType: data.type, diff: data.diff },
-            { root: true }
-          );
+          // dispatch(
+          //   "keep/handleAgentResponseType",
+          //   { agentName, responseType: data.type, diff: data.diff },
+          //   { root: true }
+          // );
         },
         (subscriptionNumber: number) => {
           dispatch("addSubscription", {
@@ -132,10 +142,7 @@ export default {
       commit("unsetSubscription", subscription);
     },
 
-    addSubscription(
-      { state, commit, dispatch },
-      payload: AgentSubscription
-    ) {
+    addSubscription({ state, commit, dispatch }, payload: AgentSubscription) {
       const existing:
         | Array<AgentSubscription>
         | [] = state.subscriptions.filter((s: AgentSubscription) => {
