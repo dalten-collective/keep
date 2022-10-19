@@ -62,7 +62,6 @@
 ::
 ++  on-poke
   |=  [=mark =vase]
-  ~&  >  "on-poke with mark {(trip mark)}"
   ^-  (quip card _this)
   ?+    mark  (on-poke mark vase)
       %keep-agent
