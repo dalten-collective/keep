@@ -1,7 +1,8 @@
 :~  title+'Keep'
     info+'Back up your Urbit.'
     color+0x81.88c9
-    glob-http+['https://freedom-club.sfo2.digitaloceanspaces.com/glob-0v3.qnl5j.oht20.jjdnj.qe8m7.pfi97.glob' 0v3.qnl5j.oht20.jjdnj.qe8m7.pfi97]
+    image+'https://freedom-club.sfo2.digitaloceanspaces.com/props/quartus/long-logo/ab_Quartus-05_only.png'
+    glob-http+['https://freedom-club.sfo2.digitaloceanspaces.com/glob-0v5.euc6k.vcrk7.8en1j.415pq.4tbt9.glob' 0v5.euc6k.vcrk7.8en1j.415pq.4tbt9]
     base+'keep'
     version+[0 1 0]
     website+'https://dalten.org/'
