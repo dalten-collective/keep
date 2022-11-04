@@ -287,6 +287,7 @@
     ?.  ?=(%hoon p.r.u.p.sign-arvo)
       ~&  >>>  "-keep-wrong-mark {<p.r.u.p.sign-arvo>}"  ~
     ::
+    :-  (info-deps:disk deps:disk desk)
     (info-dude:disk desk dude !<(@t q.r.u.p.sign-arvo))
   ==
 ::
